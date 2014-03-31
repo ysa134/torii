@@ -15,13 +15,13 @@ module.exports = function(grunt) {
   var config = {
     cfg: {
       // Name of the project
-      name: 'rsvp-tools.js',
+      name: 'torii',
 
-      // Name of the root module (i.e. 'rsvp-tools' -> 'lib/rsvp-tools.js')
-      barename: 'rsvp-tools',
+      // Name of the root module (i.e. 'torii' -> 'lib/torii.js')
+      barename: 'torii',
 
       // Name of the global namespace to export to
-      namespace: 'rsvpTools'
+      namespace: 'torii'
     },
     env: process.env,
 
