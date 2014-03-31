@@ -1,0 +1,32 @@
+{
+  "name": "torii.js",
+  "description": "A set of clean abstractions for authentication in Ember.js",
+  "authors": [
+    "Cory Forsyth <cory.forsyth@gmail.com>",
+    "Matthew Beale <matt.beale@madhatted.com>"
+  ],
+  "keywords": [
+    "authentication",
+    "ember.js"
+  ],
+  "version": "0.0.1",
+  "license": "MIT",
+  "ignore": [
+    "Gruntfile.js",
+    "node_modules",
+    "bower_components",
+    "test",
+    "options",
+    "lib"
+  ],
+  "main": [
+    "dist/torii.js",
+    "dist/torii.amd.js",
+    "dist/torii.min.js",
+    "dist/commonjs/main.js"
+  ],
+  "repo": "201-created/torii",
+  "dependencies": {
+    "rsvp": "~3.0"
+  }
+}

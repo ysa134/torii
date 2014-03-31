@@ -1,4 +1,4 @@
 torii
 =====
 
-Ember Auth. Torii.
+A set of clean abstractions for authentication in Ember.js
