@@ -1,0 +1,9 @@
+{
+  "framework": "qunit",
+  "test_page": "test/index.html",
+  "routes": {
+  },
+  "src_files": [
+  ],
+  "launch_in_dev": ["PhantomJS", "Chrome"]
+}

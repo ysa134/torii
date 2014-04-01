@@ -1,38 +1,90 @@
 module.exports = function(grunt) {
-  // Load grunt-microlib config & tasks
-  var emberConfig = require('grunt-microlib').init.bind(this)(grunt);
-  grunt.loadNpmTasks('grunt-microlib');
+  require('load-grunt-tasks')(grunt);
+  var config = require('load-grunt-config')(grunt, {
+    configPath: 'tasks/options',
+    init: false
+  });
+
+  grunt.loadTasks('tasks');
+
+  this.registerTask('default', ['build']);
+
+// Run client-side tests on the command line.
+  this.registerTask('test', 'Runs tests through the command line using PhantomJS', [
+    'build',
+    'tests',
+    'connect'
+  ]);
+
+  // Run a server. This is ideal for running the QUnit tests in the browser.
+  this.registerTask('server', [
+    'build',
+    'tests',
+    'connect',
+    'watch:server'
+  ]);
+
+
+  // Build test files
+  this.registerTask('tests', 'Builds the test package', [
+    'concat:deps',
+    'transpile:testsAmd',
+    'transpile:testsCommonjs',
+    'concat:amdNodeTests', // yet another hack to get es6 transpiled tests
+    'concat:amdTests' // yet another hack to get es6 transpiled tests
+  ]);
+
+  // Build a new version of the library
+  this.registerTask('build', 'Builds a distributable version of <%= cfg.name %>', [
+    'clean',
+    'transpile:amd',
+    'transpile:commonjs',
+    'concat:amd',
+    'concat:browser',
+    'concat:amdNoVersion',
+    'jshint',
+    'uglify:browser'
+  ]);
 
   // Custom phantomjs test task
   this.registerTask('test:phantom', "Runs tests through the command line using PhantomJS", [
-                    'buildNoVersion', 'tests']);
+    'build',
+    'tests'
+  ]);
 
   // Custom Node test task
-  this.registerTask('test', ['buildNoVersion', 'tests', 'connect', 'qunit']);
-  this.registerTask('default', ['buildNoVersion']);
-  this.registerTask('server', ['buildNoVersion', 'tests', 'connect', 'watch:server']);
+  this.registerTask('test:node', [
+    'build',
+    'tests',
+    'mochaTest'
+  ]);
 
-  var config = {
-    cfg: {
-      // Name of the project
-      name: 'torii',
+  this.registerTask('test', [
+    'build',
+    'tests',
+    'testem:ci:basic'
+  ]);
 
-      // Name of the root module (i.e. 'torii' -> 'lib/torii.js')
-      barename: 'torii',
+  this.registerTask('build-release', [
+    'clean:build',
+    'transpile:amd',
+    'transpile:commonjs',
+    'transpile:amdNoVersion',
+    'concat:browser',
+    'concat:amdNoVersion',
+    'uglify:browserNoVersion'
+  ])
 
-      // Name of the global namespace to export to
-      namespace: 'torii'
-    },
-    env: process.env,
+  // Custom YUIDoc task
+  this.registerTask('docs', ['yuidoc']);
 
-    pkg: grunt.file.readJSON('package.json'),
-
-    browserify: require('./options/browserify.js')
-  };
-
-  // Merge config into emberConfig, overwriting existing settings
-  grunt.initConfig(grunt.util._.merge(emberConfig, config));
+  config.env = process.env;
+  config.pkg = grunt.file.readJSON('package.json');
 
   // Load custom tasks from NPM
-  grunt.loadNpmTasks('grunt-browserify');
+  grunt.loadNpmTasks('grunt-contrib-yuidoc');
+  grunt.loadNpmTasks('grunt-release-it');
+
+  // Merge config into emberConfig, overwriting existing settings
+  grunt.initConfig(config);
 };

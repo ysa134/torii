@@ -1,32 +1,22 @@
 {
-  "name": "torii.js",
-  "description": "A set of clean abstractions for authentication in Ember.js",
-  "authors": [
-    "Cory Forsyth <cory.forsyth@gmail.com>",
-    "Matthew Beale <matt.beale@madhatted.com>"
-  ],
+  "name": "torii",
+  "description": "",
   "keywords": [
     "authentication",
-    "ember.js"
+    "ember"
   ],
-  "version": "0.0.1",
-  "license": "MIT",
-  "ignore": [
-    "Gruntfile.js",
-    "node_modules",
-    "bower_components",
-    "test",
-    "options",
-    "lib"
+  "version": "",
+  "scripts": [
+    "main.js"
   ],
-  "main": [
-    "dist/torii.js",
-    "dist/torii.amd.js",
-    "dist/torii.min.js",
-    "dist/commonjs/main.js"
-  ],
-  "repo": "201-created/torii",
+  "repo": "201-created/torii.js",
   "dependencies": {
-    "ember": "~1.5"
+    "handlebars": "~1.3.0",
+    "jquery": "~1.9.1",
+    "qunit": "~1.12.0",
+    "ember-qunit": "~0.1.5",
+    "ember": "1.5.0",
+    "ember-resolver": "git://github.com/stefanpenner/ember-jj-abrams-resolver.git#master",
+    "loader": "git://github.com/stefanpenner/loader.js#1.0.0"
   }
 }
