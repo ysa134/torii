@@ -27,6 +27,6 @@
   ],
   "repo": "201-created/torii",
   "dependencies": {
-    "rsvp": "~3.0"
+    "ember": "~1.5"
   }
 }
