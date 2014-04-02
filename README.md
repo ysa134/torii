@@ -13,11 +13,8 @@ Use [YUIDoc](http://yui.github.io/yuidoc/).
 
 ## Run the example app
 
-After building the code, start a simple server:
-
-  * `npm install -g http-server`
-  * `http-server .`
-  * open [http://localhost:8080/example](http://localhost:8080/example)
+  * Start the server: `grunt server`
+  * open [http://localhost:8000/example](http://localhost:8000/example)
 
 ## Supported Authentication Endpoints
 
