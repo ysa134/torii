@@ -1,0 +1,112 @@
+{
+    "project": {
+        "name": "Torii",
+        "description": "Ember Auth Library",
+        "version": "0.1",
+        "url": "http://201-created.github.io/torii"
+    },
+    "files": {
+        "lib/torii/endpoints/linked-in-oauth2.js": {
+            "name": "lib/torii/endpoints/linked-in-oauth2.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "lib/torii.js": {
+            "name": "lib/torii.js",
+            "modules": {},
+            "classes": {
+                "Torii": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        }
+    },
+    "modules": {},
+    "classes": {
+        "Torii": {
+            "name": "Torii",
+            "shortname": "Torii",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "file": "lib/torii.js",
+            "line": 12,
+            "description": "Torii is an engine for authenticating against various\nendpoints. For example, you can open a session with\nLinked In via Oauth2 and authorization codes by doing\nthe following:\n\n    Torii.open('linked-in-oauth2').then(function(authData){\n      console.log(authData.authorizationCode);\n    });\n\nFor traditional authentication flows, you will often use\nTorii via the Torii.Session API."
+        }
+    },
+    "classitems": [
+        {
+            "file": "lib/torii/endpoints/linked-in-oauth2.js",
+            "line": 1,
+            "description": "This class implements authentication against Linked In\nusing the OAuth2 authorizatin flow in a popup window.",
+            "class": "Torii"
+        },
+        {
+            "file": "lib/torii.js",
+            "line": 29,
+            "description": "Open an authorization against an API. A promise resolving\nwith an authentication response object is returned. These\nresponse objects,  are found in the \"torii/authentications\"\nnamespace.",
+            "itemtype": "method",
+            "name": "open",
+            "params": [
+                {
+                    "name": "endpointName",
+                    "description": "The endpoint to open",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "Promise resolving to an authentication object",
+                "type": "Ember.RSVP.Promise"
+            },
+            "class": "Torii"
+        },
+        {
+            "file": "lib/torii.js",
+            "line": 41,
+            "description": "Return a promise which will resolve if the endpoint has\nalready been opened. This may be async.",
+            "itemtype": "method",
+            "name": "fetch",
+            "params": [
+                {
+                    "name": "endpointName",
+                    "description": "The endpoint to open",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "Promise resolving to an authentication object",
+                "type": "Ember.RSVP.Promise"
+            },
+            "class": "Torii"
+        },
+        {
+            "file": "lib/torii.js",
+            "line": 51,
+            "description": "Return a promise which will resolve when the endpoing has\nbeen closed. Closing an endpoint may not always be a\nmeaningful action.",
+            "itemtype": "method",
+            "name": "close",
+            "params": [
+                {
+                    "name": "endpointName",
+                    "description": "The endpoint to close",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "Promise resolving to an authentication object",
+                "type": "Ember.RSVP.Promise"
+            },
+            "class": "Torii"
+        }
+    ],
+    "warnings": [
+        {
+            "message": "Missing item type\nThis class implements authentication against Linked In\nusing the OAuth2 authorizatin flow in a popup window.",
+            "line": " lib/torii/endpoints/linked-in-oauth2.js:1"
+        }
+    ]
+}
