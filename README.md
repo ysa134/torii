@@ -18,3 +18,7 @@ After building the code, start a simple server:
   * `npm install -g http-server`
   * `http-server .`
   * open [http://localhost:8080/example](http://localhost:8080/example)
+
+## Supported Authentication Endpoints
+
+  * LinkedIn ([Dev Site](https://www.linkedin.com/secure/developer) | [Docs](http://developer.linkedin.com/))
