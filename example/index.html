@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>LibKit Tests</title>
+    <meta name='description' content=''>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+    <link rel="stylesheet" href='app.css'>
+
+
+  </head>
+  <body>
+
+    <script type="text/x-handlebars">
+      <h2>Torii: Example Usage</h2>
+
+      <button {{action "authenticate" "linked-in-oauth2"}}>Linked In</button>
+      <button {{action "authenticate" "dummy-success"}}>Dummy Success</button>
+      <button {{action "authenticate" "dummy-failure"}}>Dummy Failure</button>
+
+      <div>
+        Auth data: {{authData}}
+      </div>
+    </script>
+
+    <script src='../bower_components/loader/loader.js'></script>
+    <script src='../bower_components/jquery/dist/jquery.js'></script>
+    <script src='../bower_components/handlebars/handlebars.js'></script>
+    <script src='../bower_components/ember/ember.js'></script>
+    <script src='../vendor/ember-shim.js'></script>
+    <script src='../bower_components/ember-resolver/dist/ember-resolver.js'></script>
+    <script src='../dist/torii.amd.js'></script>
+
+    <script src='app.js'></script>
+  </body>
+</html>
