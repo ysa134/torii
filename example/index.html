@@ -21,7 +21,12 @@
       <button {{action "authenticate" "dummy-failure"}}>Dummy Failure</button>
 
       <div>
-        Auth data: {{authData}}
+        Auth data: {{#if authData}}
+        { type: {{authData.type}} }
+        {{/if}}
+      </div>
+      <div>
+        Error data: {{error}}
       </div>
     </script>
 
