@@ -19,3 +19,4 @@ Use [YUIDoc](http://yui.github.io/yuidoc/).
 ## Supported Authentication Endpoints
 
   * LinkedIn ([Dev Site](https://www.linkedin.com/secure/developer) | [Docs](http://developer.linkedin.com/))
+  * Google ([Dev Site](https://console.developers.google.com/project) | [Docs](https://developers.google.com/accounts/docs/OAuth2WebServer))
