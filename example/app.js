@@ -2,8 +2,13 @@
 // we doing this?
 var configuration = require('torii/configuration').default;
 
-configuration.endpoints.linkedInOauth2 = {
+configuration.endpoints['linked-in-oauth2'] = {
   apiKey: '772yus6d70pf11'
+};
+
+configuration.endpoints['google-oauth2'] = {
+  redirectUri: 'http://localhost:8000/example/',
+  apiKey:      '139338504777-vqu8ikemg935k1kivsku7fv3cfgq9452.apps.googleusercontent.com'
 };
 
 require("torii/ember");

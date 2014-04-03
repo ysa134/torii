@@ -33,3 +33,15 @@ test("torii fails to open a dummy-failure endpoint", function(){
     });
   });
 });
+
+test('raises on a bad endpoint name', function(){
+  var thrown = false, message;
+  try {
+    torii.open('bs-man');
+  } catch (e) {
+    thrown = true;
+    message = e.message;
+  }
+  ok(thrown, "Error thrown");
+  ok(/Expected an endpoint named bs-man/.test(message), 'correct error thrown');
+});
