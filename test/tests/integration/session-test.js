@@ -7,6 +7,7 @@ module('Session - Integration', {
   setup: function(){
     container = toriiContainer();
     container.register('torii:session', Session);
+    container.injection('torii:session', 'torii', 'torii:main');
     session = container.lookup('torii:session');
   },
   teardown: function(){
@@ -49,11 +50,10 @@ test("failed auth sets isAuthenticated to false, sets error", function(){
     session.open('dummy-failure').then(function(){
       ok(false, 'should not resolve promise');
     }, function(err){
-      ok(true, 'resolves promise');
+      ok(true, 'rejects promise');
 
       ok(!session.get('isOpening'), 'session is no longer opening');
       ok(!session.get('isAuthenticated'), 'session is not authenticated');
-      ok(session.get('error'), 'session has error');
       ok(session.get('errorMessage'), 'session has error message');
     });
   });
