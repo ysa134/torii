@@ -29,3 +29,7 @@ App.ApplicationRoute = Ember.Route.extend({
     }
   }
 });
+
+Ember.Handlebars.registerBoundHelper('inspect-object', function(obj){
+  return new Handlebars.SafeString(JSON.stringify(obj));
+});
