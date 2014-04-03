@@ -3,14 +3,20 @@ var torii, app, session, container;
 import 'torii/ember'; // side effect: registers 'torii:main'
 import startApp from 'test/helpers/start-app';
 
+import configuration from 'torii/configuration';
+
+var originalConfiguration = configuration.endpoints.linkedInOauth2;
+
 module('Linked In - Acceptance', {
   setup: function(){
     app = startApp();
     container = app.__container__;
     torii = container.lookup("torii:main");
     session = container.lookup("torii:session");
+    configuration.endpoints.linkedInOauth2 = {apiKey: 'dummy'};
   },
   teardown: function(){
+    configuration.endpoints.linkedInOauth2 = originalConfiguration;
     Ember.run(app, 'destroy');
   }
 });

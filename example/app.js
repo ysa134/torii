@@ -1,5 +1,11 @@
 // If the user does not have a module system, how are
 // we doing this?
+var configuration = require('torii/configuration').default;
+
+configuration.endpoints.linkedInOauth2 = {
+  apiKey: '772yus6d70pf11'
+};
+
 require("torii/ember");
 
 var App = Ember.Application.create();
