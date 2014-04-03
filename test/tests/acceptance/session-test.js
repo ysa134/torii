@@ -37,11 +37,3 @@ test("dummy-failure session fails to open", function(){
     });
   });
 });
-
-/* Session still lacks definition
- *
-test("Opens a popup to Linked In", function(){
-  session.open("linked-in-oauth2");
-  equal(session.isOpening, true);
-});
-*/
