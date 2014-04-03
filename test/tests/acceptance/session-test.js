@@ -21,8 +21,8 @@ test("dummy-success session successfully opens", function(){
     session.open('dummy-success').then(function(user){
       ok(true, 'resolves promise');
       ok(user.get('email'), 'user has email');
-    }, function(){
-      ok(false, 'failed to resolve promise');
+    }, function(err){
+      ok(false, 'failed to resolve promise: '+err);
     });
   });
 });
