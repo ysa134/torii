@@ -5,16 +5,22 @@ import QueryString from 'torii/lib/query-string';
 var obj,
     clientId = 'abcdef',
     responseType = 'code',
-    redirectUri = 'http://localhost.dev:3000/xyz/pdq';
+    redirectUri = 'http://localhost.dev:3000/xyz/pdq',
+    optionalProperty = 'i-am-optional';
 
 module('QueryString - Unit', {
   setup: function(){
     obj = Ember.Object.create({
-      clientId: clientId,
-      responseType: responseType,
-      redirectUri: redirectUri,
-      additional_param: 'not-camelized'
+      clientId:         clientId,
+      responseType:     responseType,
+      redirectUri:      redirectUri,
+      additional_param: 'not-camelized',
+      optionalProperty: optionalProperty,
+      falseProp: false
     });
+  },
+  teardown: function(){
+    Ember.run(obj, 'destroy');
   }
 });
 
@@ -57,4 +63,28 @@ test('throws error if property does not exist', function(){
     qs.toString();
   }, /Missing url param.*nonexistent_property/,
      'throws error when property does not exist');
+});
+
+test('no error thrown when specifying optional properties that do not exist', function(){
+  var qs = new QueryString(obj, [], ['nonexistent_property']);
+
+  equal(qs.toString(), '',
+        'empty query string with nonexistent optional param');
+
+});
+
+test('optional properties is added if it does exist', function(){
+  var qs = new QueryString(obj, [], ['optional_property']);
+
+  equal(qs.toString(), 'optional_property='+optionalProperty,
+        'optional_property is populated when the value is there');
+
+});
+
+test('value of false gets into url', function(){
+  var qs = new QueryString(obj, ['false_prop']);
+
+  equal(qs.toString(), 'false_prop=false',
+        'false_prop is in url even when false');
+
 });
