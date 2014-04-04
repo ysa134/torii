@@ -1,3 +1,5 @@
+/* global Handlebars */
+
 // If the user does not have a module system, how are
 // we doing this?
 var configuration = require('torii/configuration').default;
@@ -9,6 +11,10 @@ configuration.endpoints['linked-in-oauth2'] = {
 configuration.endpoints['google-oauth2'] = {
   redirectUri: 'http://localhost:8000/example/',
   apiKey:      '139338504777-vqu8ikemg935k1kivsku7fv3cfgq9452.apps.googleusercontent.com'
+};
+
+configuration.endpoints['facebook-connect'] = {
+  appId:      '744221908941738'
 };
 
 require("torii/ember");
