@@ -5,6 +5,12 @@ Ember.testing = true;
 import resolver from './helpers/resolver';
 require('ember-qunit').setResolver(resolver);
 
+// Make getScript into a no-op
+$.getScript = Ember.RSVP.resolve;
+
+import buildFBMock from 'test/helpers/build-fb-mock';
+window.FB = buildFBMock();
+
 function exists(selector) {
   return !!find(selector).length;
 }
