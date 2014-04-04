@@ -12,7 +12,7 @@ module('Facebook Connect - Integration', {
   setup: function(){
     container = toriiContainer();
     torii = container.lookup('torii:main');
-    configuration.endpoints['facebook-connect'] = {apiKey: 'dummy'};
+    configuration.endpoints['facebook-connect'] = {appId: 'dummy'};
     window.FB = buildFBMock();
   },
   teardown: function(){
