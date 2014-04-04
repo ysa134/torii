@@ -17,6 +17,11 @@ configuration.endpoints['facebook-connect'] = {
   appId:      '744221908941738'
 };
 
+configuration.endpoints['facebook-oauth2'] = {
+  apiKey:      '744221908941738',
+  redirectUri: 'http://localhost.dev:8000/example/'
+};
+
 require("torii/ember");
 
 var App = Ember.Application.create();
