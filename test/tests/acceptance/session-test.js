@@ -18,9 +18,9 @@ module('Session - Acceptance', {
 test("dummy-success session successfully opens", function(){
 
   Ember.run(function(){
-    session.open('dummy-success').then(function(user){
+    session.open('dummy-success').then(function(){
       ok(true, 'resolves promise');
-      ok(user.get('email'), 'user has email');
+      ok(session.get('currentUser.email'), 'user has email');
     }, function(err){
       ok(false, 'failed to resolve promise: '+err);
     });
@@ -30,7 +30,7 @@ test("dummy-success session successfully opens", function(){
 test("dummy-failure session fails to open", function(){
 
   Ember.run(function(){
-    session.open('dummy-failure').then(function(user){
+    session.open('dummy-failure').then(function(){
       ok(false, 'should not resolve promise');
     }, function(error){
       ok(true, 'fails to resolve promise');

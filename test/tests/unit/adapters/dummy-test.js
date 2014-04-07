@@ -13,9 +13,9 @@ module("DummyAdapter - Unit", {
 
 test("open resolves with a user", function(){
   Ember.run(function(){
-    adapter.open().then(function(user){
+    adapter.open().then(function(data){
       ok(true, 'resolved');
-      ok(user.get('email'), 'dummy user has email');
+      ok(Ember.get(data,'currentUser.email'), 'dummy user has email');
     });
   });
 });
