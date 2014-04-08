@@ -59,3 +59,9 @@ test("it read default values from a function", function(){
   var value = testable.get('defaultedFunction');
   equal(value, 'found-via-get');
 });
+
+/* window.ENV is set in index.html */
+test("it will read off of window.ENV.torii", function(){
+  ok(configuration.didLoadFromEnv,
+     'configuration read from window.ENV.torii');
+});

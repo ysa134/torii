@@ -43,6 +43,7 @@
     <div id="qunit-fixture"></div>
     <script src='../tmp/tests.amd.js'></script>
     <script>
+      window.ENV = {torii: { didLoadFromEnv: true } };
       require('test/test-helper');
       require('test/test-loader');
     </script>
