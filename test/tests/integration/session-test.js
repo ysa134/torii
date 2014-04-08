@@ -89,7 +89,7 @@ test("starting close sets isWorking to true", function(){
     ok(true, 'calls adapter.close');
     ok(session.get('isWorking'), 'session.isWorking is true');
     return Ember.RSVP.resolve();
-  }
+  };
 
   Ember.run(function(){
     session.close();
@@ -99,7 +99,7 @@ test("starting close sets isWorking to true", function(){
 test("finished close sets isWorking to false, isAuthenticated false", function(){
   adapter.close = function(){
     return Ember.RSVP.resolve();
-  }
+  };
 
   Ember.run(function(){
     session.close().then(function(){
@@ -117,7 +117,7 @@ test("failed close sets isWorking to false, isAuthenticated true, error", functi
 
   adapter.close = function(){
     return Ember.RSVP.reject(error);
-  }
+  };
 
   Ember.run(function(){
     session.close().then(function(){
@@ -128,38 +128,4 @@ test("failed close sets isWorking to false, isAuthenticated true, error", functi
       equal(session.get('errorMessage'), error, "error is present");
     });
   });
-});
-
-module('Session (fetch) - Integration', {
-  setup: function(){
-    container = toriiContainer();
-    container.register('torii:session', Session);
-    container.injection('torii:session', 'torii', 'torii:main');
-    session = container.lookup('torii:session');
-    adapter = container.lookup('torii-adapter:application');
-  },
-  teardown: function(){
-    Ember.run(container, 'destroy');
-  }
-});
-
-test("session starts in unauthenticated unopened state", function(){
-  ok(!session.get('isAuthenticated'), 'not authenticated');
-});
-
-test("session fetch sets isWorking to true", function(){
-  var oldClose = adapter.close;
-
-  adapter.close = function(){
-    ok(true, 'calls adapter.close');
-    ok(session.get('isWorking'), 'session.isWorking is true');
-    return Ember.RSVP.resolve();
-  }
-
-  Ember.run(function(){
-    session.close();
-  });
-
-test("fetch session calls adapter", function(){
-  ok(!session.get('isAuthenticated'), 'not authenticated');
 });
