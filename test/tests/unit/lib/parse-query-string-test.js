@@ -21,3 +21,14 @@ test('parses keys without the hash fragment', function(){
   ok(result.code, 'gets code');
   equal(result.code, 'abcdef', 'gets correct code');
 });
+
+test('parses multiple keys', function(){
+  var url = 'http://localhost.dev:3000/xyz/?oauth_token=xxx&oauth_verifier=yyy';
+  var parser = new ParseQueryString(url, ['oauth_token','oauth_verifier']);
+
+  var result = parser.parse();
+  ok(result.oauth_token, 'gets token');
+  ok(result.oauth_verifier, 'gets verifier');
+  equal(result.oauth_token, 'xxx', 'gets correct token');
+  equal(result.oauth_verifier, 'yyy', 'gets correct verifier');
+});
