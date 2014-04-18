@@ -3,6 +3,10 @@ torii
 
 A set of clean abstractions for authentication in Ember.js
 
+<img src="https://assets-vestorly.s3.amazonaws.com/assets/vestorly-logo-new-8c1ab7b52a5d1e26cdaa83bb8b63a42d.png" height="140" />
+
+*Initial development of Torii was generously funded by [Vestorly](https://www.vestorly.com/). Vestorly is a technology company solving the client acquisition problem for professionals in wealth management, and the enterprises that support them. Vestorly's user interface is built entirely with Ember.js and modern web technologies. [jobs@vestorly.com](jobs@vestorly.com)*
+
 ## Generate docs
 
 Use [YUIDoc](http://yui.github.io/yuidoc/).
