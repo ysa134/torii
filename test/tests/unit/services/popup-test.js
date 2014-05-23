@@ -20,7 +20,7 @@ module("Popup - Unit", {
 
 asyncTest("open resolves based on popup window", function(){
   var expectedUrl = 'http://authServer',
-      expectedData = {__torii_message: true};
+      expectedData = "__torii_message:http://someurl.com?code=fr";
 
   window.open = function(url){
     ok(true, 'calls window.open');
@@ -30,9 +30,9 @@ asyncTest("open resolves based on popup window", function(){
   };
 
   Ember.run(function(){
-    popup.open(expectedUrl).then(function(data){
+    popup.open(expectedUrl, ['code']).then(function(data){
       ok(true, 'resolves promise');
-      deepEqual(data, expectedData, 'resolves with expected data');
+      deepEqual(data, {code: 'fr'}, 'resolves with expected data');
 
       start();
     });
