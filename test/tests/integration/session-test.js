@@ -32,13 +32,13 @@ test("starting auth sets isOpening to true", function(){
   };
 
   Ember.run(function(){
-    session.open('dummy-success');
+    session.open('dummy-success', {adapter: 'dummy'});
   });
 });
 
 test("successful auth sets isAuthenticated to true", function(){
   Ember.run(function(){
-    session.open('dummy-success').then(function(){
+    session.open('dummy-success', {adapter: 'dummy'}).then(function(){
       ok(!session.get('isOpening'), 'session is no longer opening');
       ok(session.get('isAuthenticated'), 'session is authenticated');
     });

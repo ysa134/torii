@@ -2,7 +2,6 @@ var torii, container;
 
 import toriiContainer from 'test/helpers/torii-container';
 import configuration from 'torii/configuration';
-import Oauth2Authentication from 'torii/authentications/oauth2';
 
 var originalConfiguration = configuration.endpoints['facebook-oauth2'];
 
@@ -40,9 +39,7 @@ test("Opens a popup to Facebook", function(){
 test("Resolves with an authentication object containing 'redirectUri'", function(){
   Ember.run(function(){
     torii.open('facebook-oauth2').then(function(data){
-      ok(data instanceof Oauth2Authentication,
-         'data is a type of Oauth2Authentication');
-      ok(data.get('redirectUri'),
+      ok(data.redirectUri,
          'Object has redirectUri');
     }, function(err){
       ok(false, 'Failed with err '+err);

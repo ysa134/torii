@@ -1,7 +1,6 @@
 var container, torii;
 
 import toriiContainer from 'test/helpers/torii-container';
-import DummyAuthentication from 'torii/authentications/dummy';
 
 module('Torii - Integration', {
   setup: function(){
@@ -15,9 +14,9 @@ module('Torii - Integration', {
 
 test("torii opens a dummy-success endpoint", function(){
   Ember.run(function(){
-    torii.open('dummy-success').then(function(authentication){
+    torii.open('dummy-success', {name: 'dummy'}).then(function(authentication){
       ok(true, 'torii resolves an open promise');
-      ok(DummyAuthentication.detectInstance(authentication), 'resolves with an authentication object');
+      equal(authentication.name, 'dummy', 'resolves with an authentication object');
     }, function(){
       ok(false, 'torii failed to resolves an open promise');
     });

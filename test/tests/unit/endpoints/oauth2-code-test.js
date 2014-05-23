@@ -4,7 +4,7 @@ import configuration from 'torii/configuration';
 
 var originalConfiguration = configuration.endpoints['mock-oauth2'];
 
-import BaseEndpoint from 'torii/endpoints/-oauth2-code';
+import BaseEndpoint from 'torii/endpoints/oauth2-code';
 
 var Endpoint = BaseEndpoint.extend({
   name: 'mock-oauth2',
@@ -12,7 +12,7 @@ var Endpoint = BaseEndpoint.extend({
   redirectUri: 'http://foo'
 });
 
-module('MockOauth2Endpoint (-oauth2-code subclass) - Unit', {
+module('MockOauth2Endpoint (oauth2-code subclass) - Unit', {
   setup: function(){
     configuration.endpoints['mock-oauth2'] = {};
     endpoint = new Endpoint();

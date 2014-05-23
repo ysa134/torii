@@ -1,8 +1,8 @@
-var torii, container;
-
 import toriiContainer from 'test/helpers/torii-container';
+import OAuth1Endpoint from 'torii/endpoints/oauth1';
 import configuration from 'torii/configuration';
 
+var torii, container;
 
 var opened, openedUrl, mockPopup = {
   open: function(url){
@@ -13,7 +13,7 @@ var opened, openedUrl, mockPopup = {
 };
 
 var requestTokenUri = 'http://localhost:3000/oauth/callback';
-var endpointName = '-oauth1';
+var endpointName = 'oauth1';
 var originalConfiguration = configuration.endpoints[endpointName];
 
 module('Oauth1 - Integration', {
@@ -21,6 +21,8 @@ module('Oauth1 - Integration', {
     container = toriiContainer();
     container.register('torii-service:mock-popup', mockPopup, {instantiate: false});
     container.injection('torii-endpoint', 'popup', 'torii-service:mock-popup');
+
+    container.register('torii-endpoint:'+endpointName, OAuth1Endpoint);
 
     torii = container.lookup("torii:main");
     configuration.endpoints[endpointName] = {requestTokenUri: requestTokenUri};
