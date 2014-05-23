@@ -10,7 +10,7 @@ authorization is destroyed.
 
 An endpoint in Torii is anything a user can authenticate against. This could be an
 OAuth 2.0 endpoint, your own login mechanism, or an SDK like Facebook Connect.
-Authenticating against an endpoint is done via the `torii` property, which is injected
+Authenticating against an **endpoint** is done via the `torii` property, which is injected
 on to routes:
 
 ```hbs
@@ -18,7 +18,7 @@ on to routes:
 {{if hasFacebook}}
   {{partial "comment-form"}}
 {{else}}
-  <a href="#" {{action 'sign-in-to-comment'}}>
+  <a href="#" {{action 'signInToComment'}}>
     Sign in to comment
   </a>
 {{/if}}
@@ -28,9 +28,12 @@ on to routes:
 // app/routes/post.js
 export default Ember.Route.extend({
   actions: {
-    "sign-in-to-comment": function(){
+    signInToComment: function(){
       var controller = this.controllerFor('post');
-      this.get('torii').open('facebook-connect').then(function(){
+      // The endpoint name is passed to `open`
+      this.get('torii').open('facebook-connect').then(function(authorization){
+        // FB.api is now available. authorization contains the UID and
+        // accessToken.
         controller.set('hasFacebook', true);
       });
     }
@@ -40,7 +43,8 @@ export default Ember.Route.extend({
 
 This is authentication only against an endpoint. If your application provides
 an **adapter**, then Torii can also peform **session management** via the
-`session` property, injected onto routes and controllers.
+`session` property, injected onto routes and controllers. This example uses
+Facebook's OAuth 2.0 API directly to fetch an authorization code.
 
 ```hbs
 {{! app/templates/login.hbs }}
@@ -48,7 +52,7 @@ an **adapter**, then Torii can also peform **session management** via the
   One sec while we get you signed in...
 {{else}}
   {{error}}
-  <a href="#" {{action 'sign-in-via-facebook'}}>
+  <a href="#" {{action 'signInViaFacebook'}}>
     Sign In with Facebook
   </a>
 {{/if}}
@@ -58,9 +62,10 @@ an **adapter**, then Torii can also peform **session management** via the
 // app/routes/login.js
 export default Ember.Route.extend({
   actions: {
-    'sign-in-via-facebook': function(){
+    signInViaFacebook: function(){
       var route = this,
           controller = this.controllerFor('login');
+      // The endpoint name is passed to `open`
       this.get('session').open('facebook-oauth2').then(function(){
         route.transitionTo('dashboard');
       }, function(error){
@@ -109,7 +114,7 @@ First, **install Torii via bower**:
 bower install torii
 ```
 
-**Next add Torii to your build pipeline**. In Ember-App-Kit you do this
+Next, **add Torii to your build pipeline**. In Ember-App-Kit you do this
 in `app/index.html`. In Ember-CLI, you add the package to the `Brocfile.js`:
 
 ```
@@ -117,7 +122,7 @@ app.import('vendor/torii/index.js', {
   // If you want to subclass a Torii class in your application, whitelist
   // that module here. For instance, the base endpoint class:
   //
-  // 'torii/endpoints/-base': ['default']
+  // 'torii/endpoints/base': ['default']
   //
   // See http://iamstef.net/ember-cli/#managing-dependencies
 });
