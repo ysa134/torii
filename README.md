@@ -1,6 +1,6 @@
 Torri is a set of clean abstractions for authentication in [Ember.js](http://emberjs.com/)
 applications. Torii is built with **endpoints** (authentication against a platform), a
-**session mananger** (for maintaining the current user), and **adapters** (to persist
+**session manager** (for maintaining the current user), and **adapters** (to persist
 authentication state).
 
 The API for endpoints and adapters in Torri is to **open**, by which we mean creating a new
