@@ -41,6 +41,10 @@ export default Ember.Route.extend({
 });
 ```
 
+```
+torii.open('facebook') -> #open hook on the facebook endpoint -> returned authorization
+```
+
 This is authentication only against an endpoint. If your application provides
 an **adapter**, then Torii can also peform **session management** via the
 `session` property, injected onto routes and controllers. This example uses
@@ -101,6 +105,10 @@ export default Ember.Object.extend({
 });
 ```
 
+```
+session.open('facebook') -> #open hook on the facebook endpoint -> #open hook on the application adapter -> updated session
+```
+
 Note that the adapter section is left entirely to your application.
 
 ## Using Torii
@@ -150,14 +158,41 @@ via the `torii` property injected onto routes, or the `session` property
 injected onto routes and controllers (using the session management feature
 will require you to write an adapter for your application).
 
-## Writing an endpoint
+## Endpoints in Torii
 
-Endpoints have a minimum of two hooks that must be implemented:
+### Writing an endpoint
+
+Endpoints have two hooks that may be implemented. Each *must* return a
+promise:
 
 * `open` must create a new authorization. An example of this is logging a
   user in with their username and password.
 * `fetch` must refresh an existing authorization. An example of this is
   confirming an access token stored in a session.
+
+Torii will lookup endpoints in the Ember application container, so if you
+name them conventionally (put the in the `app/torii-endpoints` directory)
+they will be available automatically.
+
+A minimal endpoint:
+
+```JavaScript
+// app/torii-endpoints/geocities.js
+export default Ember.Object.extend({
+  // create a new authorization
+  open: function(options) {
+    return new Ember.RSVP.Promise(function(resolve, reject){
+      // resolve with an authorization object
+    });
+  },
+  // refresh or confirm an authorization
+  fetch: function(options) {
+    return new Ember.RSVP.Promise(function(resolve, reject){
+      // resolve with an authorization object
+    });
+  }
+});
+```
 
 Endpoint hooks should return a promise resolving with an authorization
 object. Authorization objects should include values like access tokens, or
@@ -206,13 +241,11 @@ export default Ember.Route.extend({
 });
 ```
 
-Endpoints should implement a `fetch` hook that behaves in the same manner.
+### Built-in endpoints
 
-## Writing an adapter
+A minimal endpoint:
 
-TODO
-
-## Supported Authentication Endpoints
+Torii comes with several endpoints already included:
 
   * LinkedIn OAuth2 ([Dev Site](https://www.linkedin.com/secure/developer) | [Docs](http://developer.linkedin.com/))
   * Google OAuth2 ([Dev Site](https://console.developers.google.com/project) | [Docs](https://developers.google.com/accounts/docs/OAuth2WebServer))
@@ -220,7 +253,7 @@ TODO
   * Facebook OAuth2 ([Dev Site](https://developers.facebook.com/) | [Docs](https://developers.facebook.com/docs/facebook-login/manually-build-a-login-flow/)
   * **Authoring custom endpoints is easy** - You are encouraged to author your own.
 
-## Supporting OAuth 1.0a
+### Supporting OAuth 1.0a
 
 OAuth 1.0a, used by Twitter and some other organizations, requires a significant
 server-side component and so cannot be supported out of the box. I can be implemented
@@ -234,6 +267,57 @@ following these steps:
      transmits a message back to the parent window.
   6. Ember application in the initial window closes the popup and resolves its
      endpoint promise.
+
+## Adapters in Torii
+
+Adapters in Torii process authorizations and pass data to the session. For
+example, an endpoint might create an authorization object from the Facebook
+OAuth 2.0 API, then create a session on your applications server. The adapter
+would then fetch the user and resolve with that value, adding it to the
+`sessions` object.
+
+Again, adapters are looked up on the container, and so if you name them
+conventionally (put the in `app/torii-adapters/`) then they are loaded
+automatically.
+
+Adapters have three hooks that may be implemented. Each *must* return a
+promise:
+
+* `open` - a new session
+* `fetch` - a refreshed session
+* `close` - a closing session
+
+Adapters are flexible, but a common use would be to fetch a current user
+for the session. By default, the `application` adapter will handle all
+authorizations. An example application adapter with an `open` hook:
+
+```JavaScript
+// app/torii-adapters/application.js
+//
+// Here we will presume the store has been injected onto torii-adapter
+// factories. You would do this with an initializer, and:
+//
+// application.inject('torii-adapter', 'store', store:main');
+//
+export default Ember.Object.extend({
+  open: function(authorization){
+    var userId = authorization.user,
+        store  = this.get('store');
+    return store.find('user', userId).then(function(user){
+      return {
+        currentUser: user
+      };
+    });
+  }
+});
+```
+
+The object containing the `currentUser` is merged onto the session. Because the
+session is injected onto controllers and routes, these values will be available
+to templates.
+
+If an endpoint returns an authorization with an `adapter` property Torii will first
+look for an adapter with that name before falling back to the application adapter.
 
 ## Getting started with the Torii codebase
 
