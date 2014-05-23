@@ -241,6 +241,9 @@ export default Ember.Route.extend({
 });
 ```
 
+The cornerstone of many Torii endpoints is the `popup` object, which is injected
+onto all endpoints.
+
 ### Built-in endpoints
 
 A minimal endpoint:
