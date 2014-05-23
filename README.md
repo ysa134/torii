@@ -152,7 +152,61 @@ will require you to write an adapter for your application).
 
 ## Writing an endpoint
 
-TODO
+Endpoints have a minimum of two hooks that must be implemented:
+
+* `open` must create a new authorization. An example of this is logging a
+  user in with their username and password.
+* `fetch` must refresh an existing authorization. An example of this is
+  confirming an access token stored in a session.
+
+Endpoint hooks should return a promise resolving with an authorization
+object. Authorization objects should include values like access tokens, or
+an Ember-Data model representing a session, or minimal user data like UIDs.
+They may return SDK objects, such as an object with an API for making
+authenticated calls to an API.
+
+When used via `torii.open`, the authorization object is passed through to
+the consumer. An example:
+
+```JavaScript
+// app/torii-endpoints/geocities.js
+export default Ember.Object.extend({
+  // credentials as passed from torii.open
+  open: function(credentials){
+    return new Ember.RSVP.Promise(function(resolve, reject){
+      exampleAsyncLogin(
+        credentials.username,
+        credentials.password,
+        // the promise is resolved with the authorization
+        Ember.run.bind(null, resolve, {
+          sessionToken: response.token
+        });
+      );
+    });
+  }
+});
+```
+
+```JavaScript
+// app/routes/application.js
+export default Ember.Route.extend({
+  actions: {
+    openGeocities: function(username, password){
+      var route = this;
+      // argument to open is passed into the endpoint
+      this.get('torri').open('geocities', {
+        username: username,
+        password: password
+      }).then(function(authorization){
+        // authorization as returned by the endpoint
+        route.somethingWithGeocitiesToken(authorization.sessionToken);
+      });
+    }
+  }
+});
+```
+
+Endpoints should implement a `fetch` hook that behaves in the same manner.
 
 ## Writing an adapter
 
