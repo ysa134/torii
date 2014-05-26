@@ -319,8 +319,9 @@ The object containing the `currentUser` is merged onto the session. Because the
 session is injected onto controllers and routes, these values will be available
 to templates.
 
-If an endpoint returns an authorization with an `adapter` property Torii will first
-look for an adapter with that name before falling back to the application adapter.
+Torii will first look for an adapter matching the endpoint name passed to
+`torii.open`. If there is no matching adapter, then the session object will
+fall back to using the `application` adapter.
 
 ## Getting started with the Torii codebase
 

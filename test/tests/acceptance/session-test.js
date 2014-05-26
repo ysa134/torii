@@ -1,5 +1,6 @@
 import 'torii/ember'; // side effect: registers 'torii:main'
 import startApp from 'test/helpers/start-app';
+import DummyAdapter from 'torii/adapters/dummy';
 
 var torii, app, session, container, adapter;
 
@@ -13,7 +14,7 @@ module('Session - Acceptance', {
   setup: function(){
     app = startApp();
     container = app.__container__;
-    torii = container.lookup("torii:main");
+    torii   = container.lookup("torii:main");
     session = container.lookup("torii:session");
     adapter = container.lookup("torii-adapter:application");
   },
@@ -36,7 +37,7 @@ test("#open dummy-success session raises must-implement on application adapter",
 test("#open dummy-success session fails on signed in state", function(){
   signIn();
   Ember.run(function(){
-    session.open('dummy-success', {adapter: 'dummy'}).then(function(){
+    session.open('dummy-success').then(function(){
       ok(false, 'resolved promise');
     }, function(error){
       ok(true, 'fails promise');
@@ -46,8 +47,9 @@ test("#open dummy-success session fails on signed in state", function(){
 });
 
 test("#open dummy-success session successfully opens", function(){
+  container.register("torii-adapter:dummy-success", DummyAdapter);
   Ember.run(function(){
-    session.open('dummy-success', {adapter: 'dummy'}).then(function(){
+    session.open('dummy-success').then(function(){
       ok(true, 'resolves promise');
       ok(session.get('isAuthenticated'), 'authenticated');
       ok(session.get('currentUser.email'), 'user has email');
@@ -79,9 +81,10 @@ test("#fetch dummy-success session raises must-implement on application adapter"
 });
 
 test("#fetch dummy-success session fails on signed in state", function(){
+  container.register("torii-adapter:dummy-success", DummyAdapter);
   signIn();
   Ember.run(function(){
-    session.fetch('dummy-success', {adapter: 'dummy'}).then(function(){
+    session.fetch('dummy-success').then(function(){
       ok(false, 'resolved promise');
     }, function(error){
       ok(true, 'fails promise');
@@ -91,8 +94,9 @@ test("#fetch dummy-success session fails on signed in state", function(){
 });
 
 test("#fetch dummy-success session successfully opens", function(){
+  container.register("torii-adapter:dummy-success", DummyAdapter);
   Ember.run(function(){
-    session.fetch('dummy-success', {adapter: 'dummy'}).then(function(){
+    session.fetch('dummy-success').then(function(){
       ok(true, 'resolves promise');
       ok(session.get('isAuthenticated'), 'authenticated');
       ok(session.get('currentUser.email'), 'user has email');

@@ -2,6 +2,7 @@ var container, session, user, adapter;
 
 import toriiContainer from 'test/helpers/torii-container';
 import Session from 'torii/session';
+import DummyAdapter from 'torii/adapters/dummy';
 
 module('Session (open) - Integration', {
   setup: function(){
@@ -31,14 +32,16 @@ test("starting auth sets isOpening to true", function(){
     return oldOpen.apply(this, arguments);
   };
 
+  container.register("torii-adapter:dummy-success", DummyAdapter);
   Ember.run(function(){
-    session.open('dummy-success', {adapter: 'dummy'});
+    session.open('dummy-success');
   });
 });
 
 test("successful auth sets isAuthenticated to true", function(){
+  container.register("torii-adapter:dummy-success", DummyAdapter);
   Ember.run(function(){
-    session.open('dummy-success', {adapter: 'dummy'}).then(function(){
+    session.open('dummy-success').then(function(){
       ok(!session.get('isOpening'), 'session is no longer opening');
       ok(session.get('isAuthenticated'), 'session is authenticated');
     });
