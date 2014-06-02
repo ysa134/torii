@@ -3,7 +3,7 @@ applications. Torii is built with **endpoints** (authentication against a platfo
 **session manager** (for maintaining the current user), and **adapters** (to persist
 authentication state).
 
-The API for endpoints and adapters in Torri is to **open**, by which we mean creating a new
+The API for endpoints and adapters in Torii is to **open**, by which we mean creating a new
 authorization or authenticating a new session, **fetch**, by which we mean validating
 and existing authorization (like a session stored in cookies), or **close**, where an
 authorization is destroyed.
@@ -229,7 +229,7 @@ export default Ember.Route.extend({
     openGeocities: function(username, password){
       var route = this;
       // argument to open is passed into the endpoint
-      this.get('torri').open('geocities', {
+      this.get('torii').open('geocities', {
         username: username,
         password: password
       }).then(function(authorization){
