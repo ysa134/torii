@@ -259,7 +259,7 @@ Torii comes with several endpoints already included:
 ### Supporting OAuth 1.0a
 
 OAuth 1.0a, used by Twitter and some other organizations, requires a significant
-server-side component and so cannot be supported out of the box. I can be implemented
+server-side component and so cannot be supported out of the box. It can be implemented
 following these steps:
 
   1. Torii endpoint opens a popup to the app server asking for Twitter auth
@@ -326,7 +326,7 @@ fall back to using the `application` adapter.
 ## Getting started with the Torii codebase
 
   * Clone the repo `git clone git@github.com:Vestorly/torii.git`, `cd torii/`
-  * `npm install`, which will also rung `bower install`
+  * `npm install`, which will also run `bower install`
   * `grunt test` for tests.
   * Start the server: `grunt server`
   * Open [http://localhost:8000/example](http://localhost:8000/example) for example usage.
