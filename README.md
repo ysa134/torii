@@ -1,4 +1,4 @@
-Torri is a set of clean abstractions for authentication in [Ember.js](http://emberjs.com/)
+Torii is a set of clean abstractions for authentication in [Ember.js](http://emberjs.com/)
 applications. Torii is built with **endpoints** (authentication against a platform), a
 **session manager** (for maintaining the current user), and **adapters** (to persist
 authentication state).
@@ -252,7 +252,7 @@ Torii comes with several endpoints already included:
 
   * LinkedIn OAuth2 ([Dev Site](https://www.linkedin.com/secure/developer) | [Docs](http://developer.linkedin.com/))
   * Google OAuth2 ([Dev Site](https://console.developers.google.com/project) | [Docs](https://developers.google.com/accounts/docs/OAuth2WebServer))
-  * Facebook Connect (via FB SDK) ([Dev Site](https://developers.facebook.com/) | [Docs](https://developers.facebook.com/docs/)
+  * Facebook Connect (via FB SDK) ([Dev Site](https://developers.facebook.com/) | [Docs](https://developers.facebook.com/docs/))
   * Facebook OAuth2 ([Dev Site](https://developers.facebook.com/) | [Docs](https://developers.facebook.com/docs/facebook-login/manually-build-a-login-flow/)
   * **Authoring custom endpoints is easy** - You are encouraged to author your own.
 
