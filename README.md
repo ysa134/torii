@@ -118,11 +118,24 @@ Note that the adapter section is left entirely to your application.
 Using Torii currently requires an AMD-compatible module loader. [Ember-App Kit](https://github.com/stefanpenner/ember-app-kit)
 and [Ember-CLI](http://iamstef.net/ember-cli/) provide this out of the box.
 
-First, **install Torii via bower**:
+First, **obtain a distribution version of torii**:
+
+While the torii repo is still private, to obtain a distribution version of torii you'll need to either
+get access to the repository, pull the code and build a dist yourself, or obtain the amd build from a friend.
+
+To build a dist version of torii yourself, assuming you have access to the repo, you'll want to clone the repo and
+build torii:
 
 ```
-bower install torii
+git clone git@github.com/Vestorly/torii.git
+cd torii
+npm install
+grunt build:dist
 ```
+
+Copy `dist/torii.amd.js` to `vendor/torii/index.js` in your ember-cli project.
+
+If you have a built version of torii you can skip to the step of copying it into your project as described above.
 
 Next, **add Torii to your build pipeline**. In Ember-App-Kit you do this
 in `app/index.html`. In Ember-CLI, you add the package to the `Brocfile.js`:
@@ -137,6 +150,11 @@ app.import('vendor/torii/index.js', {
   // See http://iamstef.net/ember-cli/#managing-dependencies
 });
 ```
+
+**Add Torii's intialization code to your app**. Torii exports an amd module named `torii/ember`, which will
+add the appropriate application initializers to do Torii's container registrations and injections.
+You will want to add `require('torii/ember');` to your `app.js` file after you've defined your app.
+Here is an [example app.js](https://gist.github.com/bantic/b86787ed315c5ef98323).
 
 **Configure a Torii endpoint**. Here, we set the `window.ENV` with a
 configuration for the Facebook Connect endpoint:
@@ -156,9 +174,9 @@ window.ENV['torii'] = {
 ```
 
 With those values, we can authenticate the user against Facebook Connect
-via the `torii` property injected onto routes, or the `session` property
+via the `torii` property injected onto _routes_, or the `session` property
 injected onto routes and controllers (using the session management feature
-will require you to write an adapter for your application).
+will require you to write an adapter for your application – see notes on session management below).
 
 ## Endpoints in Torii
 
