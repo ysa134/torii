@@ -83,7 +83,7 @@ export default Ember.Route.extend({
 ```
 
 ```JavaScript
-// app/torii-adapter/application.js
+// app/torii-adapters/application.js
 export default Ember.Object.extend({
   open: function(authentication){
     var authorizationCode = authentication.get('authorizationCode');
