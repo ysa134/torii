@@ -291,6 +291,23 @@ following these steps:
   6. Ember application in the initial window closes the popup and resolves its
      endpoint promise.
 
+## Session Management in Torii
+
+If you want to use torii's session management state machine, you must opt in to it via the torii configuration.
+Because of the potential for conflicts, **torii will not inject a `session` property** unless you explicitly ask for
+it in your configuration. To do so, specify a `sessionServiceName` in your torii config, example:
+
+```
+window.ENV = window.ENV || {};
+window.ENV['torii'] = {
+  sessionServiceName: 'session', // a 'session' property will be injected on routes and controllers 
+  
+  // ... additional configuration for endpoints, etc
+};
+```
+
+Read on about adapters for more information on using torii's session management.
+
 ## Adapters in Torii
 
 Adapters in Torii process authorizations and pass data to the session. For
