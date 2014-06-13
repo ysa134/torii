@@ -1,71 +1,97 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Torii by Vestorly</title>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
+	<title>Torii</title>
+	<link rel="stylesheet" href="stylesheets/fonts.css" type="text/css" media="all" />
+	<link rel="stylesheet" href="stylesheets/bootstrap.min.css" type="text/css" media="all" />
+	<link rel="stylesheet" href="stylesheets/style.css" type="text/css" media="all" />
+	<link rel="shortcut icon" type="image/x-icon" href="css/images/favicon.ico" />
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-  </head>
-  <body>
-    <div class="wrapper">
-      <header>
-        <h1>Torii</h1>
-        <p>A set of clean abstractions for authentication in Ember.js</p>
+	<script type="text/javascript" src="javascripts/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="javascripts/bootstrap.min.js"></script>
+	<script type="text/javascript" src="javascripts/jquery.fullscreener.min.js"></script>
+	<script type="text/javascript" src="javascripts/main.js"></script>
+</head>
+<body>
+<div class="wrapper">
+	<div class="header">
+		<div class="container">
+			<a href="#" class="logo">Vestorly</a>
 
-        <p class="view"><a href="https://github.com/Vestorly/torii">View the Project on GitHub <small>Vestorly/torii</small></a></p>
+			 <div class="actions">
+			 	<a href="#" class="btn btn-bordered">FORK ME ON GITHUB</a>
+			 </div><!-- /.actions -->
+		</div><!-- /.container -->
+	</div><!-- /.header -->
 
+	<div class="intro">
+		<img src="stylesheets/images/temp/intro.jpg" alt="" width="1300" height="551" />
 
-        <ul>
-          <li><a href="https://github.com/Vestorly/torii/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/Vestorly/torii/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/Vestorly/torii">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
-        <h3>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
+		<div class="intro-entry">
+			<a href="#" class="logo-torii">Torii</a>
+			<h1>Torii is an authorization service library for your Ember.js application.</h1>
+			<p>Adding social login to your Ember.js app just got a whole lot simpler.</p>
+		</div><!-- /.intro-entry -->
+	</div><!-- /.intro -->
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+	<div class="callout">
+		<div class="container">
+			<h3>Need an OAuth 2 authorization code? Let us do the heavy lifting. <strong>Bring your Ember app's sign-in into 2014.</strong></h3>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
+			<div class="actions">
+				<a href="#" class="btn btn-light">FORK ME ON GITHUB</a>
+				<a href="#" class="btn btn-dark">See a demo</a>
+			</div><!-- /.actions -->
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+			<h3>Drop-in services for authorization and authentication in Ember.js applications.</h3>
+		</div><!-- /.container -->
+	</div><!-- /.callout -->
 
-<h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
+	<div class="main">
+		<div class="section">
+			<div class="container">
+				<h3>HOW DOES IT WORK?</h3>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+				<p><strong>Users gain authorization to a resource with a Torii endpoint.</strong> Endpoints are wrappers for the user experience of authenticating to a service and getting an access token. For example, the torii facebook-oauth2 endpoint would open a popup for Jim to sign into Facebook, and when he does, resolve a promise with his OAuth 2 access token for communicating with Facebook.</p>
+				<p>Most apps already authenticate users. <strong>Torii adapters abstract opening a user session into three actions: opening, fetching, and closing.</strong> Just implement an app's authentication API with promises, and Torii's session manager is good to go.</p>
+				<p><strong>Torii comes with a lightweight session management service built with a state machine and leveraging adapters.</strong> New apps can benefit from a cleaner session abstraction at the start, and porting existing codebases to Torii's session service should be easy. Using Torii's session manager is not required though, and to building or consuming endpoints works</p>
+			</div><!-- /.container -->
+		</div><!-- /.section -->
 
-<h3>
-<a name="rather-drive-stick" class="anchor" href="#rather-drive-stick"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
+		<div class="section section-grey">
+			<div class="container">
+				<h3>GETTING STARTED</h3>
+				<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc adipiscing erat in lacus dictum posuere. Aliquam non mi nec ligula eleifend porttitor ut a sem. Fusce at bibendum sem. </p>
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+				<div class="code">
+<pre>
+some code {
+	goes here: and then;
+	the user: will understand;
+}
+.what-to-do {
+</pre>
 
-<h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+				<div class="more">
+					<a href="#"><strong>Show me more</strong></a>
+				</div><!-- /.more -->
+				</div><!-- /.code -->
+				<p>Torii is used in production, today, by Vestorly and other companies using Ember.js.</p>
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+				<div class="actions">
+					<a href="#" class="btn btn-orange">Try it now</a>
+				</div><!-- /.actions -->
+			</div><!-- /.container -->
+		</div><!-- /.section -->
+	</div><!-- /.main -->
 
-<h3>
-<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
-
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
-      </section>
-      <footer>
-        <p>This project is maintained by <a href="https://github.com/Vestorly">Vestorly</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
-      </footer>
-    </div>
-    <script src="javascripts/scale.fix.js"></script>
-    
-  </body>
+	<div class="footer footer-simple">
+		<div class="container">
+			<p>A <span>Vestorly Open Source</span> Project</p>
+		</div><!-- /.container -->
+	</div><!-- /.footer -->
+</div><!-- /.wrapper -->
+</body>
 </html>
