@@ -64,9 +64,9 @@
 			<div class="container">
 				<h3>HOW DOES IT WORK?</h3>
 
-				<p><strong>Torii is a set of clean abstractions for authentication in Ember.js applications.</strong>  Users gain authorization to a resource with a Torii endpoint. Endpoints are wrappers for the user experience of authenticating to a service and getting an access token. For example, the torii facebook-oauth2 endpoint will open a popup for a user to sign into Facebook, which then resolves a promise with the OAuth 2 access token to communicate with Facebook.</p>
+				<p><strong>Torii is a set of clean abstractions for authentication in Ember.js applications.</strong>  Users gain authorization to a resource with a Torii provider. Providers are wrappers for the user experience of authenticating to a service and getting an access token. For example, the torii facebook-oauth2 provider will open a popup for a user to sign into Facebook, which then resolves a promise with the OAuth 2 access token to communicate with Facebook.</p>
 				<p>Most apps already authenticate users. <strong>Torii adapters abstract opening a user session into three actions: opening, fetching, and closing.</strong> Just implement an app's authentication API with promises, and Torii's session manager is good to go.</p>
-				<p><strong>Torii comes with a lightweight session management service built with a state machine and leveraging adapters.</strong> New apps can benefit from a cleaner session abstraction at the start, and porting existing codebases to Torii's session service should be easy. Using Torii's session manager is not required though, and to building or consuming endpoints works</p>
+				<p><strong>Torii comes with a lightweight session management service built with a state machine and leveraging adapters.</strong> New apps can benefit from a cleaner session abstraction at the start, and porting existing codebases to Torii's session service should be easy. Using Torii's session manager is not required though, and to building or consuming providers works</p>
 			</div><!-- /.container -->
 		</div><!-- /.section -->
 
@@ -83,7 +83,7 @@
 // In Ember-CLI you will set these values in config/environment.js
 window.ENV = window.ENV || {};
 window.ENV['torii'] = {
-  endpoints: {
+  providers: {
     'facebook-connect': {
       appId: 'xxxxx-some-app-id',
       scope: 'email,birthday'
@@ -100,14 +100,14 @@ require('torii/ember');
 </pre>
 				</div>
 
-				<p>Configure a Torii endpoint.  For example, setup Facebook Connect:</p>
+				<p>Configure a Torii provider.  For example, setup Facebook Connect:</p>
 				<div class="code">
 <pre>
 // In Ember-App-Kit you will set this in app/index.html
 // In Ember-CLI you will set these values in config/environment.js
 window.ENV = window.ENV || {};
 window.ENV['torii'] = {
-  endpoints: {
+  providers: {
     'facebook-connect': {
       appId: 'xxxxx-some-app-id',
       scope: 'email,birthday'
