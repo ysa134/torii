@@ -12,7 +12,7 @@ module('Torii - Integration', {
   }
 });
 
-test("torii opens a dummy-success endpoint", function(){
+test("torii opens a dummy-success provider", function(){
   Ember.run(function(){
     torii.open('dummy-success', {name: 'dummy'}).then(function(authentication){
       ok(true, 'torii resolves an open promise');
@@ -23,7 +23,7 @@ test("torii opens a dummy-success endpoint", function(){
   });
 });
 
-test("torii fails to open a dummy-failure endpoint", function(){
+test("torii fails to open a dummy-failure provider", function(){
   Ember.run(function(){
     torii.open('dummy-failure').then(function(authentication){
       ok(false, 'torii resolved an open promise');
@@ -33,7 +33,7 @@ test("torii fails to open a dummy-failure endpoint", function(){
   });
 });
 
-test('raises on a bad endpoint name', function(){
+test('raises on a bad provider name', function(){
   var thrown = false, message;
   try {
     torii.open('bs-man');
@@ -42,5 +42,5 @@ test('raises on a bad endpoint name', function(){
     message = e.message;
   }
   ok(thrown, "Error thrown");
-  ok(/Expected an endpoint named bs-man/.test(message), 'correct error thrown');
+  ok(/Expected an provider named bs-man/.test(message), 'correct error thrown');
 });
