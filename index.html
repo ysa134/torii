@@ -18,10 +18,10 @@
 <div class="wrapper">
 	<div class="header">
 		<div class="container">
-			<a href="#" class="logo">Vestorly</a>
+			<a href="https://www.vestorly.com" class="logo">Vestorly</a>
 
 			 <div class="actions">
-			 	<a href="#" class="btn btn-bordered">FORK ME ON GITHUB</a>
+			 	<a href="https://github.com/vestorly/torii" class="btn btn-bordered">FORK ME ON GITHUB</a>
 			 </div><!-- /.actions -->
 		</div><!-- /.container -->
 	</div><!-- /.header -->
@@ -30,7 +30,7 @@
 		<img src="stylesheets/images/temp/intro.jpg" alt="" width="1300" height="551" />
 
 		<div class="intro-entry">
-			<a href="#" class="logo-torii">Torii</a>
+			<a href="https://github.com/vestorly/torii" class="logo-torii">Torii</a>
 			<h1>Torii is an authorization service library for your Ember.js application.</h1>
 			<p>Adding social login to your Ember.js app just got a whole lot simpler.</p>
 		</div><!-- /.intro-entry -->
@@ -41,8 +41,8 @@
 			<h3>Need an OAuth 2 authorization code? Let us do the heavy lifting. <strong>Bring your Ember app's sign-in into 2014.</strong></h3>
 
 			<div class="actions">
-				<a href="#" class="btn btn-light">FORK ME ON GITHUB</a>
-				<a href="#" class="btn btn-dark">See a demo</a>
+				<a href="https://github.com/vestorly/torii" class="btn btn-light">FORK ME ON GITHUB</a>
+				<a href="https://github.com/vestorly/torii#using-torii" class="btn btn-dark">See a demo</a>
 			</div><!-- /.actions -->
 
 			<h3>Drop-in services for authorization and authentication in Ember.js applications.</h3>
@@ -63,25 +63,59 @@
 		<div class="section section-grey">
 			<div class="container">
 				<h3>GETTING STARTED</h3>
-				<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc adipiscing erat in lacus dictum posuere. Aliquam non mi nec ligula eleifend porttitor ut a sem. Fusce at bibendum sem. </p>
+
+				<p>First, Obtain the dist version of torii, and simply copy it over to your vendor directory.  Next, add Torii to your build pipleline.  In Ember-App-Kit you can do this in app/index.html as shown below:</p>
 
 				<div class="code">
 <pre>
-some code {
-	goes here: and then;
-	the user: will understand;
-}
-.what-to-do {
+// In Ember-App-Kit you will set this in app/index.html
+// In Ember-CLI you will set these values in config/environment.js
+window.ENV = window.ENV || {};
+window.ENV['torii'] = {
+  endpoints: {
+    'facebook-connect': {
+      appId: 'xxxxx-some-app-id',
+      scope: 'email,birthday'
+    }
+  }
+};
 </pre>
 
+				<p>Add Torii's initialization code to your app:</p>
+
+				<div class="code">
+<pre>
+require('torii/ember');
+</pre>
+
+				<p>Configure a Torii endpoint.  For example, setup Facebook Connect:</p>
+
+				<div class="code">
+<pre>
+// In Ember-App-Kit you will set this in app/index.html
+// In Ember-CLI you will set these values in config/environment.js
+window.ENV = window.ENV || {};
+window.ENV['torii'] = {
+  endpoints: {
+    'facebook-connect': {
+      appId: 'xxxxx-some-app-id',
+      scope: 'email,birthday'
+    }
+  }
+};
+</pre>
+
+			<p>With those values, we can authenticate the user against Facebook Connect via the torii property injected onto routes, or the session property injected onto routes and controllers (using the session management feature will require you to write an adapter for your application – see notes on session management below). <strong><a href="https://github.com/vestorly/torii#using-torii">See more details on the Torii Readme Page.</a><strong> </p>
+
+
 				<div class="more">
-					<a href="#"><strong>Show me more</strong></a>
+					<a href="https://github.com/vestorly/torii"><strong>Show me more</strong></a>
 				</div><!-- /.more -->
 				</div><!-- /.code -->
 				<p>Torii is used in production, today, by Vestorly and other companies using Ember.js.</p>
 
 				<div class="actions">
-					<a href="#" class="btn btn-orange">Try it now</a>
+					<a href="https://github.com/vestorly/torii" class="btn btn-orange">Try it now</a>
 				</div><!-- /.actions -->
 			</div><!-- /.container -->
 		</div><!-- /.section -->
@@ -89,7 +123,7 @@ some code {
 
 	<div class="footer footer-simple">
 		<div class="container">
-			<p>A <span>Vestorly Open Source</span> Project</p>
+			<p><a href="http://vestorly.github.io/">A <span>Vestorly Open Source</span> Project</a></p>
 		</div><!-- /.container -->
 	</div><!-- /.footer -->
 </div><!-- /.wrapper -->
