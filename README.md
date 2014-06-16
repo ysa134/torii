@@ -365,7 +365,7 @@ fall back to using the `application` adapter.
   * `npm install`, which will also run `bower install`
   * `grunt test` for tests.
   * Start the server: `grunt server`
-  * Open [http://localhost:8000/example](http://localhost:8000/example) for example usage.
+  * Open [http://localhost:8000/example/basic.html](http://localhost:8000/example/basic.html) for example usage.
 
 ## Generate docs
 

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Torii usage demo</title>
+    <meta name='description' content=''>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+    <link rel="stylesheet" href='app.css'>
+  </head>
+  <body>
+
+    <script type="text/x-handlebars">
+      <h2>Torii: Example Usage</h2>
+
+      <button {{action "authenticate" "linked-in-oauth2"}}>Linked In OAuth2</button>
+      <button {{action "authenticate" "google-oauth2"}}>Google OAuth2</button>
+      <button {{action "authenticate" "facebook-connect"}}>Facebook Connect</button>
+      <button {{action "authenticate" "facebook-oauth2"}}>Facebook Oauth2</button>
+      <button {{action "authenticate" "dummy-success"}}>Dummy Success</button>
+      <button {{action "authenticate" "dummy-failure"}}>Dummy Failure</button>
+
+      <div>
+        Auth data: {{#if authData}}
+          {<pre>{{inspect-object authData}}</pre>}
+        {{/if}}
+      </div>
+      <div>
+        Error data: {{error}}
+      </div>
+    </script>
+
+    <script src='../bower_components/loader/loader.js'></script>
+    <script src='../bower_components/jquery/jquery.js'></script>
+    <script src='../bower_components/handlebars/handlebars.js'></script>
+    <script src='../bower_components/ember/ember.js'></script>
+    <script src='../vendor/ember-shim.js'></script>
+    <script src='../bower_components/ember-resolver/dist/ember-resolver.js'></script>
+    <script src='../dist/torii.amd.js'></script>
+
+    <script>
+      window.ENV = window.ENV || {};
+      var configuration = window.ENV.torii = {providers: {}};
+
+      configuration.providers['linked-in-oauth2'] = {
+        apiKey: '772yus6d70pf11',
+        redirectUri: 'http://localhost:8000/example/basic.html'
+      };
+
+      configuration.providers['google-oauth2'] = {
+        redirectUri: 'http://localhost:8000/example/basic.html',
+        apiKey:      '139338504777-vqu8ikemg935k1kivsku7fv3cfgq9452.apps.googleusercontent.com'
+      };
+
+      configuration.providers['facebook-connect'] = {
+        appId:      '744221908941738'
+      };
+
+      configuration.providers['facebook-oauth2'] = {
+        apiKey:      '744221908941738',
+        redirectUri: 'http://localhost:8000/example/basic.html'
+      };
+
+      require("torii/ember");
+
+      var App = Ember.Application.create();
+
+      App.ApplicationRoute = Ember.Route.extend({
+        actions: {
+          authenticate: function(provider){
+            var controller = this.controller;
+            controller.set('error', null);
+            controller.set('authData', null);
+            this.get('torii').open(provider).then(function(authData){
+              controller.set('authData', authData);
+            }, function(error){
+              controller.set('error', error);
+            });
+          }
+        }
+      });
+
+      Ember.Handlebars.registerBoundHelper('inspect-object', function(obj){
+        return new Handlebars.SafeString(JSON.stringify(obj));
+      });
+    </script>
+  </body>
+</html>
