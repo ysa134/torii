@@ -2,6 +2,7 @@
 /tmp
 /dist
 /bower_components
+/doc
 
 *.un~
 *.swp
