@@ -90,6 +90,7 @@ window.ENV['torii'] = {
   }
 };
 </pre>
+			</div>
 
 				<p>Add Torii's initialization code to your app:</p>
 
@@ -97,6 +98,7 @@ window.ENV['torii'] = {
 <pre>
 require('torii/ember');
 </pre>
+				</div>
 
 				<p>Configure a Torii endpoint.  For example, setup Facebook Connect:</p>
 
@@ -114,6 +116,7 @@ window.ENV['torii'] = {
   }
 };
 </pre>
+			</div>
 
 			<p>With those values, we can authenticate the user against Facebook Connect via the torii property injected onto routes, or the session property injected onto routes and controllers (using the session management feature will require you to write an adapter for your application – see notes on session management below).</p>
 
