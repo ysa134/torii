@@ -120,8 +120,7 @@ and [Ember-CLI](http://iamstef.net/ember-cli/) provide this out of the box.
 
 First, **obtain a distribution version of torii**:
 
-While the torii repo is still private, to obtain a distribution version of torii you'll need to either
-get access to the repository, pull the code and build a dist yourself, or obtain the amd build from a friend.
+The torii repo is publc, to obtain a distribution version of torii you'll need pull the code and build a dist yourself.
 
 To build a dist version of torii yourself, assuming you have access to the repo, you'll want to clone the repo and
 build torii:
@@ -300,8 +299,8 @@ it in your configuration. To do so, specify a `sessionServiceName` in your torii
 ```
 window.ENV = window.ENV || {};
 window.ENV['torii'] = {
-  sessionServiceName: 'session', // a 'session' property will be injected on routes and controllers 
-  
+  sessionServiceName: 'session', // a 'session' property will be injected on routes and controllers
+
   // ... additional configuration for endpoints, etc
 };
 ```
@@ -376,7 +375,7 @@ Use [YUIDoc](http://yui.github.io/yuidoc/).
   * Generate: `yuidoc lib/`
   * Output will be put into "docs/"
 
-*Initial development of Torii was generously funded by [Vestorly](https://www.vestorly.com/). Vestorly is a technology company solving the client acquisition problem for professionals in wealth management, and the enterprises that support them. Vestorly's user interface is built entirely with Ember.js and modern web technologies. [jobs@vestorly.com](jobs@vestorly.com)*
+*Initial development of Torii was generously funded by [Vestorly](https://www.vestorly.com/). Vestorly is a technology company solving the client acquisition problem for professionals in wealth management, and the enterprises that support them. Vestorly's user interface is built entirely with Ember.js and modern web technologies. [hello@vestorly.com](hello@vestorly.com)*
 
 ## How to help
 
