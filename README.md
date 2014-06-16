@@ -1,18 +1,18 @@
 [![Torii Build Status](https://circleci.com/gh/Vestorly/torii.png?circle-token=9bdd2f37dbcb0be85f82a6b1ac61b9333b68625b "Torii Build Status")](https://circleci.com/gh/Vestorly/torii)
 
 Torii is a set of clean abstractions for authentication in [Ember.js](http://emberjs.com/)
-applications. Torii is built with **endpoints** (authentication against a platform), a
+applications. Torii is built with **providers** (authentication against a platform), a
 **session manager** (for maintaining the current user), and **adapters** (to persist
 authentication state).
 
-The API for endpoints and adapters in Torii is to **open**, by which we mean creating a new
+The API for providers and adapters in Torii is to **open**, by which we mean creating a new
 authorization or authenticating a new session, **fetch**, by which we mean validating
-and existing authorization (like a session stored in cookies), or **close**, where an
+an existing authorization (like a session stored in cookies), or **close**, where an
 authorization is destroyed.
 
-An endpoint in Torii is anything a user can authenticate against. This could be an
+A provider in Torii is anything a user can authenticate against. This could be an
 OAuth 2.0 endpoint, your own login mechanism, or an SDK like Facebook Connect.
-Authenticating against an **endpoint** is done via the `torii` property, which is injected
+Authenticating against a **provider** is done via the `torii` property, which is injected
 on to routes:
 
 ```hbs
@@ -32,7 +32,7 @@ export default Ember.Route.extend({
   actions: {
     signInToComment: function(){
       var controller = this.controllerFor('post');
-      // The endpoint name is passed to `open`
+      // The provider name is passed to `open`
       this.get('torii').open('facebook-connect').then(function(authorization){
         // FB.api is now available. authorization contains the UID and
         // accessToken.
@@ -44,10 +44,10 @@ export default Ember.Route.extend({
 ```
 
 ```
-torii.open('facebook') -> #open hook on the facebook endpoint -> returned authorization
+torii.open('facebook') -> #open hook on the facebook provider -> returned authorization
 ```
 
-This is authentication only against an endpoint. If your application provides
+This is authentication only against a provider. If your application provides
 an **adapter**, then Torii can also peform **session management** via the
 `session` property, injected onto routes and controllers. This example uses
 Facebook's OAuth 2.0 API directly to fetch an authorization code.
@@ -71,7 +71,7 @@ export default Ember.Route.extend({
     signInViaFacebook: function(){
       var route = this,
           controller = this.controllerFor('login');
-      // The endpoint name is passed to `open`
+      // The provider name is passed to `open`
       this.get('session').open('facebook-oauth2').then(function(){
         route.transitionTo('dashboard');
       }, function(error){
@@ -108,7 +108,7 @@ export default Ember.Object.extend({
 ```
 
 ```
-session.open('facebook') -> #open hook on the facebook endpoint -> #open hook on the application adapter -> updated session
+session.open('facebook') -> #open hook on the facebook provider -> #open hook on the application adapter -> updated session
 ```
 
 Note that the adapter section is left entirely to your application.
@@ -142,9 +142,9 @@ in `app/index.html`. In Ember-CLI, you add the package to the `Brocfile.js`:
 ```
 app.import('vendor/torii/index.js', {
   // If you want to subclass a Torii class in your application, whitelist
-  // that module here. For instance, the base endpoint class:
+  // that module here. For instance, the base provider class:
   //
-  // 'torii/endpoints/base': ['default']
+  // 'torii/providers/base': ['default']
   //
   // See http://iamstef.net/ember-cli/#managing-dependencies
 });
@@ -155,15 +155,15 @@ add the appropriate application initializers to do Torii's container registratio
 You will want to add `require('torii/ember');` to your `app.js` file after you've defined your app.
 Here is an [example app.js](https://gist.github.com/bantic/b86787ed315c5ef98323).
 
-**Configure a Torii endpoint**. Here, we set the `window.ENV` with a
-configuration for the Facebook Connect endpoint:
+**Configure a Torii provider**. Here, we set the `window.ENV` with a
+configuration for the Facebook Connect provider:
 
 ```JavaScript
 // In Ember-App-Kit you will set this in app/index.html
 // In Ember-CLI you will set these values in config/environment.js
 window.ENV = window.ENV || {};
 window.ENV['torii'] = {
-  endpoints: {
+  providers: {
     'facebook-connect': {
       appId: 'xxxxx-some-app-id',
       scope: 'email,birthday'
@@ -177,11 +177,11 @@ via the `torii` property injected onto _routes_, or the `session` property
 injected onto routes and controllers (using the session management feature
 will require you to write an adapter for your application – see notes on session management below).
 
-## Endpoints in Torii
+## Providers in Torii
 
-### Writing an endpoint
+### Writing a provider
 
-Endpoints have two hooks that may be implemented. Each *must* return a
+Providers have two hooks that may be implemented. Each *must* return a
 promise:
 
 * `open` must create a new authorization. An example of this is logging a
@@ -189,14 +189,14 @@ promise:
 * `fetch` must refresh an existing authorization. An example of this is
   confirming an access token stored in a session.
 
-Torii will lookup endpoints in the Ember application container, so if you
-name them conventionally (put the in the `app/torii-endpoints` directory)
+Torii will lookup providers in the Ember application container, so if you
+name them conventionally (put the in the `app/torii-providers` directory)
 they will be available automatically.
 
-A minimal endpoint:
+A minimal provider:
 
 ```JavaScript
-// app/torii-endpoints/geocities.js
+// app/torii-providers/geocities.js
 export default Ember.Object.extend({
   // create a new authorization
   open: function(options) {
@@ -213,7 +213,7 @@ export default Ember.Object.extend({
 });
 ```
 
-Endpoint hooks should return a promise resolving with an authorization
+Provider hooks should return a promise resolving with an authorization
 object. Authorization objects should include values like access tokens, or
 an Ember-Data model representing a session, or minimal user data like UIDs.
 They may return SDK objects, such as an object with an API for making
@@ -223,7 +223,7 @@ When used via `torii.open`, the authorization object is passed through to
 the consumer. An example:
 
 ```JavaScript
-// app/torii-endpoints/geocities.js
+// app/torii-providers/geocities.js
 export default Ember.Object.extend({
   // credentials as passed from torii.open
   open: function(credentials){
@@ -247,12 +247,12 @@ export default Ember.Route.extend({
   actions: {
     openGeocities: function(username, password){
       var route = this;
-      // argument to open is passed into the endpoint
+      // argument to open is passed into the provider
       this.get('torii').open('geocities', {
         username: username,
         password: password
       }).then(function(authorization){
-        // authorization as returned by the endpoint
+        // authorization as returned by the provider
         route.somethingWithGeocitiesToken(authorization.sessionToken);
       });
     }
@@ -260,20 +260,20 @@ export default Ember.Route.extend({
 });
 ```
 
-The cornerstone of many Torii endpoints is the `popup` object, which is injected
-onto all endpoints.
+The cornerstone of many Torii providers is the `popup` object, which is injected
+onto all providers.
 
-### Built-in endpoints
+### Built-in providers
 
-A minimal endpoint:
+A minimal provider:
 
-Torii comes with several endpoints already included:
+Torii comes with several providers already included:
 
   * LinkedIn OAuth2 ([Dev Site](https://www.linkedin.com/secure/developer) | [Docs](http://developer.linkedin.com/))
   * Google OAuth2 ([Dev Site](https://console.developers.google.com/project) | [Docs](https://developers.google.com/accounts/docs/OAuth2WebServer))
   * Facebook Connect (via FB SDK) ([Dev Site](https://developers.facebook.com/) | [Docs](https://developers.facebook.com/docs/))
   * Facebook OAuth2 ([Dev Site](https://developers.facebook.com/) | [Docs](https://developers.facebook.com/docs/facebook-login/manually-build-a-login-flow/))
-  * **Authoring custom endpoints is designed to be easy** - You are encouraged to author your own.
+  * **Authoring custom providers is designed to be easy** - You are encouraged to author your own.
 
 ### Supporting OAuth 1.0a
 
@@ -281,14 +281,14 @@ OAuth 1.0a, used by Twitter and some other organizations, requires a significant
 server-side component and so cannot be supported out of the box. It can be implemented
 following these steps:
 
-  1. Torii endpoint opens a popup to the app server asking for Twitter auth
+  1. Torii provider opens a popup to the app server asking for Twitter auth
   2. Server redirects to Twitter with the credentials for login
   3. User enters their credentials at Twitter
   4. Twitter redirects to app server which completes the authentication
   5. Server loads the Ember application with a message in the URL, or otherwise
      transmits a message back to the parent window.
   6. Ember application in the initial window closes the popup and resolves its
-     endpoint promise.
+     provider promise.
 
 ## Session Management in Torii
 
@@ -301,7 +301,7 @@ window.ENV = window.ENV || {};
 window.ENV['torii'] = {
   sessionServiceName: 'session', // a 'session' property will be injected on routes and controllers
 
-  // ... additional configuration for endpoints, etc
+  // ... additional configuration for providers, etc
 };
 ```
 
@@ -310,7 +310,7 @@ Read on about adapters for more information on using torii's session management.
 ## Adapters in Torii
 
 Adapters in Torii process authorizations and pass data to the session. For
-example, an endpoint might create an authorization object from the Facebook
+example, a provider might create an authorization object from the Facebook
 OAuth 2.0 API, then create a session on your applications server. The adapter
 would then fetch the user and resolve with that value, adding it to the
 `sessions` object.
@@ -355,7 +355,7 @@ The object containing the `currentUser` is merged onto the session. Because the
 session is injected onto controllers and routes, these values will be available
 to templates.
 
-Torii will first look for an adapter matching the endpoint name passed to
+Torii will first look for an adapter matching the provider name passed to
 `torii.open`. If there is no matching adapter, then the session object will
 fall back to using the `application` adapter.
 
@@ -385,6 +385,6 @@ authentication solution. There are still a few things we could use help with:
 * A non-AMD build of the code
 * More testing of sessions
 * More documentation
-* Publish your own endpoint or adapter implementation!
+* Publish your own provider or adapter implementation!
 
 We welcome your contributions.

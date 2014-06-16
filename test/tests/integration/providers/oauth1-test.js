@@ -1,5 +1,5 @@
 import toriiContainer from 'test/helpers/torii-container';
-import OAuth1Endpoint from 'torii/endpoints/oauth1';
+import OAuth1Provider from 'torii/providers/oauth1';
 import configuration from 'torii/configuration';
 
 var torii, container;
@@ -13,30 +13,30 @@ var opened, openedUrl, mockPopup = {
 };
 
 var requestTokenUri = 'http://localhost:3000/oauth/callback';
-var endpointName = 'oauth1';
-var originalConfiguration = configuration.endpoints[endpointName];
+var providerName = 'oauth1';
+var originalConfiguration = configuration.providers[providerName];
 
 module('Oauth1 - Integration', {
   setup: function(){
     container = toriiContainer();
     container.register('torii-service:mock-popup', mockPopup, {instantiate: false});
-    container.injection('torii-endpoint', 'popup', 'torii-service:mock-popup');
+    container.injection('torii-provider', 'popup', 'torii-service:mock-popup');
 
-    container.register('torii-endpoint:'+endpointName, OAuth1Endpoint);
+    container.register('torii-provider:'+providerName, OAuth1Provider);
 
     torii = container.lookup("torii:main");
-    configuration.endpoints[endpointName] = {requestTokenUri: requestTokenUri};
+    configuration.providers[providerName] = {requestTokenUri: requestTokenUri};
   },
   teardown: function(){
     opened = false;
-    configuration.endpoints[endpointName] = originalConfiguration;
+    configuration.providers[providerName] = originalConfiguration;
     Ember.run(container, 'destroy');
   }
 });
 
 test("Opens a popup to the requestTokenUri", function(){
   Ember.run(function(){
-    torii.open(endpointName).finally(function(){
+    torii.open(providerName).finally(function(){
       equal(openedUrl, requestTokenUri, 'opens with requestTokenUri');
       ok(opened, "Popup service is opened");
     });

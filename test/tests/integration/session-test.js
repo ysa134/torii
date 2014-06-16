@@ -22,11 +22,11 @@ test("session starts in unauthenticated unopened state", function(){
 });
 
 test("starting auth sets isOpening to true", function(){
-  var endpoint = container.lookup('torii-endpoint:dummy-success');
-  var oldOpen = endpoint.open;
+  var provider = container.lookup('torii-provider:dummy-success');
+  var oldOpen = provider.open;
 
-  endpoint.open = function(){
-    ok(true, 'calls endpoint.open');
+  provider.open = function(){
+    ok(true, 'calls provider.open');
     ok(session.get('isOpening'), 'session.isOpening is true');
 
     return oldOpen.apply(this, arguments);
