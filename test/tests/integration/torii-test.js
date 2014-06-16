@@ -42,5 +42,30 @@ test('raises on a bad provider name', function(){
     message = e.message;
   }
   ok(thrown, "Error thrown");
-  ok(/Expected an provider named bs-man/.test(message), 'correct error thrown');
+  ok(/Expected a provider named 'bs-man'/.test(message),
+     'correct error thrown');
+});
+
+test('raises when calling #fetch with a meaningful error message', function(){
+  var thrown = false, message;
+  try {
+    torii.fetch('dummy-failure');
+  } catch (e) {
+    thrown = true;
+    message = e.message;
+  }
+  ok(thrown, "Error thrown");
+  ok(/Expected provider 'dummy-failure' to define the 'fetch' method/.test(message), 'correct error thrown');
+});
+
+test('raises when calling #close with a meaningful error message', function(){
+  var thrown = false, message;
+  try {
+    torii.close('dummy-failure');
+  } catch (e) {
+    thrown = true;
+    message = e.message;
+  }
+  ok(thrown, "Error thrown");
+  ok(/Expected provider 'dummy-failure' to define the 'close' method/.test(message), 'correct error thrown');
 });

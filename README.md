@@ -181,13 +181,12 @@ will require you to write an adapter for your application – see notes on sessi
 
 ### Writing a provider
 
-Providers have two hooks that may be implemented. Each *must* return a
+Providers have a single hook that must be implemented. Each *must* return a
 promise:
 
 * `open` must create a new authorization. An example of this is logging a
-  user in with their username and password.
-* `fetch` must refresh an existing authorization. An example of this is
-  confirming an access token stored in a session.
+  user in with their username and password, or interfacing with an
+  external OAuth provider like Facebook to retrieve authorization data.
 
 Torii will lookup providers in the Ember application container, so if you
 name them conventionally (put the in the `app/torii-providers` directory)
@@ -203,12 +202,6 @@ export default Ember.Object.extend({
     return new Ember.RSVP.Promise(function(resolve, reject){
       // resolve with an authorization object
     });
-  },
-  // refresh or confirm an authorization
-  fetch: function(options) {
-    return new Ember.RSVP.Promise(function(resolve, reject){
-      // resolve with an authorization object
-    });
   }
 });
 ```
@@ -220,7 +213,7 @@ They may return SDK objects, such as an object with an API for making
 authenticated calls to an API.
 
 When used via `torii.open`, the authorization object is passed through to
-the consumer. An example:
+the consumer. An example provider:
 
 ```JavaScript
 // app/torii-providers/geocities.js
@@ -231,10 +224,12 @@ export default Ember.Object.extend({
       exampleAsyncLogin(
         credentials.username,
         credentials.password,
-        // the promise is resolved with the authorization
-        Ember.run.bind(null, resolve, {
-          sessionToken: response.token
-        });
+
+        // callback function:
+        function(error, response) {
+          // the promise is resolved with the authorization
+          Ember.run.bind(null, resolve, {sessionToken: response.token});
+        }
       );
     });
   }
@@ -265,8 +260,6 @@ onto all providers.
 
 ### Built-in providers
 
-A minimal provider:
-
 Torii comes with several providers already included:
 
   * LinkedIn OAuth2 ([Dev Site](https://www.linkedin.com/secure/developer) | [Docs](http://developer.linkedin.com/))
@@ -292,7 +285,7 @@ following these steps:
 
 ## Session Management in Torii
 
-If you want to use torii's session management state machine, you must opt in to it via the torii configuration.
+If you want to use torii's session management state machine, you _must_ opt in to it via the torii configuration.
 Because of the potential for conflicts, **torii will not inject a `session` property** unless you explicitly ask for
 it in your configuration. To do so, specify a `sessionServiceName` in your torii config, example:
 
@@ -334,11 +327,14 @@ authorizations. An example application adapter with an `open` hook:
 // app/torii-adapters/application.js
 //
 // Here we will presume the store has been injected onto torii-adapter
-// factories. You would do this with an initializer, and:
+// factories. You would do this with an initializer, e.g.:
 //
 // application.inject('torii-adapter', 'store', store:main');
 //
 export default Ember.Object.extend({
+
+  // The authorization argument passed in to `session.open` here is
+  // the result of the `torii.open(providerName)` promise
   open: function(authorization){
     var userId = authorization.user,
         store  = this.get('store');
@@ -356,8 +352,9 @@ session is injected onto controllers and routes, these values will be available
 to templates.
 
 Torii will first look for an adapter matching the provider name passed to
-`torii.open`. If there is no matching adapter, then the session object will
-fall back to using the `application` adapter.
+`session.open` (i.e., if you do `session.open('geocities')`, torii first looks
+for an adapter at `torii-adapters/geocities`). If there is no matching adapter,
+then the session object will fall back to using the `application` adapter.
 
 ## Getting started with the Torii codebase
 
