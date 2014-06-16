@@ -64,7 +64,7 @@
 			<div class="container">
 				<h3>HOW DOES IT WORK?</h3>
 
-				<p><strong>Users gain authorization to a resource with a Torii endpoint.</strong> Endpoints are wrappers for the user experience of authenticating to a service and getting an access token. For example, the torii facebook-oauth2 endpoint would open a popup for Jim to sign into Facebook, and when he does, resolve a promise with his OAuth 2 access token for communicating with Facebook.</p>
+				<p><strong>Torii is a set of clean abstractions for authentication in Ember.js applications.</strong>  Users gain authorization to a resource with a Torii endpoint. Endpoints are wrappers for the user experience of authenticating to a service and getting an access token. For example, the torii facebook-oauth2 endpoint will open a popup for a user to sign into Facebook, which then resolves a promise with the OAuth 2 access token to communicate with Facebook.</p>
 				<p>Most apps already authenticate users. <strong>Torii adapters abstract opening a user session into three actions: opening, fetching, and closing.</strong> Just implement an app's authentication API with promises, and Torii's session manager is good to go.</p>
 				<p><strong>Torii comes with a lightweight session management service built with a state machine and leveraging adapters.</strong> New apps can benefit from a cleaner session abstraction at the start, and porting existing codebases to Torii's session service should be easy. Using Torii's session manager is not required though, and to building or consuming endpoints works</p>
 			</div><!-- /.container -->
