@@ -1,4 +1,4 @@
-import DummyAdapter from 'torii/adapters/dummy';
+import DummyAdapter from 'test/helpers/dummy-adapter';
 
 var adapter;
 

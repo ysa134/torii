@@ -1,6 +1,8 @@
 import 'torii/ember'; // side effect: registers 'torii:main'
 import startApp from 'test/helpers/start-app';
-import DummyAdapter from 'torii/adapters/dummy';
+import DummyAdapter from 'test/helpers/dummy-adapter';
+import DummySuccessProvider from 'test/helpers/dummy-success-provider';
+import DummyFailureProvider from 'test/helpers/dummy-failure-provider';
 
 var torii, app, session, container, adapter;
 
@@ -17,6 +19,9 @@ module('Session - Acceptance', {
     torii   = container.lookup("torii:main");
     session = container.lookup("torii:session");
     adapter = container.lookup("torii-adapter:application");
+
+    container.register('torii-provider:dummy-failure', DummyFailureProvider);
+    container.register('torii-provider:dummy-success', DummySuccessProvider);
   },
   teardown: function(){
     Ember.run(app, 'destroy');

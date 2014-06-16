@@ -1,10 +1,15 @@
 var container, torii;
 
 import toriiContainer from 'test/helpers/torii-container';
+import DummySuccessProvider from 'test/helpers/dummy-success-provider';
+import DummyFailureProvider from 'test/helpers/dummy-failure-provider';
 
 module('Torii - Integration', {
   setup: function(){
     container = toriiContainer();
+
+    container.register('torii-provider:dummy-success', DummySuccessProvider);
+    container.register('torii-provider:dummy-failure', DummyFailureProvider);
     torii = container.lookup('torii:main');
   },
   teardown: function(){

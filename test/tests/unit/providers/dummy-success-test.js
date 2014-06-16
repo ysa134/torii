@@ -1,6 +1,6 @@
 var provider;
 
-import Provider from 'torii/providers/dummy-success';
+import Provider from 'test/helpers/dummy-success-provider';
 
 module('DummySuccessProvider - Unit', {
   setup: function(){
