@@ -60,25 +60,26 @@
  */
 
 window.ENV = window.ENV || {};
-var configuration = window.ENV.torii = {providers: {}};
+var configuration = window.ENV.torii = {providers: {}},
+    redirectUri = 'http://vestorly.github.io/torii/demo.html';
 
 configuration.providers['linked-in-oauth2'] = {
-  apiKey: '772yus6d70pf11',
-  redirectUri: 'http://localhost:8000/example/basic.html'
+  apiKey: '77h2z5gntwugau',
+  redirectUri: redirectUri
 };
 
 configuration.providers['google-oauth2'] = {
-  redirectUri: 'http://localhost:8000/example/basic.html',
-  apiKey:      '139338504777-vqu8ikemg935k1kivsku7fv3cfgq9452.apps.googleusercontent.com'
+  redirectUri: redirectUri,
+  apiKey:      '541873702882-jkfl29delr6r7t4fon8b54fd3ignhs8s.apps.googleusercontent.com'
 };
 
 configuration.providers['facebook-connect'] = {
-  appId:      '744221908941738'
+  appId:      '639484756139940'
 };
 
 configuration.providers['facebook-oauth2'] = {
-  apiKey:      '744221908941738',
-  redirectUri: 'http://localhost:8000/example/basic.html'
+  apiKey:      '639484756139940',
+  redirectUri: redirectUri
 };
 
 require("torii/ember");
