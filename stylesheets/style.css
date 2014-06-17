@@ -241,3 +241,25 @@ strong { font-family: 'Freight Sans Pro Medium'; font-weight: normal; }
 	.footer-nav li ~ li { margin-left: 30px; }
 
 }
+
+table.buttons {
+  margin: 0 auto;
+}
+
+table.buttons tr td {
+  padding: 6px;
+  text-align: center;
+}
+
+.intro-entry pre {
+  text-align: left;
+}
+
+.header-bg {
+  background: url("images/temp/intro.jpg");
+  padding-bottom: 19px;
+}
+
+.back-link {
+  margin: 6px 0 0 0;
+}

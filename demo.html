@@ -1,0 +1,162 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
+	<title>Torii Demo</title>
+
+ 	<meta content='Torii Demo' property='og:title'>
+  <meta content='Torii Demo' name='title'>
+  <meta content='https://d1sva73gxwx496.cloudfront.net/images/homepage/logo-white-0366f369.png' name='og:image'>
+  <meta content='Torii is an authorization service library for your Ember.js application. Adding social login to your Ember.js app just got a whole lot simpler.' name='description'>
+  <meta content='Vestorly' name='author'>
+  <meta content='Torii' property='og:site_name'>
+  <meta content='website' property='og:type'>
+
+
+	<link rel="stylesheet" href="stylesheets/fonts.css" type="text/css" media="all" />
+	<link rel="stylesheet" href="stylesheets/bootstrap.min.css" type="text/css" media="all" />
+	<link rel="stylesheet" href="stylesheets/style.css" type="text/css" media="all" />
+	<link rel="shortcut icon" type="image/x-icon" href="stylesheets/images/favicon.ico" />
+
+  <script src='bower_components/loader/loader.js'></script>
+  <script src='bower_components/jquery/jquery.js'></script>
+	<script type="text/javascript" src="javascripts/bootstrap.min.js"></script>
+	<script type="text/javascript" src="javascripts/jquery.fullscreener.min.js"></script>
+	<script type="text/javascript" src="javascripts/main.js"></script>
+  <script src='bower_components/handlebars/handlebars.js'></script>
+  <script src='bower_components/ember/ember.js'></script>
+  <script src='vendor/ember-shim.js'></script>
+  <script src='bower_components/ember-resolver/dist/ember-resolver.js'></script>
+  <script src='vendor/torii.amd.js'></script>
+  <script src='//cdnjs.cloudflare.com/ajax/libs/rainbow/1.2.0/js/rainbow.min.js'></script>
+  <script src='//cdnjs.cloudflare.com/ajax/libs/rainbow/1.2.0/js/language/generic.js'></script>
+  <script src='//cdnjs.cloudflare.com/ajax/libs/rainbow/1.2.0/js/language/javascript.js'></script>
+</head>
+<body>
+<div class="wrapper">
+	<div class="header header-bg">
+		<div class="container">
+			<a href="/" class="btn btn-bordered back-link">Torii Main Page</a>
+
+			 <div class="actions">
+			 	<a href="https://github.com/vestorly/torii" class="btn btn-bordered">FORK ME ON GITHUB</a>
+			 </div><!-- /.actions -->
+		</div><!-- /.container -->
+	</div><!-- /.header -->
+
+	<div class="main">
+		<div class="section">
+			<div class="container">
+				<h3>The Demo. Open a provider.</h3>
+
+        <div id="ember-app"></div>
+      </div>
+    </div>
+		<div class="section section-grey">
+			<div class="container">
+				<h3>The Source</h3>
+
+  <pre><code id="source" data-language="javascript">/*
+ * Source code for this demo:
+ */
+
+window.ENV = window.ENV || {};
+var configuration = window.ENV.torii = {providers: {}};
+
+configuration.providers['linked-in-oauth2'] = {
+  apiKey: '772yus6d70pf11',
+  redirectUri: 'http://localhost:8000/example/basic.html'
+};
+
+configuration.providers['google-oauth2'] = {
+  redirectUri: 'http://localhost:8000/example/basic.html',
+  apiKey:      '139338504777-vqu8ikemg935k1kivsku7fv3cfgq9452.apps.googleusercontent.com'
+};
+
+configuration.providers['facebook-connect'] = {
+  appId:      '744221908941738'
+};
+
+configuration.providers['facebook-oauth2'] = {
+  apiKey:      '744221908941738',
+  redirectUri: 'http://localhost:8000/example/basic.html'
+};
+
+require("torii/ember");
+
+var App = Ember.Application.create({
+  rootElement: '#ember-app'
+});
+
+App.ApplicationRoute = Ember.Route.extend({
+  actions: {
+    authenticate: function(provider){
+      var controller = this.controller;
+      controller.set('error', null);
+      controller.set('authData', null);
+      this.get('torii').open(provider).then(function(authData){
+        controller.set('authData', authData);
+      }, function(error){
+        controller.set('error', error);
+      });
+    }
+  }
+});
+
+Ember.Handlebars.registerBoundHelper('inspect-object', function(obj){
+  return new Handlebars.SafeString(JSON.stringify(obj));
+});</code></pre>
+
+			</div><!-- /.container -->
+		</div><!-- /.section -->
+	</div><!-- /.main -->
+
+	<div class="footer footer-simple">
+		<div class="container">
+			<p>A <span><a href="http://vestorly.github.io/">Vestorly Open Source</a></span> Project</p>
+		</div><!-- /.container -->
+	</div><!-- /.footer -->
+</div><!-- /.wrapper -->
+<script type="text/x-handlebars">
+  <table class="buttons">
+    <tr>
+      <td>
+        <button class="btn" {{action "authenticate" "linked-in-oauth2"}}>Linked In OAuth2</button>
+      </td>
+      <td>
+        <button class="btn" {{action "authenticate" "google-oauth2"}}>Google OAuth2</button>
+      </td>
+      <td>
+        <button class="btn" {{action "authenticate" "facebook-connect"}}>Facebook Connect</button>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <button class="btn" {{action "authenticate" "facebook-oauth2"}}>Facebook Oauth2</button>
+      </td>
+      <td>
+        <button class="btn" {{action "authenticate" "dummy-success"}}>Dummy Success</button>
+      </td>
+      <td>
+        <button class="btn" {{action "authenticate" "dummy-failure"}}>Dummy Failure</button>
+      </td>
+    </tr>
+  </table>
+
+  <br>
+
+  <div>
+    <pre><code>Auth data: {{#if authData}}{ {{inspect-object authData}} }{{/if}}</code></pre>
+  </div>
+  <div>
+    <pre><code>Error data: {{error}}</code></pre>
+  </div>
+
+  <p></p>
+</script>
+<script>
+  eval($('#source').text());
+</script>
+</body>
+</html>
