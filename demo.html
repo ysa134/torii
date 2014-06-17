@@ -146,7 +146,7 @@ Ember.Handlebars.registerBoundHelper('inspect-object', function(obj){
   <br>
 
   <div>
-    <pre><code>Auth data: {{#if authData}}{ {{inspect-object authData}} }{{/if}}</code></pre>
+    <pre><code>Auth data: {{#if authData}}{{inspect-object authData}}{{/if}}</code></pre>
   </div>
   <div>
     <pre><code>Error data: {{error}}</code></pre>
