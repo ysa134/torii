@@ -2,12 +2,16 @@ var container, session, user, adapter;
 
 import toriiContainer from 'test/helpers/torii-container';
 import Session from 'torii/session';
-import DummyAdapter from 'torii/adapters/dummy';
+import DummyAdapter from 'test/helpers/dummy-adapter';
+import DummySuccessProvider from 'test/helpers/dummy-success-provider';
+import DummyFailureProvider from 'test/helpers/dummy-failure-provider';
 
 module('Session (open) - Integration', {
   setup: function(){
     container = toriiContainer();
     container.register('torii:session', Session);
+    container.register('torii-provider:dummy-success', DummySuccessProvider);
+    container.register('torii-provider:dummy-failure', DummyFailureProvider);
     container.injection('torii:session', 'torii', 'torii:main');
     session = container.lookup('torii:session');
   },

@@ -1,6 +1,6 @@
 var provider;
 
-import Provider from 'torii/providers/dummy-failure';
+import Provider from 'test/helpers/dummy-failure-provider';
 
 module('DummyFailureProvider - Unit', {
   setup: function(){
