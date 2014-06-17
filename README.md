@@ -118,29 +118,16 @@ Note that the adapter section is left entirely to your application.
 Using Torii currently requires an AMD-compatible module loader. [Ember-App Kit](https://github.com/stefanpenner/ember-app-kit)
 and [Ember-CLI](http://iamstef.net/ember-cli/) provide this out of the box.
 
-First, **obtain a distribution version of torii**:
+Install torii via bower:
 
-The torii repo is publc, to obtain a distribution version of torii you'll need pull the code and build a dist yourself.
-
-To build a dist version of torii yourself, assuming you have access to the repo, you'll want to clone the repo and
-build torii:
-
-```
-git clone git@github.com/Vestorly/torii.git
-cd torii
-npm install
-grunt build:dist
-```
-
-Copy `dist/torii.amd.js` to `vendor/torii/index.js` in your ember-cli project.
-
-If you have a built version of torii you can skip to the step of copying it into your project as described above.
+`bower install torii`
 
 Next, **add Torii to your build pipeline**. In Ember-App-Kit you do this
 in `app/index.html`. In Ember-CLI, you add the package to the `Brocfile.js`:
 
 ```
-app.import('vendor/torii/index.js', {
+// Your path to torii may be different than the one below
+app.import('vendor/torii/dist/torii.amd.js', {
   // If you want to subclass a Torii class in your application, whitelist
   // that module here. For instance, the base provider class:
   //
@@ -373,6 +360,15 @@ Use [YUIDoc](http://yui.github.io/yuidoc/).
   * Output will be put into "docs/"
 
 *Initial development of Torii was generously funded by [Vestorly](https://www.vestorly.com/). Vestorly is a technology company solving the client acquisition problem for professionals in wealth management, and the enterprises that support them. Vestorly's user interface is built entirely with Ember.js and modern web technologies. [hello@vestorly.com](hello@vestorly.com)*
+
+## Release a new version
+
+  * Bump version in package.json
+  * Bump version in bower.json
+  * `grunt build`
+  * Force commit new/changed files in dist/
+  * `git tag <version>`
+  * `git push --tags`
 
 ## How to help
 
