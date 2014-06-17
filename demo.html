@@ -17,6 +17,7 @@
 	<link rel="stylesheet" href="stylesheets/fonts.css" type="text/css" media="all" />
 	<link rel="stylesheet" href="stylesheets/bootstrap.min.css" type="text/css" media="all" />
 	<link rel="stylesheet" href="stylesheets/style.css" type="text/css" media="all" />
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/rainbow/1.2.0/themes/github.css" type="text/css" media="all" />
 	<link rel="shortcut icon" type="image/x-icon" href="stylesheets/images/favicon.ico" />
 
   <script src='bower_components/loader/loader.js'></script>
@@ -27,7 +28,6 @@
   <script src='bower_components/handlebars/handlebars.js'></script>
   <script src='bower_components/ember/ember.js'></script>
   <script src='vendor/ember-shim.js'></script>
-  <script src='bower_components/ember-resolver/dist/ember-resolver.js'></script>
   <script src='vendor/torii.amd.js'></script>
   <script src='//cdnjs.cloudflare.com/ajax/libs/rainbow/1.2.0/js/rainbow.min.js'></script>
   <script src='//cdnjs.cloudflare.com/ajax/libs/rainbow/1.2.0/js/language/generic.js'></script>
@@ -48,6 +48,7 @@
 	<div class="main">
 		<div class="section">
 			<div class="container">
+        <br>
 				<h3>The Demo. Open a provider.</h3>
 
         <div id="ember-app"></div>
@@ -152,11 +153,11 @@ Ember.Handlebars.registerBoundHelper('inspect-object', function(obj){
   <div>
     <pre><code>Error data: {{error}}</code></pre>
   </div>
-
-  <p></p>
 </script>
 <script>
-  eval($('#source').text());
+  $(function(){
+    eval($('#source').text());
+  });
 </script>
 </body>
 </html>
