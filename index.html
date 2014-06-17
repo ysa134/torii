@@ -74,21 +74,19 @@
 				<h3>GETTING STARTED</h3>
 
 
-				<p>First, install torii from bower: `bower install torii`.  Next, add Torii to your build pipleline.  In Ember-App-Kit you can do this in app/index.html as shown below:</p>
+				<p>First, install torii from bower: `bower install torii`.  Next, add Torii to your build pipleline.  In Ember-App-Kit you can do this in app/index.html. If you are using ember-cli, you can add it to your Brocfile.js as shown below:</p>
 
 				<div class="code">
 <pre>
-// In Ember-App-Kit you will set this in app/index.html
-// In Ember-CLI you will set these values in config/environment.js
-window.ENV = window.ENV || {};
-window.ENV['torii'] = {
-  providers: {
-    'facebook-connect': {
-      appId: 'xxxxx-some-app-id',
-      scope: 'email,birthday'
-    }
-  }
-};
+// Your path to torii may be different than the one below
+app.import('vendor/torii/dist/torii.amd.js', {
+  // If you want to subclass a Torii class in your application, whitelist
+  // that module here. For instance, the base provider class:
+  //
+  // 'torii/providers/base': ['default']
+  //
+  // See http://iamstef.net/ember-cli/#managing-dependencies
+});
 </pre>
 			</div>
 
