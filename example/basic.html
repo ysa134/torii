@@ -18,8 +18,6 @@
       <button {{action "authenticate" "google-oauth2"}}>Google OAuth2</button>
       <button {{action "authenticate" "facebook-connect"}}>Facebook Connect</button>
       <button {{action "authenticate" "facebook-oauth2"}}>Facebook Oauth2</button>
-      <button {{action "authenticate" "dummy-success"}}>Dummy Success</button>
-      <button {{action "authenticate" "dummy-failure"}}>Dummy Failure</button>
 
       <div>
         Auth data: {{#if authData}}
@@ -32,7 +30,7 @@
     </script>
 
     <script src='../bower_components/loader/loader.js'></script>
-    <script src='../bower_components/jquery/jquery.js'></script>
+    <script src='../bower_components/jquery/dist/jquery.js'></script>
     <script src='../bower_components/handlebars/handlebars.js'></script>
     <script src='../bower_components/ember/ember.js'></script>
     <script src='../vendor/ember-shim.js'></script>
