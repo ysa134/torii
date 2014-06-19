@@ -7,8 +7,8 @@ module.exports = {
     dest: 'dist/<%= pkg.name %>-<%= pkg.version %>.amd.js',
     options: {
       banner: '/**\n' +
-              '  @class RSVP\n' +
-              '  @module RSVP\n' +
+              '  @class Torii\n' +
+              '  @module Torii\n' +
               '  */\n'
     }
   },

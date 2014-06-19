@@ -359,8 +359,6 @@ Use [YUIDoc](http://yui.github.io/yuidoc/).
   * Generate: `yuidoc lib/`
   * Output will be put into "docs/"
 
-*Initial development of Torii was generously funded by [Vestorly](https://www.vestorly.com/). Vestorly is a technology company solving the client acquisition problem for professionals in wealth management, and the enterprises that support them. Vestorly's user interface is built entirely with Ember.js and modern web technologies. [hello@vestorly.com](hello@vestorly.com)*
-
 ## Release a new version
 
   * Bump version in package.json
@@ -372,8 +370,16 @@ Use [YUIDoc](http://yui.github.io/yuidoc/).
 
 ## How to help
 
-Torii aims to provide a flexible set of primitives for creating your application' own
-authentication solution. There are still a few things we could use help with:
+*Initial development of Torii was generously funded by
+[Vestorly](https://www.vestorly.com/). Vestorly is a technology company
+solving the client acquisition problem for professionals in wealth
+management, and the enterprises that support them. Vestorly's user
+interface is built entirely with Ember.js and modern web technologies.
+[hello@vestorly.com](hello@vestorly.com)*
+
+Torii aims to provide a flexible set of primitives for creating your
+application' own authentication solution. There are still a few things
+we could use help with:
 
 * A non-AMD build of the code
 * More testing of sessions
