@@ -1,7 +1,3 @@
-/**
-  @class Torii
-  @module Torii
-  */
 define("torii/adapters/application", 
   ["exports"],
   function(__exports__) {

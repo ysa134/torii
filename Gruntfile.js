@@ -43,7 +43,8 @@ module.exports = function(grunt) {
     'concat:browser',
     'concat:amdNoVersion',
     'jshint',
-    'uglify:browser'
+    'uglify:browser',
+    'copy:npm'
   ]);
 
   // Custom phantomjs test task
