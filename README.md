@@ -176,7 +176,7 @@ promise:
   external OAuth provider like Facebook to retrieve authorization data.
 
 Torii will lookup providers in the Ember application container, so if you
-name them conventionally (put the in the `app/torii-providers` directory)
+name them conventionally (put them in the `app/torii-providers` directory)
 they will be available automatically.
 
 A minimal provider:
