@@ -49,7 +49,7 @@ strong { font-family: 'Freight Sans Pro Medium'; font-weight: normal; }
 .btn { display: inline-block; border: 0; border-radius: 2px; font-family: 'Freight Sans Pro Semibold'; font-size: 19px; color: #fff; text-align: center; text-transform: uppercase; vertical-align: middle; cursor: pointer; -webkit-appearance: none; font-weight: normal; }
 .btn:hover { text-decoration: none; color: #fff; }
 
-.btn-bordered { padding: 0 20px; border: 2px solid #ae908e; border-radius: 3px; height: 38px; font-size: 14px; line-height: 34px; letter-spacing: 1px; }
+.btn-bordered { padding: 0 13px; border: 2px solid #ae908e; border-radius: 3px; height: 38px; font-size: 14px; line-height: 34px; letter-spacing: 1px; }
 .btn-bordered:hover { border-color: #fff; }
 
 .btn-light,
