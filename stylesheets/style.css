@@ -263,3 +263,12 @@ table.buttons tr td {
 .back-link {
   margin: 6px 0 0 0;
 }
+
+button.auth {
+  margin-bottom: 15px;
+  min-width: 207px;
+}
+
+.text-center {
+	text-align: center;
+}

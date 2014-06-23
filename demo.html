@@ -37,11 +37,8 @@
 <div class="wrapper">
 	<div class="header header-bg">
 		<div class="container">
-			<a href="./" class="btn btn-bordered back-link">Torii Main Page</a>
-
-			 <div class="actions">
-			 	<a href="https://github.com/vestorly/torii" class="btn btn-bordered">FORK ME ON GITHUB</a>
-			 </div><!-- /.actions -->
+			<a href="./" class="btn btn-bordered pull-left">Torii Main Page</a>
+      <a href="https://github.com/vestorly/torii" class="btn btn-bordered pull-right">FORK ME ON GITHUB</a>
 		</div><!-- /.container -->
 	</div><!-- /.header -->
 
@@ -118,30 +115,26 @@ Ember.Handlebars.registerBoundHelper('inspect-object', function(obj){
 	</div><!-- /.footer -->
 </div><!-- /.wrapper -->
 <script type="text/x-handlebars">
-  <table class="buttons">
-    <tr>
-      <td>
-        <button class="btn" {{action "authenticate" "linked-in-oauth2"}}>Linked In OAuth2</button>
-      </td>
-      <td>
-        <button class="btn" {{action "authenticate" "google-oauth2"}}>Google OAuth2</button>
-      </td>
-      <td>
-        <button class="btn" {{action "authenticate" "facebook-connect"}}>Facebook Connect</button>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <button class="btn" {{action "authenticate" "facebook-oauth2"}}>Facebook Oauth2</button>
-      </td>
-      <td>
-        <button class="btn" {{action "authenticate" "dummy-success"}}>Dummy Success</button>
-      </td>
-      <td>
-        <button class="btn" {{action "authenticate" "dummy-failure"}}>Dummy Failure</button>
-      </td>
-    </tr>
-  </table>
+  <div class="row text-center">
+    <div class="col-xs-12 col-sm-6 col-md-4">
+      <button class="btn auth" {{action "authenticate" "linked-in-oauth2"}}>Linked In OAuth2</button>
+    </div>
+    <div class="col-xs-12 col-sm-6 col-md-4">
+      <button class="btn auth" {{action "authenticate" "google-oauth2"}}>Google OAuth2</button>
+    </div>
+    <div class="col-xs-12 col-sm-6 col-md-4">
+      <button class="btn auth" {{action "authenticate" "facebook-connect"}}>Facebook Connect</button>
+    </div>
+    <div class="col-xs-12 col-sm-6 col-md-4">
+      <button class="btn auth" {{action "authenticate" "facebook-oauth2"}}>Facebook Oauth2</button>
+    </div>
+    <div class="col-xs-12 col-sm-6 col-md-4">
+      <button class="btn auth" {{action "authenticate" "dummy-success"}}>Dummy Success</button>
+    </div>
+    <div class="col-xs-12 col-sm-6 col-md-4">
+      <button class="btn auth" {{action "authenticate" "dummy-failure"}}>Dummy Failure</button>
+    </div>
+  </div>
 
   <br>
 
