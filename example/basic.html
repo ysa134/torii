@@ -60,7 +60,7 @@
         redirectUri: 'http://localhost:8000/example/basic.html'
       };
 
-      require("torii/ember");
+      require("torii/load-initializers")['default']();
 
       var App = Ember.Application.create();
 

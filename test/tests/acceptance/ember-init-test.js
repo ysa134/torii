@@ -1,4 +1,3 @@
-import 'torii/ember'; // side effect: registers 'torii:main'
 import startApp from 'test/helpers/start-app';
 import configuration from 'torii/configuration';
 
@@ -29,7 +28,7 @@ test('session is not injected by default', function(){
 test('session is injected with the name in the configuration', function(){
   configuration.sessionServiceName = 'wackySessionName';
 
-  app = startApp();
+  app = startApp({loadInitializers: true});
   container = app.__container__;
   ok(container.has('torii:session'), 'torii:session is injected');
 

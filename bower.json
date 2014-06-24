@@ -23,6 +23,8 @@
     "bower_components",
     "dist/commonjs",
     "ember-addon",
+    "app-addon",
+    "vendor-addon",
     "example",
     "lib",
     "tasks",

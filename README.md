@@ -118,7 +118,23 @@ Note that the adapter section is left entirely to your application.
 Using Torii currently requires an AMD-compatible module loader. [Ember-App Kit](https://github.com/stefanpenner/ember-app-kit)
 and [Ember-CLI](http://iamstef.net/ember-cli/) provide this out of the box.
 
-Install torii via bower:
+### Using Torii as an ember-addon
+
+Torii is configured to be compatible with the ember-cli
+[ember-addon](http://reefpoints.dockyard.com/2014/06/24/introducing_ember_cli_addons.html)
+functionality, as of ember-cli version 0.0.36.
+
+If you are using ember-cli you can simply install the torii npm module:
+
+`npm install torii --save-dev`
+
+The ember-addon hooks will include torii into your app and add its
+initializers.
+
+### Using Torii via bower
+
+Torii is also published as a bower package (as named amd modules).
+Install via bower:
 
 `bower install torii`
 
@@ -126,24 +142,28 @@ Next, **add Torii to your build pipeline**. In Ember-App-Kit you do this
 in `app/index.html`. In Ember-CLI, you add the package to the `Brocfile.js`:
 
 ```
-// Your path to torii may be different than the one below
-app.import('vendor/torii/dist/torii.amd.js', {
-  // If you want to subclass a Torii class in your application, whitelist
-  // that module here. For instance, the base provider class:
-  //
-  // 'torii/providers/base': ['default']
-  //
-  // See http://iamstef.net/ember-cli/#managing-dependencies
+// Your path to torii may be different than the one below, depending on
+// your bower configuration.
+app.import('vendor/torii/dist/torii.amd.js');
 });
 ```
 
-**Add Torii's intialization code to your app**. Torii exports an amd module named `torii/ember`, which will
+**Add Torii's intialization code to your app**. Torii exports an amd module named `torii/load-initializers`, which will
 add the appropriate application initializers to do Torii's container registrations and injections.
-You will want to add `require('torii/ember');` to your `app.js` file after you've defined your app.
+You will want to add `require('torii/load-initializers')['default']();` to your `app.js` file after you've defined your app
+and before you've created it.
 Here is an [example app.js](https://gist.github.com/bantic/b86787ed315c5ef98323).
 
-**Configure a Torii provider**. Here, we set the `window.ENV` with a
-configuration for the Facebook Connect provider:
+## Configuring a Torii provider
+
+Now that you have added Torii to your application, you will want to
+configure at least one authentication provider. Torii looks for a global
+object at `window.ENV.torii.providers` that defines a hash of provider
+names and their options.
+
+**Configure a Torii provider**. Torii comes with a `facebook-connect`
+provider included. To configure torii for the 'facebook-connect'
+provider, include it in the `window.ENV.torii.providers` hash like so:
 
 ```JavaScript
 // In Ember-App-Kit you will set this in app/index.html
@@ -166,18 +186,23 @@ will require you to write an adapter for your application – see notes on sessi
 
 ## Providers in Torii
 
+Torii is built with several providers for common cases. If you intend to
+use another provider for authentication, you will need to create your
+own.
+
 ### Writing a provider
 
-Providers have a single hook that must be implemented. Each *must* return a
+Providers have a single hook, `open`, that must be implemented. It *must* return a
 promise:
 
-* `open` must create a new authorization. An example of this is logging a
+* `open` creates a new authorization. An example of this is logging in a
   user in with their username and password, or interfacing with an
   external OAuth provider like Facebook to retrieve authorization data.
 
 Torii will lookup providers in the Ember application container, so if you
 name them conventionally (put them in the `app/torii-providers` directory)
-they will be available automatically.
+they will be available automatically when using ember-cli or ember app
+kit.
 
 A minimal provider:
 
@@ -200,7 +225,7 @@ They may return SDK objects, such as an object with an API for making
 authenticated calls to an API.
 
 When used via `torii.open`, the authorization object is passed through to
-the consumer. An example provider:
+the consumer. An example provider called 'geocities':
 
 ```JavaScript
 // app/torii-providers/geocities.js
@@ -229,8 +254,9 @@ export default Ember.Route.extend({
   actions: {
     openGeocities: function(username, password){
       var route = this;
+      var providerName = 'geocities';
       // argument to open is passed into the provider
-      this.get('torii').open('geocities', {
+      this.get('torii').open(providerName, {
         username: username,
         password: password
       }).then(function(authorization){

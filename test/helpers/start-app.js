@@ -1,5 +1,10 @@
+import initializeTorii from 'test/helpers/initialize-torii';
+
 function startApp(attrs) {
   var App;
+  if (!attrs) { attrs = {}; }
+
+  var loadInitializers = attrs.loadInitializers;
 
   var attributes = Ember.merge({
     // useful Test defaults
@@ -12,6 +17,10 @@ function startApp(attrs) {
   Application.Router = Ember.Router.extend({
     location: 'none'
   });
+
+  if (loadInitializers) {
+    initializeTorii(Application);
+  }
 
   Ember.run(function(){
     App = Application.create(attributes);

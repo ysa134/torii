@@ -1,4 +1,3 @@
-import 'torii/ember'; // side effect: registers 'torii:main'
 import startApp from 'test/helpers/start-app';
 import DummyAdapter from 'test/helpers/dummy-adapter';
 import DummySuccessProvider from 'test/helpers/dummy-success-provider';
@@ -14,7 +13,7 @@ function signIn(sessionData){
 
 module('Session - Acceptance', {
   setup: function(){
-    app = startApp();
+    app = startApp({loadInitializers: true});
     container = app.__container__;
     torii   = container.lookup("torii:main");
     session = container.lookup("torii:session");
