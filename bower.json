@@ -22,6 +22,7 @@
   "ignore": [
     "bower_components",
     "dist/commonjs",
+    "ember-addon",
     "example",
     "lib",
     "tasks",
