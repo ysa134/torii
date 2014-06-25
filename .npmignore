@@ -4,3 +4,8 @@
 /tasks/
 /tmp/
 /example/
+/dist/
+/lib/
+testem.json
+yuidoc.json
+bower.json
