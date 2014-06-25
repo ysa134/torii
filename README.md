@@ -394,6 +394,9 @@ Use [YUIDoc](http://yui.github.io/yuidoc/).
   * Force commit new/changed files in app-addon/ and vendor-addon/
   * `git tag <version>`
   * `git push --tags`
+  * Publishing a version git tag will automatically register a new bower
+    version
+  * To publish the updated npm module, `npm publish ./`
 
 ## How to help
 
