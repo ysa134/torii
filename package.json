@@ -16,6 +16,7 @@
   "devDependencies": {
     "connect-redirection": "0.0.1",
     "grunt": "~0.4.2",
+    "grunt-banner": "^0.2.3",
     "grunt-browserify": "~1.2.12",
     "grunt-cli": "~0.1.11",
     "grunt-contrib-clean": "~0.5.0",
@@ -55,13 +56,28 @@
     "email": "hello@vestorly.com"
   },
   "contributors": [
-    {"name": "Matt Beale", "email": "matt.beale@madhatted.com"},
-    {"name": "Cory Forsyth", "email": "cory.forsyth@gmail.com"},
-    {"name": "Vestorly", "email": "hello@vestorly.com"}
+    {
+      "name": "Matt Beale",
+      "email": "matt.beale@madhatted.com"
+    },
+    {
+      "name": "Cory Forsyth",
+      "email": "cory.forsyth@gmail.com"
+    },
+    {
+      "name": "Vestorly",
+      "email": "hello@vestorly.com"
+    }
   ],
   "maintainers": [
-    {"name": "Matt Beale", "email": "matt.beale@madhatted.com"},
-    {"name": "Cory Forsyth", "email": "cory.forsyth@gmail.com"}
+    {
+      "name": "Matt Beale",
+      "email": "matt.beale@madhatted.com"
+    },
+    {
+      "name": "Cory Forsyth",
+      "email": "cory.forsyth@gmail.com"
+    }
   ],
   "license": "MIT"
 }

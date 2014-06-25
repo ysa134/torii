@@ -44,6 +44,7 @@ module.exports = function(grunt) {
     'concat:amdNoVersion',
     'jshint',
     'uglify:browser',
+    'usebanner:addVersion',
     'copy:appAddOn',
     'copy:vendorAddOn'
   ]);
