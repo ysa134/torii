@@ -40,13 +40,15 @@ EmberToriiAddon.prototype.treeFor = function treeFor(name) {
 
 EmberToriiAddon.prototype.included = function included(app) {
   app.import('vendor/torii/torii.amd.js', {
-    'torii/torii': ['default'],
+    exports: {
+      'torii/torii': ['default'],
 
-    // These are all exports that the torii initializers must import
-    'torii/session': ['default'],
-    'torii/bootstrap': ['default'],
-    'torii/configuration': ['default'],
-    'torii/redirect-handler': ['default']
+      // These are all exports that the torii initializers must import
+      'torii/session': ['default'],
+      'torii/bootstrap': ['default'],
+      'torii/configuration': ['default'],
+      'torii/redirect-handler': ['default']
+    }
   });
 
 };
