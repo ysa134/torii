@@ -1,4 +1,8 @@
 /**
+ * Torii version: 0.1.0
+ * Built: Wed Jun 25 2014 16:45:14 GMT-0400 (EDT)
+ */
+/**
   @class Torii
   @module Torii
   */
