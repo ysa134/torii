@@ -90,7 +90,7 @@ configuration.providers['facebook-oauth2'] = {
   redirectUri: redirectUri
 };
 
-require("torii/ember");
+require("torii/load-initializers")['default']();
 
 var App = Ember.Application.create({
   rootElement: '#ember-app'

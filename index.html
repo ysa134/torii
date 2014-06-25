@@ -73,28 +73,31 @@
 			<div class="container">
 				<h3>GETTING STARTED</h3>
 
+				<p>
+        If using ember-cli version 0.0.37 or later, you can install torii as an ember-addon. To do so, simply install the `torii`
+        npm module: `npm install torii --save-dev`. The ember-addon infrastructure will take care of adding it to your ember app
+        and initializing it.
+        </p>
 
-				<p>First, install torii from bower: `bower install torii`.  Next, add Torii to your build pipleline.  In Ember-App-Kit you can do this in app/index.html. If you are using ember-cli, you can add it to your Brocfile.js as shown below:</p>
+        <p>
+        If you are using an older version of ember-cli or ember app kit, you can install torii from bower:
+        `bower install torii`.
+        Next, add Torii to your build pipleline.
+        In Ember-App-Kit you can do this in app/index.html by adding a script tag to include the 'torii.amd.js' file.
+        If you are using ember-cli, you can add it to your Brocfile.js as shown below:</p>
 
 				<div class="code">
 <pre>
-// Your path to torii may be different than the one below
-app.import('vendor/torii/dist/torii.amd.js', {
-  // If you want to subclass a Torii class in your application,
-  // whitelist that module here.
-  // For instance, the base provider class:
-  //
-  // 'torii/providers/base': ['default']
-  //
-  // See http://iamstef.net/ember-cli/#managing-dependencies
-});
+// Your path to torii may be different than the one below,
+// depending on your bower configuration
+app.import('vendor/torii/dist/torii.amd.js');
 </pre>
 			</div>
 
-				<p>Add Torii's initialization code to your app:</p>
+				<p>If you are installing torii via bower, you need to add torii's initialization code to your app:</p>
 				<div class="code">
 <pre>
-require('torii/ember');
+require('torii/load-initializers')['default']();
 </pre>
 				</div>
 
