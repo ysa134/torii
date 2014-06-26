@@ -1,6 +1,6 @@
 /**
  * Torii version: 0.1.0
- * Built: Wed Jun 25 2014 16:45:14 GMT-0400 (EDT)
+ * Built: Thu Jun 26 2014 15:58:31 GMT-0400 (EDT)
  */
 define("torii/adapters/application", 
   ["exports"],
@@ -59,6 +59,11 @@ define("torii/bootstrap",
       container.register('torii-service:popup', PopupService);
 
       container.injection('torii-provider', 'popup', 'torii-service:popup');
+
+      if (window.DS) {
+        container.injection('torii-provider', 'store', 'store:main');
+        container.injection('torii-adapter', 'store', 'store:main');
+      }
 
       return container;
     }
@@ -143,9 +148,8 @@ define("torii/initializers/initialize-torii",
     var bootstrapTorii = __dependency1__["default"];
     var configuration = __dependency2__["default"];
 
-    __exports__["default"] = {
+    var initializer = {
       name: 'torii',
-      after: 'torii-callback',
       initialize: function(container, app){
         bootstrapTorii(container);
 
@@ -161,6 +165,12 @@ define("torii/initializers/initialize-torii",
         app.inject('route', 'torii', 'torii:main');
       }
     };
+
+    if (window.DS) {
+      initializer.after = 'store';
+    }
+
+    __exports__["default"] = initializer;
   });
 define("torii/lib/load-initializer", 
   ["exports"],
@@ -680,7 +690,7 @@ define("torii/providers/facebook-connect",
       // click itself.
       loadFbLogin: function(){
         fbLoad( this.settings() );
-      }.on('init'),
+      }.on('init')
 
     });
 
