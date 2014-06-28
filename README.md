@@ -86,7 +86,7 @@ export default Ember.Route.extend({
 // app/torii-adapters/application.js
 export default Ember.Object.extend({
   open: function(authentication){
-    var authorizationCode = authentication.get('authorizationCode');
+    var authorizationCode = authentication.authorizationCode;
     return new Ember.RSVP.Promise(function(resolve, reject){
       Ember.$.ajax({
         url: 'api/session',
