@@ -122,9 +122,9 @@ and [Ember-CLI](http://iamstef.net/ember-cli/) provide this out of the box.
 
 Torii is configured to be compatible with the ember-cli
 [ember-addon](http://reefpoints.dockyard.com/2014/06/24/introducing_ember_cli_addons.html)
-functionality, as of ember-cli version 0.0.36.
+functionality, as of ember-cli version 0.0.37.
 
-If you are using ember-cli you can simply install the torii npm module:
+If you are using ember-cli at version 0.0.37 or later, you can simply install the torii npm module:
 
 `npm install torii --save-dev`
 
