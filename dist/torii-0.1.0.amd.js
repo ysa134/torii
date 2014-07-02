@@ -1,11 +1,7 @@
 /**
  * Torii version: 0.1.0
- * Built: Thu Jun 26 2014 15:58:31 GMT-0400 (EDT)
+ * Built: Wed Jul 02 2014 18:49:11 GMT-0400 (EDT)
  */
-/**
-  @class Torii
-  @module Torii
-  */
 define("torii/adapters/application", 
   ["exports"],
   function(__exports__) {
@@ -342,12 +338,13 @@ define("torii/lib/state-machine",
       var afterTransitions  = (options.afterTransitions ||[]);
       var rule;
 
-      for(var i = 0, length = beforeTransitions.length; length > i; i++){
+      var i, length;
+      for(i = 0, length = beforeTransitions.length; length > i; i++){
         rule = beforeTransitions[i];
         this.beforeTransition.call(this, rule, rule.fn);
       }
 
-      for(var i = 0, length = afterTransitions.length; length > i; i++){
+      for(i = 0, length = afterTransitions.length; length > i; i++){
         rule = afterTransitions[i];
         this.afterTransition.call(this, rule, rule.fn);
       }
@@ -375,7 +372,7 @@ define("torii/lib/state-machine",
           if (0 < splits.length){
             nextStateName = splits.join('.') + nextStateName;
           } else {
-            nextStateName = nextStateName.substring(1)
+            nextStateName = nextStateName.substring(1);
           }
         }
 
@@ -1003,7 +1000,7 @@ define("torii/services/popup",
       }, options);
     }
 
-    var messagePrefix = '__torii_message:'
+    var messagePrefix = '__torii_message:';
 
     function validateToriiMessage(message){
       return message && message.indexOf(messagePrefix) === 0;
@@ -1226,7 +1223,7 @@ define("torii/session/state-machine",
           this[propertiesToClear[i]] = null;
         }
         this.transitionTo(target);
-      }
+      };
     }
 
     __exports__["default"] = function(session){
@@ -1257,7 +1254,7 @@ define("torii/session/state-machine",
             },
             failOpen: function(errorMessage){
               this.states['unauthenticated'].errorMessage = errorMessage;
-              this.transitionTo('unauthenticated')
+              this.transitionTo('unauthenticated');
             }
           },
           fetching: {
@@ -1270,7 +1267,7 @@ define("torii/session/state-machine",
             },
             failFetch: function(errorMessage){
               this.states['unauthenticated'].errorMessage = errorMessage;
-              this.transitionTo('unauthenticated')
+              this.transitionTo('unauthenticated');
             }
           },
           closing: {
@@ -1283,7 +1280,7 @@ define("torii/session/state-machine",
             },
             failClose: function(errorMessage){
               this.states['unauthenticated'].errorMessage = errorMessage;
-              this.transitionTo('unauthenticated')
+              this.transitionTo('unauthenticated');
             }
           }
         }
