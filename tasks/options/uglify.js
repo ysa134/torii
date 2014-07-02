@@ -1,21 +1,21 @@
 module.exports = {
-  browser: {
+  withVersion: {
     options: {
       mangle: true
     },
     files: {
       'dist/<%= pkg.name %>-<%= pkg.version %>.min.js': [
-        'dist/<%= pkg.name %>-<%= pkg.version %>.js'
+        'dist/<%= pkg.name %>-<%= pkg.version %>.amd.js'
       ],
     }
   },
-  browserNoVersion: {
+  noVersion: {
     options: {
       mangle: true
     },
     files: {
       'dist/<%= pkg.name %>.min.js': [
-        'dist/<%= pkg.name %>.js'
+        'dist/<%= pkg.name %>.amd.js'
       ],
     }
   }

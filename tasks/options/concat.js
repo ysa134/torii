@@ -3,13 +3,7 @@ module.exports = {
     src: [
       'tmp/**/*.amd.js'
     ],
-    dest: 'dist/<%= pkg.name %>-<%= pkg.version %>.amd.js',
-    options: {
-      banner: '/**\n' +
-              '  @class Torii\n' +
-              '  @module Torii\n' +
-              '  */\n'
-    }
+    dest: 'dist/<%= pkg.name %>-<%= pkg.version %>.amd.js'
   },
 
   amdNoVersion: {
@@ -19,31 +13,13 @@ module.exports = {
     dest: 'dist/<%= pkg.name %>.amd.js'
   },
 
-  deps: {
-    src: ['vendor/deps/*.js'],
-    dest: 'tmp/deps.amd.js'
-  },
-
-  browser: {
+  forTests: {
     src: [
       'vendor/loader.js',
       'tmp/<%= pkg.name %>/**/*.amd.js',
       'tmp/<%= pkg.name %>.amd.js'
     ],
-    dest: 'tmp/<%= pkg.name %>.browser1.js'
-  },
-
-  amdNodeTests: {
-    src: [
-      'vendor/loader.js',
-      'dist/<%= pkg.name %>.amd.js',
-      'tmp/tests/amd/**/*.js',
-    ],
-    dest: 'tmp/tests.node.js',
-    options: {
-      banner: 'var assert = require("../test/vendor/assert");',
-      footer: '\n;Object.keys(require.entries).filter(function(file) { return /_test$/.test(file); }).map(require);'
-    }
+    dest: 'tmp/<%= pkg.name %>.testbuild.js'
   },
 
   amdTests: {
