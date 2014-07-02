@@ -29,7 +29,7 @@ module.exports = function(grunt) {
     'clean:build',
     'transpile:amd',
     'concat:forTests',
-    'jshint',
+    'jshint:lib'
   ]);
 
   // Custom phantomjs test task
