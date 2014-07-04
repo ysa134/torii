@@ -145,7 +145,6 @@ in `app/index.html`. In Ember-CLI, you add the package to the `Brocfile.js`:
 // Your path to torii may be different than the one below, depending on
 // your bower configuration.
 app.import('vendor/torii/dist/torii.amd.js');
-});
 ```
 
 **Add Torii's intialization code to your app**. Torii exports an amd module named `torii/load-initializers`, which will
