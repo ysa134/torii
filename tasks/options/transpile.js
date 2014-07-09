@@ -22,22 +22,6 @@ module.exports = {
     }]
   },
 
-  commonjs: {
-    moduleName: nameFor,
-    type: 'cjs',
-    files: [{
-      expand: true,
-      cwd: 'lib/',
-      src: ['<%= pkg.name %>/**/*.js'],
-      dest: 'dist/commonjs/',
-      ext: '.js'
-    },
-    {
-      src: ['lib/<%= pkg.name %>.js'],
-      dest: 'dist/commonjs/main.js'
-    }]
-  },
-
   testsAmd: {
     moduleName: nameFor,
     type: 'amd',
@@ -50,19 +34,5 @@ module.exports = {
       'test/**/*-test.js'
     ],
     dest: 'tmp/tests/amd'
-  },
-
-  testsCommonjs: {
-    moduleName: nameFor,
-    expand: true,
-    type: 'cjs',
-    src: [
-      'test/test-helper.js',
-      'test/test-loader.js',
-      'test/helpers/*.js',
-      'test/tests.js',
-      'test/**/*-test.js'
-    ],
-    dest: 'tmp/tests/cjs'
   }
 };

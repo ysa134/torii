@@ -9,13 +9,6 @@ module.exports = function(grunt) {
 
   this.registerTask('default', ['build']);
 
-// Run client-side tests on the command line.
-  this.registerTask('test', 'Runs tests through the command line using PhantomJS', [
-    'build',
-    'tests',
-    'connect'
-  ]);
-
   // Run a server. This is ideal for running the QUnit tests in the browser.
   this.registerTask('server', [
     'build',
@@ -27,39 +20,22 @@ module.exports = function(grunt) {
 
   // Build test files
   this.registerTask('tests', 'Builds the test package', [
-    'concat:deps',
     'transpile:testsAmd',
-    'transpile:testsCommonjs',
-    'concat:amdNodeTests', // yet another hack to get es6 transpiled tests
     'concat:amdTests' // yet another hack to get es6 transpiled tests
   ]);
 
   // Build a new version of the library
   this.registerTask('build', 'Builds a distributable version of <%= cfg.name %>', [
-    'clean',
+    'clean:build',
     'transpile:amd',
-    'transpile:commonjs',
-    'concat:amd',
-    'concat:browser',
-    'concat:amdNoVersion',
-    'jshint',
-    'uglify:browser',
-    'usebanner:addVersion',
-    'copy:appAddOn',
-    'copy:vendorAddOn'
+    'concat:forTests',
+    'jshint:lib'
   ]);
 
   // Custom phantomjs test task
   this.registerTask('test:phantom', "Runs tests through the command line using PhantomJS", [
     'build',
     'tests'
-  ]);
-
-  // Custom Node test task
-  this.registerTask('test:node', [
-    'build',
-    'tests',
-    'mochaTest'
   ]);
 
   this.registerTask('test', [
@@ -69,14 +45,16 @@ module.exports = function(grunt) {
   ]);
 
   this.registerTask('build-release', [
-    'clean:build',
-    'transpile:amd',
-    'transpile:commonjs',
-    'transpile:amdNoVersion',
-    'concat:browser',
+    'clean:release',
+    'build',
+    'concat:amd',
     'concat:amdNoVersion',
-    'uglify:browserNoVersion'
-  ])
+    'uglify:withVersion',
+    'uglify:noVersion',
+    'usebanner:addVersion',
+    'copy:appAddOn',
+    'copy:vendorAddOn'
+  ]);
 
   // Custom YUIDoc task
   this.registerTask('docs', ['yuidoc']);
@@ -86,7 +64,6 @@ module.exports = function(grunt) {
 
   // Load custom tasks from NPM
   grunt.loadNpmTasks('grunt-contrib-yuidoc');
-  grunt.loadNpmTasks('grunt-release-it');
 
   // Merge config into emberConfig, overwriting existing settings
   grunt.initConfig(config);

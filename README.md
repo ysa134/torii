@@ -388,7 +388,7 @@ Use [YUIDoc](http://yui.github.io/yuidoc/).
 
   * Bump version in package.json
   * Bump version in bower.json
-  * `grunt build`
+  * `grunt build-release`
   * Force commit new/changed files in dist/
   * Force commit new/changed files in app-addon/ and vendor-addon/
   * `git tag <version>`
