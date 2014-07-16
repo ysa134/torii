@@ -17,7 +17,7 @@ on to routes:
 
 ```hbs
 {{! app/templates/post.hbs }}
-{{if hasFacebook}}
+{{#if hasFacebook}}
   {{partial "comment-form"}}
 {{else}}
   <a href="#" {{action 'signInToComment'}}>
