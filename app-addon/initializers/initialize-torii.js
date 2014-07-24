@@ -1,4 +1,4 @@
-import bootstrapTorii from 'torii/bootstrap';
+import bootstrapTorii from 'torii/bootstrap/torii';
 import configuration from 'torii/configuration';
 
 var initializer = {

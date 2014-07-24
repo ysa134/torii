@@ -1,6 +1,6 @@
 /**
- * Torii version: 0.1.0
- * Built: Wed Jul 02 2014 18:49:11 GMT-0400 (EDT)
+ * Torii version: 0.1.1
+ * Built: Thu Jul 24 2014 18:19:42 GMT-0400 (EDT)
  */
 define("torii/adapters/application", 
   ["exports"],
@@ -33,7 +33,22 @@ define("torii/adapters/application",
 
     __exports__["default"] = ApplicationAdapter;
   });
-define("torii/bootstrap", 
+define("torii/bootstrap/session", 
+  ["torii/session","exports"],
+  function(__dependency1__, __exports__) {
+    "use strict";
+    var Session = __dependency1__["default"];
+
+    __exports__["default"] = function(container, sessionName){
+      container.register('torii:session', Session);
+      container.injection('torii:session', 'torii', 'torii:main');
+      container.injection('route',      sessionName, 'torii:session');
+      container.injection('controller', sessionName, 'torii:session');
+
+      return container;
+    }
+  });
+define("torii/bootstrap/torii", 
   ["torii/torii","torii/providers/linked-in-oauth2","torii/providers/google-oauth2","torii/providers/facebook-connect","torii/providers/facebook-oauth2","torii/adapters/application","torii/providers/twitter-oauth1","torii/services/popup","exports"],
   function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __exports__) {
     "use strict";
@@ -119,30 +134,26 @@ define("torii/initializers/initialize-torii-callback",
     };
   });
 define("torii/initializers/initialize-torii-session", 
-  ["torii/configuration","torii/session","exports"],
+  ["torii/configuration","torii/bootstrap/session","exports"],
   function(__dependency1__, __dependency2__, __exports__) {
     "use strict";
     var configuration = __dependency1__["default"];
-    var Session = __dependency2__["default"];
+    var bootstrapSession = __dependency2__["default"];
 
     __exports__["default"] = {
       name: 'torii-session',
       after: 'torii',
 
       initialize: function(container, app){
-
         if (configuration.sessionServiceName) {
-          var sessionName = configuration.sessionServiceName;
-          app.register('torii:session', Session);
-          app.inject('torii:session', 'torii', 'torii:main');
-          app.inject('route',      sessionName, 'torii:session');
-          app.inject('controller', sessionName, 'torii:session');
+          bootstrapSession(container, configuration.sessionServiceName);
+          container.injection('adapter', configuration.sessionServiceName, 'torii:session');
         }
       }
     };
   });
 define("torii/initializers/initialize-torii", 
-  ["torii/bootstrap","torii/configuration","exports"],
+  ["torii/bootstrap/torii","torii/configuration","exports"],
   function(__dependency1__, __dependency2__, __exports__) {
     "use strict";
     var bootstrapTorii = __dependency1__["default"];
@@ -1297,19 +1308,26 @@ define("torii/torii",
       return container.lookup('torii-provider:'+providerName);
     }
 
-    function proxyToProvider(methodName){
+    function proxyToProvider(methodName, requireMethod){
       return function(providerName, options){
-        var provider = lookupProvider(this.container, providerName);
+        var container = this.container;
+        var provider = lookupProvider(container, providerName);
         if (!provider) {
           throw new Error("Expected a provider named '"+providerName+"' " +
                           ", did you forget to register it?");
         }
 
         if (!provider[methodName]) {
-          throw new Error("Expected provider '"+providerName+"' to define " +
-                          "the '"+methodName+"' method.");
+          if (requireMethod) {
+            throw new Error("Expected provider '"+providerName+"' to define " +
+                            "the '"+methodName+"' method.");
+          } else {
+            return Ember.RSVP.Promise.resolve({});
+          }
         }
-        return provider[methodName](options);
+        return new Ember.RSVP.Promise(function(resolve, reject){
+          resolve( provider[methodName](options) );
+        });
       };
     }
 
@@ -1340,7 +1358,7 @@ define("torii/torii",
        * @param {String} providerName The provider to open
        * @return {Ember.RSVP.Promise} Promise resolving to an authentication object
        */
-      open:  proxyToProvider('open'),
+      open:  proxyToProvider('open', true),
 
       /**
        * Return a promise which will resolve if the provider has
