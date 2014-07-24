@@ -13,7 +13,9 @@
     "ember-addon/",
     "bower.json"
   ],
-  "ember-addon-main": "ember-addon/index.js",
+  "ember-addon": {
+    "main": "ember-addon/index.js"
+  },
   "devDependencies": {
     "connect-redirection": "0.0.1",
     "grunt": "~0.4.2",
