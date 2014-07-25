@@ -45,7 +45,8 @@ EmberToriiAddon.prototype.included = function included(app) {
 
       // These are all exports that the torii initializers must import
       'torii/session': ['default'],
-      'torii/bootstrap': ['default'],
+      'torii/bootstrap/session': ['default'],
+      'torii/bootstrap/torii': ['default'],
       'torii/configuration': ['default'],
       'torii/redirect-handler': ['default']
     }
