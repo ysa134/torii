@@ -1,6 +1,6 @@
 /**
- * Torii version: 0.1.2
- * Built: Fri Jul 25 2014 10:51:44 GMT-0400 (EDT)
+ * Torii version: 0.1.3
+ * Built: Fri Jul 25 2014 11:23:42 GMT-0400 (EDT)
  */
 define("torii/adapters/application", 
   ["exports"],
@@ -144,7 +144,7 @@ define("torii/initializers/initialize-torii-session",
       name: 'torii-session',
       after: 'torii',
 
-      initialize: function(container, app){
+      initialize: function(container){
         if (configuration.sessionServiceName) {
           bootstrapSession(container, configuration.sessionServiceName);
           container.injection('adapter', configuration.sessionServiceName, 'torii:session');
