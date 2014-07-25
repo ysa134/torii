@@ -5,7 +5,7 @@ export default {
   name: 'torii-session',
   after: 'torii',
 
-  initialize: function(container){
+  initialize: function(container, app){
     if (configuration.sessionServiceName) {
       bootstrapSession(container, configuration.sessionServiceName);
       container.injection('adapter', configuration.sessionServiceName, 'torii:session');
