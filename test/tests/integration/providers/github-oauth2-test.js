@@ -28,7 +28,7 @@ module('Github - Integration', {
   }
 });
 
-test("Opens a popup to Google", function(){
+test("Opens a popup to GitHub", function(){
   Ember.run(function(){
     torii.open('github-oauth2').finally(function(){
       ok(opened, "Popup service is opened");
