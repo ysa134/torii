@@ -115,8 +115,7 @@ Note that the adapter section is left entirely to your application.
 
 ## Using Torii
 
-Using Torii currently requires an AMD-compatible module loader. [Ember-App Kit](https://github.com/stefanpenner/ember-app-kit)
-and [Ember-CLI](http://iamstef.net/ember-cli/) provide this out of the box.
+Using Torii currently requires an AMD-compatible module loader. [Ember-CLI](http://www.ember-cli.com/) provide this out of the box.
 
 ### Using Torii as an ember-addon
 
