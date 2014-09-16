@@ -38,17 +38,26 @@
     <script src='../dist/torii.amd.js'></script>
 
     <script>
+      if (window.location.host !== 'torii-example.com:8000') {
+        alert('The basic example must be run from ' +
+              'http://torii-example.com:8000. (Your host: ' +
+              window.location.host + ')');
+      }
+
+      var redirectUri = 'http://torii-example.com:8000/example/basic.html';
+
       window.ENV = window.ENV || {};
       var configuration = window.ENV.torii = {providers: {}};
 
       configuration.providers['linked-in-oauth2'] = {
         apiKey: '772yus6d70pf11',
-        redirectUri: 'http://localhost:8000/example/basic.html'
+        redirectUri: redirectUri
       };
 
       configuration.providers['google-oauth2'] = {
-        redirectUri: 'http://localhost:8000/example/basic.html',
-        apiKey:      '139338504777-vqu8ikemg935k1kivsku7fv3cfgq9452.apps.googleusercontent.com'
+        apiKey: '139338504777-321kme2daihrj8kr8g739ntne4h2bghk.apps.googleusercontent.com',
+        scope: 'email',
+        redirectUri: redirectUri
       };
 
       configuration.providers['facebook-connect'] = {
@@ -57,7 +66,7 @@
 
       configuration.providers['facebook-oauth2'] = {
         apiKey:      '744221908941738',
-        redirectUri: 'http://localhost:8000/example/basic.html'
+        redirectUri: redirectUri
       };
 
       require("torii/load-initializers")['default']();
