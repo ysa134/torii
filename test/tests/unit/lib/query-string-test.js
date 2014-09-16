@@ -88,3 +88,23 @@ test('value of false gets into url', function(){
         'false_prop is in url even when false');
 
 });
+
+test('uniq-ifies required params', function(){
+  var qs = new QueryString(obj, ['client_id', 'client_id']);
+
+  equal(qs.toString(), 'client_id='+clientId,
+        'only includes client_id once');
+});
+
+test('uniq-ifies optional params', function(){
+  var qs = new QueryString(obj, [], ['client_id', 'client_id']);
+
+  equal(qs.toString(), 'client_id='+clientId,
+        'only includes client_id once');
+});
+
+test('throws if optionalParams includes any requiredParams', function(){
+  throws(function(){
+    var qs = new QueryString(obj, ['client_id'], ['client_id']);
+  }, /required parameters cannot also be optional/i);
+});
