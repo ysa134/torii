@@ -8,18 +8,51 @@
     <meta name='viewport' content='width=device-width, initial-scale=1'>
 
     <link rel="stylesheet" href='app.css'>
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
   </head>
   <body>
 
     <script type="text/x-handlebars">
       <h2>Torii: Example Usage</h2>
 
-      <button {{action "authenticate" "linked-in-oauth2"}}>Linked In OAuth2</button>
-      <button {{action "authenticate" "google-oauth2"}}>Google OAuth2</button>
-      <button {{action "authenticate" "facebook-connect"}}>Facebook Connect</button>
-      <button {{action "authenticate" "facebook-oauth2"}}>Facebook Oauth2</button>
+      <div class='providers'>
+        <div class='provider'>
+          <i class="fa fa-5x fa-linkedin-square"></i>
+          <button {{action "authenticate" "linked-in-oauth2"}}>
+            Linked In OAuth2
+          </button>
+        </div>
 
-      <div>
+        <div class='provider'>
+          <i class="fa fa-5x fa-facebook-square"></i>
+          <button {{action "authenticate" "facebook-oauth2"}}>
+            Facebook OAuth2
+          </button>
+        </div>
+
+        <div class='provider'>
+          <i class="fa fa-5x fa-facebook"></i>
+          <button {{action "authenticate" "facebook-connect"}}>
+            Facebook Connect
+          </button>
+        </div>
+
+        <div class='provider'>
+          <i class="fa fa-5x fa-google-plus-square"></i>
+          <button {{action "authenticate" "google-oauth2"}}>
+            Google OAuth2
+          </button>
+        </div>
+
+        <div class='provider'>
+          <i class="fa fa-5x fa-github-square"></i>
+          <button {{action "authenticate" "github-oauth2"}}>
+            Github OAuth 2
+          </button>
+        </div>
+      </div>
+
+      <div class='auth-data'>
         Auth data: {{#if authData}}
           {<pre>{{inspect-object authData}}</pre>}
         {{/if}}
@@ -51,6 +84,11 @@
 
       configuration.providers['linked-in-oauth2'] = {
         apiKey: '772yus6d70pf11',
+        redirectUri: redirectUri
+      };
+
+      configuration.providers['github-oauth2'] = {
+        apiKey: '36564132549469e48c02',
         redirectUri: redirectUri
       };
 
