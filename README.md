@@ -368,13 +368,40 @@ Torii will first look for an adapter matching the provider name passed to
 for an adapter at `torii-adapters/geocities`). If there is no matching adapter,
 then the session object will fall back to using the `application` adapter.
 
-## Getting started with the Torii codebase
+## Running the tests locally
 
   * Clone the repo `git clone git@github.com:Vestorly/torii.git`, `cd torii/`
   * `npm install`, which will also run `bower install`
   * `grunt test` for tests.
-  * Start the server: `grunt server`
-  * Open [http://localhost:8000/example/basic.html](http://localhost:8000/example/basic.html) for example usage.
+  * Or, to run tests in the browser:
+    * Start the server: `grunt server`
+    * Open [http://localhost:8000/tests/](http://localhost:8000/tests/)
+
+## Running the torii examples locally
+
+  * Clone the repo `git clone git@github.com:Vestorly/torii.git`, `cd torii/`
+  * `npm install`, which will also run `bower install`
+
+The torii example apps (at facebook, google, linkedin, etc) are all
+configured to use
+`http://torii-example.com:8000/example/basic.html` as their redirect
+uri, so you will need to make an alias in your hosts file that points
+**torii-example.com** to localhost, and you must view the examples from
+that same host.
+
+To add this hostname on a Mac:
+  * `sudo vim /etc/hosts`
+  * Add line like this: `127.0.0.1 torii-example.com`
+
+The `/etc/hosts` equivalent filepath on Windows is:
+`%SystemRoot%\system32\drivers\etc\hosts`.
+
+For more info, see [Hosts at wikipedia](http://en.wikipedia.org/wiki/Hosts_(file)).
+
+Now, start your server and visit the page:
+
+  * `grunt server`
+  * open `http://torii-example.com/example/basic.html`
 
 ## Generate docs
 
