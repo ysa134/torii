@@ -11,6 +11,7 @@ var mockWindow = {
 module("Popup - Unit", {
   setup: function(){
     popup = new Popup();
+    window.name = 'original-window-name';
   },
   teardown: function(){
     window.open = originalWindowOpen;
@@ -25,6 +26,7 @@ asyncTest("open resolves based on popup window", function(){
   window.open = function(url){
     ok(true, 'calls window.open');
     equal(url, expectedUrl, 'opens with expected url');
+    equal(window.name, 'torii-opener', 'Correct name is set on the opener');
 
     return mockWindow;
   };
@@ -32,6 +34,7 @@ asyncTest("open resolves based on popup window", function(){
   Ember.run(function(){
     popup.open(expectedUrl, ['code']).then(function(data){
       ok(true, 'resolves promise');
+      equal(window.name, 'original-window-name', 'opener window\'s name is reset');
       deepEqual(data, {code: 'fr'}, 'resolves with expected data');
       start();
     }, function(){
@@ -48,6 +51,7 @@ asyncTest("open rejects when window does not open", function(){
   closedWindow.closed = true;
   window.open = function(url){
     ok(true, 'calls window.open');
+    equal(window.name, 'torii-opener', 'Correct name is set on the opener');
     return closedWindow;
   };
 
@@ -57,6 +61,7 @@ asyncTest("open rejects when window does not open", function(){
       start();
     }, function(){
       ok(true, 'rejected the open promise');
+      equal(window.name, 'original-window-name', 'opener window\'s name is reset');
       start();
     });
   });
