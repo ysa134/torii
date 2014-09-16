@@ -8,11 +8,11 @@ var originalConfiguration = configuration.providers['facebook-oauth2'];
 var opened, mockPopup = {
   open: function(){
     opened = true;
-    return Ember.RSVP.resolve({});
+    return Ember.RSVP.resolve({code:'abc'});
   }
 };
 
-module('Facebook - Integration', {
+module('Facebook OAuth2 - Integration', {
   setup: function(){
     container = toriiContainer();
     container.register('torii-service:mock-popup', mockPopup, {instantiate: false});
