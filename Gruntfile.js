@@ -49,8 +49,9 @@ module.exports = function(grunt) {
     'build',
     'concat:amd',
     'concat:amdNoVersion',
-    'uglify:withVersion',
+    'es3_safe_recast:all',
     'uglify:noVersion',
+    'uglify:withVersion',
     'usebanner:addVersion',
     'copy:appAddOn',
     'copy:vendorAddOn'
