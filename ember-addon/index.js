@@ -1,57 +1,51 @@
 'use strict';
-
 var path = require('path');
-var fs   = require('fs');
 
-function EmberToriiAddon(project) {
-  this.project = project;
-  this.name    = 'Torii';
-}
+module.exports = {
+  name: 'torii',
+  treeFor: function treeFor(name) {
+    this.replace = this.replace || require('broccoli-string-replace');
 
-function unwatchedTree(dir) {
-  return {
-    read:    function() { return dir; },
-    cleanup: function() { }
-  };
-}
+    if (name === 'vendor') {
+      var tree = this.treeGenerator(path.join('node_modules', 'torii', 'dist', 'addon', name));
 
-EmberToriiAddon.prototype.treeFor = function treeFor(name) {
+      // Use a build-time check to output a warning if Torii is not
+      // conigured.
+      var config = this.project.config(this.app.env);
+      if (!config.torii) {
+        console.warn("Torii is installed but not configured in config/environment.js!");
+      } else {
+        // Use run-time lookup of the ENV via require. This is better than
+        // build-time configuration since this code will not be run again if
+        // config/environment changes.
+        tree = this.replace(tree, {
+          files: ['torii/torii.amd.js'],
+          patterns: [{
+            match: /get\(window, 'ENV\.torii'\)/,
+            replacement: 'require("'+this.app.name+'/config/environment")["default"].torii'
+          }]
+        });
+      }
+      return tree;
+    }
 
-  // include app-addon (this has the initializers so that loadInitializers
-  // will automatically include them)
-  // We must include the initializers as part of the app tree so that
-  // the es6 import statements work,
-  // and we must also be sure to make those things importable by
-  // explicitly declaring them when we do app.import in `included`
+    if (name === 'app') {
+      return this.treeGenerator(path.join('node_modules', 'torii', 'dist', 'addon', name));
+    }
 
-  // vendor-addon has the built version of torii as a named amd module,
-  // in the directory 'torii', so that it is properly namespaced for our
-  // app.import call in `included`
+  },
+  included: function included(app) {
+    app.import('vendor/torii/torii.amd.js', {
+      exports: {
+        'torii/torii': ['default'],
 
-  // There are no styles for torii, so when treeFor is called with 'styles',
-  // this is a no-op
-
-  var treePath = path.join('node_modules', 'torii', name + '-addon');
-
-  if (fs.existsSync(treePath)) {
-    return unwatchedTree(treePath);
+        // These are all exports that the torii initializers must import
+        'torii/session': ['default'],
+        'torii/bootstrap/session': ['default'],
+        'torii/bootstrap/torii': ['default'],
+        'torii/configuration': ['default'],
+        'torii/redirect-handler': ['default']
+      }
+    });
   }
 };
-
-EmberToriiAddon.prototype.included = function included(app) {
-  app.import('vendor/torii/torii.amd.js', {
-    exports: {
-      'torii/torii': ['default'],
-
-      // These are all exports that the torii initializers must import
-      'torii/session': ['default'],
-      'torii/bootstrap/session': ['default'],
-      'torii/bootstrap/torii': ['default'],
-      'torii/configuration': ['default'],
-      'torii/redirect-handler': ['default']
-    }
-  });
-
-};
-
-module.exports = EmberToriiAddon;

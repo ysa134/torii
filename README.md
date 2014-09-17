@@ -161,11 +161,29 @@ names and their options.
 
 **Configure a Torii provider**. Torii comes with a `facebook-connect`
 provider included. To configure torii for the 'facebook-connect'
-provider, include it in the `window.ENV.torii.providers` hash like so:
+provider with ember-cli, simply add `torii` to your `config/environment.js` file:
+
+```JavaScript
+/* jshint node: true */
+module.exports = function(environment) {
+  var ENV = {
+    /* ... */
+    torii: {
+      providers: {
+        'facebook-connect': {
+        appId: 'xxxxx-some-app-id',
+        scope: 'email,birthday'
+      }
+    }
+  };
+  return ENV;
+};
+```
+
+For a non-ember-cli application, you can set the same values on `ENV`:
 
 ```JavaScript
 // In Ember-App-Kit you will set this in app/index.html
-// In Ember-CLI you will set these values in config/environment.js
 window.ENV = window.ENV || {};
 window.ENV['torii'] = {
   providers: {
@@ -299,9 +317,23 @@ following these steps:
 
 If you want to use torii's session management state machine, you _must_ opt in to it via the torii configuration.
 Because of the potential for conflicts, **torii will not inject a `session` property** unless you explicitly ask for
-it in your configuration. To do so, specify a `sessionServiceName` in your torii config, example:
+it in your configuration. To do so, specify a `sessionServiceName` in your torii config.
 
+To add a session service in Ember-CLI, simply:
+
+```JavaScript
+// config/environment.js
+/* ... */
+    torii: {
+      // a 'session' property will be injected on routes and controllers
+      sessionServiceName: 'session'
+    }
+/* ... */
 ```
+
+Or to do the same in a global configuratoin
+
+```JavaScript
 window.ENV = window.ENV || {};
 window.ENV['torii'] = {
   sessionServiceName: 'session', // a 'session' property will be injected on routes and controllers

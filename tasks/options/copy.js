@@ -2,14 +2,14 @@ module.exports = {
   appAddOn: {
     cwd: 'lib/torii',
     src: 'initializers/*.js',
-    dest: 'app-addon',
+    dest: 'dist/addon/app',
     expand: true
   },
 
   vendorAddOn: {
     cwd: 'dist',
     src: 'torii.amd.js',
-    dest: 'vendor-addon/torii/',
+    dest: 'dist/addon/vendor/torii/',
     expand: true
   }
 };
