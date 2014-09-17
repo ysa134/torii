@@ -44,7 +44,15 @@ module.exports = {
         'torii/bootstrap/session': ['default'],
         'torii/bootstrap/torii': ['default'],
         'torii/configuration': ['default'],
-        'torii/redirect-handler': ['default']
+        'torii/redirect-handler': ['default'],
+        'torii/providers/facebook-connect': ['default'],
+        'torii/providers/facebook-oauth2': ['default'],
+        'torii/providers/github-oauth2': ['default'],
+        'torii/providers/google-oauth2': ['default'],
+        'torii/providers/linked-in-oauth2': ['default'],
+        'torii/providers/oauth1': ['default'],
+        'torii/providers/oauth2-code': ['default'],
+        'torii/providers/twitter-oauth1': ['default']
       }
     });
   }
