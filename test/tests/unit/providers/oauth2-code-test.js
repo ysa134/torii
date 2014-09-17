@@ -9,7 +9,8 @@ import BaseProvider from 'torii/providers/oauth2-code';
 var Provider = BaseProvider.extend({
   name: 'mock-oauth2',
   baseUrl: 'http://example.com',
-  redirectUri: 'http://foo'
+  redirectUri: 'http://foo',
+  responseParams: ['authorization_code']
 });
 
 module('MockOauth2Provider (oauth2-code subclass) - Unit', {
@@ -53,4 +54,33 @@ test("Provider generates a URL with optional scope", function(){
   };
   equal(provider.buildUrl(), 'http://example.com?response_type=code&client_id=dummyKey&redirect_uri=http%3A%2F%2Ffoo&scope=someScope',
         'generates the correct URL');
+});
+
+test('Provider#open throws when any required response params are missing', function(){
+  expect(3);
+
+  configuration.providers['mock-oauth2'] = {
+    apiKey: 'dummyKey',
+    scope: 'someScope'
+  };
+
+  var mockPopup = {
+    open: function(url, responseParams){
+      ok(true, 'calls popup.open');
+
+      return Ember.RSVP.resolve({});
+    }
+  };
+
+  provider.set('popup', mockPopup);
+
+  Ember.run(function(){
+    provider.open().then(function(){
+      ok(false, '#open should not resolve');
+    }).catch(function(e){
+      ok(true, 'failed');
+      var regex = /missing these required response params.*authorization_code/i;
+      ok(regex.test(e), 'error message includes "missing these required response params"');
+    });
+  });
 });
