@@ -1,6 +1,6 @@
 /**
  * Torii version: 0.1.3
- * Built: Fri Jul 25 2014 11:23:42 GMT-0400 (EDT)
+ * Built: Wed Sep 17 2014 12:24:54 GMT-0400 (EDT)
  */
 define("torii/adapters/application", 
   ["exports"],
@@ -49,8 +49,8 @@ define("torii/bootstrap/session",
     }
   });
 define("torii/bootstrap/torii", 
-  ["torii/torii","torii/providers/linked-in-oauth2","torii/providers/google-oauth2","torii/providers/facebook-connect","torii/providers/facebook-oauth2","torii/adapters/application","torii/providers/twitter-oauth1","torii/services/popup","exports"],
-  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __exports__) {
+  ["torii/torii","torii/providers/linked-in-oauth2","torii/providers/google-oauth2","torii/providers/facebook-connect","torii/providers/facebook-oauth2","torii/adapters/application","torii/providers/twitter-oauth1","torii/providers/github-oauth2","torii/services/popup","exports"],
+  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __dependency9__, __exports__) {
     "use strict";
     var Torii = __dependency1__["default"];
     var LinkedInOauth2Provider = __dependency2__["default"];
@@ -59,8 +59,9 @@ define("torii/bootstrap/torii",
     var FacebookOauth2Provider = __dependency5__["default"];
     var ApplicationAdapter = __dependency6__["default"];
     var TwitterProvider = __dependency7__["default"];
+    var GithubOauth2Provider = __dependency8__["default"];
 
-    var PopupService = __dependency8__["default"];
+    var PopupService = __dependency9__["default"];
 
     __exports__["default"] = function(container){
       container.register('torii:main', Torii);
@@ -69,6 +70,7 @@ define("torii/bootstrap/torii",
       container.register('torii-provider:facebook-connect', FacebookConnectProvider);
       container.register('torii-provider:facebook-oauth2', FacebookOauth2Provider);
       container.register('torii-provider:twitter', TwitterProvider);
+      container.register('torii-provider:github-oauth2', GithubOauth2Provider);
       container.register('torii-adapter:application', ApplicationAdapter);
 
       container.register('torii-service:popup', PopupService);
@@ -127,7 +129,7 @@ define("torii/initializers/initialize-torii-callback",
       before: 'torii',
       initialize: function(container, app){
         app.deferReadiness();
-        RedirectHandler.handle(window.location.toString()).catch(function(){
+        RedirectHandler.handle(window.location.toString())["catch"](function(){
           app.advanceReadiness();
         });
       }
@@ -732,6 +734,36 @@ define("torii/providers/facebook-oauth2",
       })
     });
   });
+define("torii/providers/github-oauth2", 
+  ["torii/providers/oauth2-code","torii/configuration","exports"],
+  function(__dependency1__, __dependency2__, __exports__) {
+    "use strict";
+    /**
+     * This class implements authentication against Github
+     * using the OAuth2 authorization flow in a popup window.
+     */
+
+    var Oauth2 = __dependency1__["default"];
+    var configurable = __dependency2__.configurable;
+
+    var GithubOauth2 = Oauth2.extend({
+      name:       'github-oauth2',
+      baseUrl:    'https://github.com/login/oauth/authorize',
+
+      // additional url params that this provider requires
+      requiredUrlParams: ['state'],
+
+      state: 'STATE',
+
+      redirectUri: configurable('redirectUri', function(){
+        // A hack that allows redirectUri to be configurable
+        // but default to the superclass
+        return this._super();
+      })
+    });
+
+    __exports__["default"] = GithubOauth2;
+  });
 define("torii/providers/google-oauth2", 
   ["torii/providers/oauth2-code","torii/configuration","exports"],
   function(__dependency1__, __dependency2__, __exports__) {
@@ -746,15 +778,18 @@ define("torii/providers/google-oauth2",
 
     var GoogleOauth2 = Oauth2.extend({
 
-      name:       'google-oauth2',
-      baseUrl:    'https://accounts.google.com/o/oauth2/auth',
+      name:    'google-oauth2',
+      baseUrl: 'https://accounts.google.com/o/oauth2/auth',
 
       // additional params that this provider requires
-      requiredUrlParams:   ['state'],
+      requiredUrlParams: ['state'],
+      optionalUrlParams: ['scope', 'request_visible_actions'],
 
-      scope:        configurable('scope', 'email'),
+      request_visible_actions: configurable('requestVisibleActions', ''),
 
-      state: 'STATE',
+      scope: configurable('scope', 'email'),
+
+      state: configurable('state', 'STATE'),
 
       redirectUri: configurable('redirectUri',
                                 'http://localhost:8000/oauth2callback')
@@ -947,14 +982,14 @@ define("torii/redirect-handler",
       run: function(){
         var url = this.url;
         return new Ember.RSVP.Promise(function(resolve, reject){
-          if (!window.opener) {
-            reject('No window.opener');
-          } else {
+          if (window.opener && window.opener.name === 'torii-opener') {
             var data = "__torii_message:"+url;
             window.opener.postMessage(data, '*');
             // TODO listen for a message from the parent allowing
             // this promise to continue. As written, the popup will
             // hang until the parent window closes it.
+          } else {
+            reject('No window.opener');
           }
         });
       }
@@ -1003,7 +1038,7 @@ define("torii/services/popup",
     function prepareOptions(options){
       var width = options.width || 500,
           height = options.height || 500;
-      return Ember.$.merge({
+      return Ember.$.extend({
         left: ((screen.width / 2) - (width / 2)),
         top: ((screen.height / 2) - (height / 2)),
         width: width,
@@ -1039,6 +1074,10 @@ define("torii/services/popup",
         var service   = this,
             lastPopup = this.popup;
 
+        var oldName = window.name;
+        // Is checked by the popup to see if it was opened by Torii
+        window.name = 'torii-opener';
+
         return new Ember.RSVP.Promise(function(resolve, reject){
           if (lastPopup) {
             service.close();
@@ -1070,9 +1109,10 @@ define("torii/services/popup",
 
           service.schedulePolling();
 
-        }).finally(function(){
+        })["finally"](function(){
           // didClose will reject this same promise, but it has already resolved.
           service.close();
+          window.name = oldName;
           Ember.$(window).off('message.torii');
         });
       },
@@ -1162,7 +1202,7 @@ define("torii/session",
         }).then(function(user){
           sm.send('finishOpen', user);
           return user;
-        }).catch(function(error){
+        })["catch"](function(error){
           sm.send('failOpen', error);
           return Ember.RSVP.reject(error);
         });
@@ -1184,7 +1224,7 @@ define("torii/session",
         }).then(function(data){
           sm.send('finishFetch', data);
           return;
-        }).catch(function(error){
+        })["catch"](function(error){
           sm.send('failFetch', error);
           return Ember.RSVP.reject(error);
         });
@@ -1202,7 +1242,7 @@ define("torii/session",
           return adapter.close();
         }).then(function(){
           sm.send('finishClose');
-        }).catch(function(error){
+        })["catch"](function(error){
           sm.send('failClose', error);
           return Ember.RSVP.reject(error);
         });

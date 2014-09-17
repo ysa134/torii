@@ -8,8 +8,6 @@
   },
   "files": [
     "dist/",
-    "app-addon/",
-    "vendor-addon/",
     "ember-addon/",
     "bower.json"
   ],
@@ -80,5 +78,8 @@
       "email": "cory.forsyth@gmail.com"
     }
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "broccoli-string-replace": "^0.0.2"
+  }
 }
