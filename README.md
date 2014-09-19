@@ -407,7 +407,7 @@ then the session object will fall back to using the `application` adapter.
   * `grunt test` for tests.
   * Or, to run tests in the browser:
     * Start the server: `grunt server`
-    * Open [http://localhost:8000/tests/](http://localhost:8000/tests/)
+    * Open [http://localhost:8000/test/](http://localhost:8000/test/)
 
 ## Running the torii examples locally
 
