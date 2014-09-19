@@ -110,6 +110,24 @@ test("#fetch dummy-success session successfully opens", function(){
   });
 });
 
+test("#fetch session passes options to adapter", function(){
+  var adapterFetchCalledWith = null;
+  container.register("torii-adapter:dummy-success", DummyAdapter.extend({
+    fetch: function(options){
+      adapterFetchCalledWith = options;
+      return this._super(options);
+    }
+  }));
+  Ember.run(function(){
+    var opts = {};
+    session.fetch('dummy-success', opts).then(function(){
+      equal(adapterFetchCalledWith, opts, 'options should be passed through to adapter');
+    }, function(err){
+      ok(false, 'failed to resolve promise: '+err);
+    });
+  });
+});
+
 test("#fetch dummy-failure session fails to open", function(){
   Ember.run(function(){
     session.open('dummy-failure').then(function(){
