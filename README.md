@@ -449,7 +449,7 @@ Use [YUIDoc](http://yui.github.io/yuidoc/).
   * Bump version in bower.json
   * `grunt build-release`
   * Force commit new/changed files in dist/
-  * Force commit new/changed files in app-addon/ and vendor-addon/
+  * Commit changed bower.json, package.json
   * `git tag <version>`
   * `git push --tags`
   * Publishing a version git tag will automatically register a new bower
