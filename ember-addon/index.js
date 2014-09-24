@@ -5,9 +5,10 @@ module.exports = {
   name: 'torii',
   treeFor: function treeFor(name) {
     this.replace = this.replace || require('broccoli-string-replace');
+    var distPath = path.resolve(__dirname, '..', 'dist', 'addon', name);
 
     if (name === 'vendor') {
-      var tree = this.treeGenerator(path.join('node_modules', 'torii', 'dist', 'addon', name));
+      var tree = this.treeGenerator(distPath);
 
       // Use a build-time check to output a warning if Torii is not
       // conigured.
@@ -30,7 +31,7 @@ module.exports = {
     }
 
     if (name === 'app') {
-      return this.treeGenerator(path.join('node_modules', 'torii', 'dist', 'addon', name));
+      return this.treeGenerator(distPath);
     }
 
   },
