@@ -49,6 +49,7 @@ module.exports = function(grunt) {
     'build',
     'concat:amd',
     'concat:amdNoVersion',
+    'concat:browser',
     'es3_safe_recast:all',
     'uglify:noVersion',
     'uglify:withVersion',

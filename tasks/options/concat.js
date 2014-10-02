@@ -27,6 +27,16 @@ module.exports = {
       'tmp/tests/amd/**/*.js'
     ],
     dest: 'tmp/tests.amd.js',
+  },
+
+  browser: {
+    src: [
+      'wrap/browser.start',
+      'bower_components/loader/loader.js',
+      'dist/<%= pkg.name %>.amd.js',
+      'wrap/browser.end'
+    ],
+    dest: 'dist/<%= pkg.name %>.js'
   }
 
 };

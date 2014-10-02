@@ -9,7 +9,7 @@ module.exports = {
       linebreak: true
     },
     files: {
-      src: ['dist/*.amd.js'],
+      src: ['dist/*.amd.js', 'dist/torii.js'],
     }
   }
 };
