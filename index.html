@@ -27,7 +27,7 @@
 <div class="wrapper">
 	<div class="header">
 		<div class="container">
-			<a href="https://www.vestorly.com" class="logo">Vestorly</a>
+			<a href="http://vestorly.github.io/" class="logo">Vestorly</a>
 
 			 <div class="actions">
 			 	<a href="https://github.com/vestorly/torii" class="btn btn-bordered">FORK ME ON GITHUB</a>
@@ -79,46 +79,6 @@
         and initializing it.
         </p>
 
-        <p>
-        If you are using an older version of ember-cli or ember app kit, you can install torii from bower:
-        `bower install torii`.
-        Next, add Torii to your build pipleline.
-        In Ember-App-Kit you can do this in app/index.html by adding a script tag to include the 'torii.amd.js' file.
-        If you are using ember-cli, you can add it to your Brocfile.js as shown below:</p>
-
-				<div class="code">
-<pre>
-// Your path to torii may be different than the one below,
-// depending on your bower configuration
-app.import('vendor/torii/dist/torii.amd.js');
-</pre>
-			</div>
-
-				<p>If you are installing torii via bower, you need to add torii's initialization code to your app:</p>
-				<div class="code">
-<pre>
-require('torii/load-initializers')['default']();
-</pre>
-				</div>
-
-				<p>Configure a Torii provider.  For example, setup Facebook Connect:</p>
-				<div class="code">
-<pre>
-// In Ember-App-Kit you will set this in app/index.html
-// In Ember-CLI you will set these values in config/environment.js
-window.ENV = window.ENV || {};
-window.ENV['torii'] = {
-  providers: {
-    'facebook-connect': {
-      appId: 'xxxxx-some-app-id',
-      scope: 'email,birthday'
-    }
-  }
-};
-</pre>
-			</div>
-
-			<p>With those values, we can authenticate the user against Facebook Connect via the torii property injected onto routes, or the session property injected onto routes and controllers (using the session management feature will require you to write an adapter for your application – see notes on session management below).</p>
 
 
 				<div class="more">
