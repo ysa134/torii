@@ -46,6 +46,7 @@ module.exports = {
         'torii/bootstrap/torii': ['default'],
         'torii/configuration': ['default'],
         'torii/redirect-handler': ['default'],
+        'torii/providers/base': ['default'],
         'torii/providers/facebook-connect': ['default'],
         'torii/providers/facebook-oauth2': ['default'],
         'torii/providers/github-oauth2': ['default'],
