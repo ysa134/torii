@@ -53,6 +53,7 @@ module.exports = {
         'torii/providers/linked-in-oauth2': ['default'],
         'torii/providers/oauth1': ['default'],
         'torii/providers/oauth2-code': ['default'],
+        'torii/providers/oauth2-bearer': ['default'],
         'torii/providers/twitter-oauth1': ['default']
       }
     });
