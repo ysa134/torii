@@ -186,17 +186,17 @@ test("#close dummy-success session raises must-implement on application adapter"
 
 test("#close session passes options to adapter", function(){
   signIn({currentUser: {email: 'some@email.com'}});
-  var adapterFetchCalledWith = null;
+  var adapterCloseCalledWith = null;
   container.register("torii-adapter:dummy-success", DummyAdapter.extend({
     close: function(options){
-      adapterFetchCalledWith = options;
+      adapterCloseCalledWith = options;
       return this._super(options);
     }
   }));
   Ember.run(function(){
     var opts = {};
     session.close('dummy-success', opts).then(function(){
-      equal(adapterFetchCalledWith, opts, 'options should be passed through to adapter');
+      equal(adapterCloseCalledWith, opts, 'options should be passed through to adapter');
     }, function(err){
       ok(false, 'failed to resolve promise: '+err);
     });
