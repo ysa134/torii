@@ -157,12 +157,12 @@ test("#close dummy-success fails in an unauthenticated state", function(){
 test("#close dummy-success session closes", function(){
   signIn({currentUser: {email: 'some@email.com'}});
   adapter.reopen({
-    close: function(){
+    close: function(provider, options){
       return Ember.RSVP.Promise.resolve();
     }
   });
   Ember.run(function(){
-    session.close().then(function(){
+    session.close('dummy-success').then(function(){
       ok(true, 'resolved promise');
       ok(!session.get('isAuthenticated'), 'authenticated');
       ok(!session.get('currentUser.email'), 'user has email');
@@ -180,6 +180,25 @@ test("#close dummy-success session raises must-implement on application adapter"
     }, function(error){
       ok(true, 'fails promise');
       ok(error.message.match(/must implement/), 'fails with message to implement');
+    });
+  });
+});
+
+test("#close session passes options to adapter", function(){
+  signIn({currentUser: {email: 'some@email.com'}});
+  var adapterFetchCalledWith = null;
+  container.register("torii-adapter:dummy-success", DummyAdapter.extend({
+    close: function(options){
+      adapterFetchCalledWith = options;
+      return this._super(options);
+    }
+  }));
+  Ember.run(function(){
+    var opts = {};
+    session.close('dummy-success', opts).then(function(){
+      equal(adapterFetchCalledWith, opts, 'options should be passed through to adapter');
+    }, function(err){
+      ok(false, 'failed to resolve promise: '+err);
     });
   });
 });
