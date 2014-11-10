@@ -157,7 +157,7 @@ test("#close dummy-success fails in an unauthenticated state", function(){
 test("#close dummy-success session closes", function(){
   signIn({currentUser: {email: 'some@email.com'}});
   adapter.reopen({
-    close: function(provider, options){
+    close: function(){
       return Ember.RSVP.Promise.resolve();
     }
   });
