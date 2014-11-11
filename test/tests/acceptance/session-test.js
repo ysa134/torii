@@ -162,7 +162,7 @@ test("#close dummy-success session closes", function(){
     }
   });
   Ember.run(function(){
-    session.close().then(function(){
+    session.close('dummy-success').then(function(){
       ok(true, 'resolved promise');
       ok(!session.get('isAuthenticated'), 'authenticated');
       ok(!session.get('currentUser.email'), 'user has email');
@@ -175,11 +175,46 @@ test("#close dummy-success session closes", function(){
 test("#close dummy-success session raises must-implement on application adapter", function(){
   signIn();
   Ember.run(function(){
-    session.close().then(function(){
+    session.close('dummy-success').then(function(){
       ok(false, 'resolved promise');
     }, function(error){
       ok(true, 'fails promise');
       ok(error.message.match(/must implement/), 'fails with message to implement');
+    });
+  });
+});
+
+test("#close dummy-success session passes options to application adapter", function(){
+  signIn({currentUser: {email: 'some@email.com'}});
+  var optionsCloseCalledWith = null;
+
+  adapter.close = function(options) {
+    optionsCloseCalledWith = options;
+    return new Ember.RSVP.Promise(function (resolve) { resolve(); });
+  };
+
+  Ember.run(function(){
+    var opts = {};
+    session.close('dummy-success', opts).then(function(){
+      equal(optionsCloseCalledWith, opts, 'options should be passed through to adapter');
+    });
+  });
+});
+
+test("#close dummy-success session uses named adapter when present", function(){
+  signIn({currentUser: {email: 'some@email.com'}});
+  var correctAdapterCalled = false;
+  container.register("torii-adapter:dummy-success", DummyAdapter.extend({
+    close: function() {
+      correctAdapterCalled = true;
+      return this._super();
+    }
+  }));
+  Ember.run(function(){
+    session.close('dummy-success').then(function(){
+      ok(correctAdapterCalled, 'named adapter should be used');
+    }, function(err){
+      ok(false, 'failed to resolve promise: '+err);
     });
   });
 });
