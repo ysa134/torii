@@ -184,21 +184,19 @@ test("#close dummy-success session raises must-implement on application adapter"
   });
 });
 
-test("#close dummy-success session passes options to adapter", function(){
+test("#close dummy-success session passes options to application adapter", function(){
   signIn({currentUser: {email: 'some@email.com'}});
   var optionsCloseCalledWith = null;
-  container.register("torii-adapter:dummy-success", DummyAdapter.extend({
-    close: function(options){
-      optionsCloseCalledWith = options;
-      return this._super(options);
-    }
-  }));
+
+  adapter.close = function(options) {
+    optionsCloseCalledWith = options;
+    return new Ember.RSVP.Promise(function (resolve) { resolve(); });
+  };
+
   Ember.run(function(){
     var opts = {};
     session.close('dummy-success', opts).then(function(){
       equal(optionsCloseCalledWith, opts, 'options should be passed through to adapter');
-    }, function(err){
-      ok(false, 'failed to resolve promise: '+err);
     });
   });
 });
