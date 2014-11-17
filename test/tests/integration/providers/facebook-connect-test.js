@@ -24,14 +24,16 @@ module('Facebook Connect - Integration', {
 });
 
 test("Opens facebook connect session", function(){
+  console.log('HELLO');
   $.getScript = function(){
     window.fbAsyncInit();
-  }
+  };
   Ember.run(function(){
     torii.open('facebook-connect').then(function(){
       ok(true, "Facebook connect opened");
-    }, function(){
-      ok(false, "Facebook connect failed to open");
+    }, function(e){
+      console.error(e,e.message);
+      ok(false, "XXX Facebook connect failed to open: " + e.message);
     });
   });
 });
