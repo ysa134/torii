@@ -32,8 +32,7 @@ test("Opens facebook connect session", function(){
     torii.open('facebook-connect').then(function(){
       ok(true, "Facebook connect opened");
     }, function(e){
-      console.error(e,e.message);
-      ok(false, "XXX Facebook connect failed to open: " + e.message);
+      ok(false, "Facebook connect failed to open: " + e.message);
     });
   });
 });
