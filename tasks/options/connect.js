@@ -15,7 +15,7 @@ module.exports = {
             next();
           }
         },
-        connect.static(options.base)
+        connect.static(String(options.base))
       ];
     }
 
