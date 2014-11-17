@@ -1,6 +1,6 @@
 /**
- * Torii version: 0.2.1
- * Built: Wed Oct 01 2014 23:06:49 GMT-0400 (EDT)
+ * Torii version: 0.2.2
+ * Built: Mon Nov 17 2014 15:17:01 GMT-0500 (EST)
  */
 (function() {
 
@@ -769,7 +769,7 @@ define("torii/providers/facebook-connect",
       return fbPromise;
     }
 
-    function fbLogin(){
+    function fbLogin(scope){
       return new Ember.RSVP.Promise(function(resolve, reject){
         FB.login(function(response){
           if (response.authResponse) {
@@ -777,7 +777,7 @@ define("torii/providers/facebook-connect",
           } else {
             Ember.run(null, reject, response.status);
           }
-        });
+        }, { scope: scope });
       });
     }
 
@@ -798,8 +798,12 @@ define("torii/providers/facebook-connect",
       // API:
       //
       open: function(){
+        var scope = this.get('scope');
+
         return fbLoad( this.settings() )
-          .then(fbLogin)
+          .then(function(){
+            return fbLogin(scope);
+          })
           .then(fbNormalize);
       },
 
@@ -1004,6 +1008,56 @@ define("torii/providers/oauth1",
     });
 
     __exports__["default"] = Oauth1;
+  });
+define("torii/providers/oauth2-bearer", 
+  ["torii/providers/oauth2-code","exports"],
+  function(__dependency1__, __exports__) {
+    "use strict";
+    var Provider = __dependency1__["default"];
+
+    var Oauth2Bearer = Provider.extend({
+      responseType: 'token',
+
+      /**
+       * @method open
+       * @return {Promise<object>} If the authorization attempt is a success,
+       * the promise will resolve an object containing the following keys:
+       *   - authorizationToken: The `token` from the 3rd-party provider
+       *   - provider: The name of the provider (i.e., google-oauth2)
+       *   - redirectUri: The redirect uri (some server-side exchange flows require this)
+       * If there was an error or the user either canceled the authorization or
+       * closed the popup window, the promise rejects.
+       */
+      open: function(){
+        var name        = this.get('name'),
+            url         = this.buildUrl(),
+            redirectUri = this.get('redirectUri'),
+            responseParams = this.get('responseParams');
+
+        return this.get('popup').open(url, responseParams).then(function(authData){
+          var missingResponseParams = [];
+
+          responseParams.forEach(function(param){
+            if (authData[param] === undefined) {
+              missingResponseParams.push(param);
+            }
+          });
+
+          if (missingResponseParams.length){
+            throw "The response from the provider is missing " +
+                  "these required response params: " + responseParams.join(', ');
+          }
+
+          return {
+            authorizationToken: authData,
+            provider: name,
+            redirectUri: redirectUri
+          };
+        });
+      }
+    });
+
+    __exports__["default"] = Oauth2Bearer;
   });
 define("torii/providers/oauth2-code", 
   ["torii/providers/base","torii/configuration","torii/lib/query-string","torii/lib/required-property","exports"],
@@ -1456,7 +1510,7 @@ define("torii/session",
         });
       },
 
-      close: function(){
+      close: function(provider, options){
         var container = this.container,
             sm        = this.get('stateMachine');
 
@@ -1464,8 +1518,8 @@ define("torii/session",
           sm.send('startClose');
           resolve();
         }).then(function(){
-          var adapter = lookupAdapter(container);
-          return adapter.close();
+          var adapter = lookupAdapter(container, provider);
+          return adapter.close(options);
         }).then(function(){
           sm.send('finishClose');
         }).catch(function(error){
