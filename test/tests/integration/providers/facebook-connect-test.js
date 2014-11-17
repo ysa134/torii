@@ -24,7 +24,6 @@ module('Facebook Connect - Integration', {
 });
 
 test("Opens facebook connect session", function(){
-  console.log('HELLO');
   $.getScript = function(){
     window.fbAsyncInit();
   };
