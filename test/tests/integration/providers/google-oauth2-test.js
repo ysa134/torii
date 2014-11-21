@@ -50,3 +50,17 @@ test("Opens a popup to Google with request_visible_actions", function(){
     torii.open('google-oauth2');
   });
 });
+
+test("Opens a popup to Google with access_type parameter", function(){
+  expect(1);
+  configuration.providers['google-oauth2'].accessType = "offline";
+  mockPopup.open = function(url){
+    ok(
+      url.indexOf("access_type=offline") > -1,
+      "access_type parameter is present" );
+    return Ember.RSVP.resolve({});
+  }
+  Ember.run(function(){
+    torii.open('google-oauth2');
+  });
+});
