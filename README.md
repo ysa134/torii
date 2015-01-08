@@ -54,7 +54,7 @@ Facebook's OAuth 2.0 API directly to fetch an authorization code.
 
 ```hbs
 {{! app/templates/login.hbs }}
-{{if session.isWorking}}
+{{#if session.isWorking}}
   One sec while we get you signed in...
 {{else}}
   {{error}}
