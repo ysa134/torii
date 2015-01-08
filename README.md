@@ -171,8 +171,9 @@ module.exports = function(environment) {
     torii: {
       providers: {
         'facebook-connect': {
-        appId: 'xxxxx-some-app-id',
-        scope: 'email,birthday'
+          appId: 'xxxxx-some-app-id',
+          scope: 'email,birthday'
+        }
       }
     }
   };
