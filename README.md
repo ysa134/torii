@@ -52,6 +52,27 @@ an **adapter**, then Torii can also peform **session management** via the
 `session` property, injected onto routes and controllers. This example uses
 Facebook's OAuth 2.0 API directly to fetch an authorization code.
 
+```JavaScript
+/* jshint node: true */
+// config/environment.js
+module.exports = function(environment) {
+  var ENV = {
+    /* ... */
+    torii: {
+      // a 'session' property will be injected on routes and controllers
+      sessionServiceName: 'session'
+      providers: {
+        'facebook-oauth2': {
+          apiKey:      'facebook-app-id',
+          redirectUri: document.location.href
+        }
+      }
+    }
+  };
+  return ENV;
+};
+```
+
 ```hbs
 {{! app/templates/login.hbs }}
 {{#if session.isWorking}}
