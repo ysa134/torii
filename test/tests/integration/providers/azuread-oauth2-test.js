@@ -8,7 +8,7 @@ var originalConfiguration = configuration.providers['azuread-oauth2'];
 var opened, mockPopup = {
   open: function(){
     opened = true;
-    return Ember.RSVP.resolve({});
+    return Ember.RSVP.resolve({ 'code': 'test' });
   }
 };
 
@@ -19,7 +19,7 @@ module('AzureAd - Integration', {
     container.injection('torii-provider', 'popup', 'torii-service:mock-popup');
 
     torii = container.lookup("torii:main");
-    configuration.providers['azuread-oauth2'] = { cliendId: 'dummy' };
+    configuration.providers['azuread-oauth2'] = { apiKey: 'dummy' };
   },
   teardown: function(){
     opened = false;
