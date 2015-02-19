@@ -12,7 +12,7 @@ module('Google - Integration', {
     mockPopup = {
       open: function(){
         opened = true;
-        return Ember.RSVP.resolve({});
+        return Ember.RSVP.resolve({ code: 'test' });
       }
     };
     container = toriiContainer();
@@ -44,7 +44,7 @@ test("Opens a popup to Google with request_visible_actions", function(){
     ok(
       url.indexOf("request_visible_actions=http%3A%2F%2Fsome-url.com") > -1,
       "request_visible_actions is present" );
-    return Ember.RSVP.resolve({});
+    return Ember.RSVP.resolve({ code: 'test' });
   }
   Ember.run(function(){
     torii.open('google-oauth2');
@@ -58,7 +58,7 @@ test("Opens a popup to Google with access_type parameter", function(){
     ok(
       url.indexOf("access_type=offline") > -1,
       "access_type parameter is present" );
-    return Ember.RSVP.resolve({});
+    return Ember.RSVP.resolve({ code: 'test' });
   }
   Ember.run(function(){
     torii.open('google-oauth2');
