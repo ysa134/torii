@@ -1,8 +1,9 @@
-var provider;
+var provider, tokenProvider;
 
 import configuration from 'torii/configuration';
 
 var originalConfiguration = configuration.providers['mock-oauth2'];
+var originalTokenConfiguration = configuration.providers['mock-oauth2-token'];
 
 import BaseProvider from 'torii/providers/oauth2-code';
 
@@ -10,17 +11,27 @@ var Provider = BaseProvider.extend({
   name: 'mock-oauth2',
   baseUrl: 'http://example.com',
   redirectUri: 'http://foo',
-  responseParams: ['authorization_code']
+  responseParams: ['authorization_code'],
+});
+
+var TokenProvider = BaseProvider.extend({
+  name: 'mock-oauth2-token',
+  baseUrl: 'http://example.com',
+  redirectUri: 'http://foo',
+  responseParams: ['authorization_code'],
+  responseType: 'token_id'
 });
 
 module('MockOauth2Provider (oauth2-code subclass) - Unit', {
   setup: function(){
     configuration.providers['mock-oauth2'] = {};
     provider = new Provider();
+    tokenProvider = new TokenProvider();
   },
   teardown: function(){
     Ember.run(provider, 'destroy');
     configuration.providers['mock-oauth2'] = originalConfiguration;
+    configuration.providers['mock-oauth2'] = originalTokenConfiguration;
   }
 });
 
@@ -81,6 +92,30 @@ test('Provider#open throws when any required response params are missing', funct
       ok(true, 'failed');
       var regex = /missing these required response params.*authorization_code/i;
       ok(regex.test(e), 'error message includes "missing these required response params"');
+    });
+  });
+});
+
+test('should use the value of provider.responseType as key for the authorizationCode', function(){
+  expect(2);
+
+  configuration.providers['mock-oauth2-token'] = {
+    apiKey: 'dummyKey',
+    scope: 'someScope',
+  };
+
+  var mockPopup = {
+    open: function(url, responseParams){
+      ok(true, 'calls popup.open');
+      return Ember.RSVP.resolve({ 'token_id': 'test', 'authorization_code': 'pief' });
+    }
+  };
+
+  tokenProvider.set('popup', mockPopup);
+
+  Ember.run(function(){
+    tokenProvider.open().then(function(res){
+      ok(res.authorizationCode === 'test', 'authenticationToken present')
     });
   });
 });
