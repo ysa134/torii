@@ -8,7 +8,7 @@ var originalConfiguration = configuration.providers['linked-in-oauth2'];
 var opened, mockPopup = {
   open: function(){
     opened = true;
-    return Ember.RSVP.resolve({});
+    return Ember.RSVP.resolve({ code: 'test' });
   }
 };
 

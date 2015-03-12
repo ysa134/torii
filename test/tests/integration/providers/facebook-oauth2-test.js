@@ -8,7 +8,7 @@ var originalConfiguration = configuration.providers['facebook-oauth2'];
 var opened, mockPopup = {
   open: function(){
     opened = true;
-    return Ember.RSVP.resolve({code:'abc'});
+    return Ember.RSVP.resolve({ code: 'abc' });
   }
 };
 
