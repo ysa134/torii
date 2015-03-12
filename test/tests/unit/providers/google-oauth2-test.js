@@ -37,4 +37,3 @@ test("Provider generates a URL with required config", function(){
         expectedUrl,
         'generates the correct URL');
 });
-w
