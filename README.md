@@ -60,7 +60,7 @@ module.exports = function(environment) {
     /* ... */
     torii: {
       // a 'session' property will be injected on routes and controllers
-      sessionServiceName: 'session'
+      sessionServiceName: 'session',
       providers: {
         'facebook-oauth2': {
           apiKey:      'facebook-app-id',
@@ -318,6 +318,7 @@ Torii comes with several providers already included:
   * Google OAuth2 ([Dev Site](https://console.developers.google.com/project) | [Docs](https://developers.google.com/accounts/docs/OAuth2WebServer))
   * Facebook Connect (via FB SDK) ([Dev Site](https://developers.facebook.com/) | [Docs](https://developers.facebook.com/docs/))
   * Facebook OAuth2 ([Dev Site](https://developers.facebook.com/) | [Docs](https://developers.facebook.com/docs/facebook-login/manually-build-a-login-flow/))
+  * Stripe Connect (OAuth2) ([Dev Site](https://stripe.com/docs) | [Docs](https://stripe.com/docs/connect))
   * **Authoring custom providers is designed to be easy** - You are encouraged to author your own.
 
 ### Supporting OAuth 1.0a
