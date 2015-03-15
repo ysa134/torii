@@ -22,7 +22,6 @@
     "grunt-contrib-clean": "~0.6.0",
     "grunt-contrib-concat": "~0.5.0",
     "grunt-contrib-connect": "~0.7.1",
-    "grunt-contrib-copy": "^0.7.0",
     "grunt-contrib-jshint": "~0.10.0",
     "grunt-contrib-testem": "~0.5.14",
     "grunt-contrib-uglify": "~0.6.0",
@@ -80,6 +79,7 @@
   ],
   "license": "MIT",
   "dependencies": {
+    "broccoli-funnel": "^0.2.2",
     "broccoli-string-replace": "^0.0.2"
   }
 }
