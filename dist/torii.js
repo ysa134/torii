@@ -1,6 +1,6 @@
 /**
- * Torii version: 0.2.3
- * Built: Thu Mar 12 2015 11:24:45 GMT-0400 (EDT)
+ * Torii version: 0.3.0
+ * Built: Mon Mar 16 2015 08:55:49 GMT-0400 (EDT)
  */
 (function() {
 
@@ -146,8 +146,8 @@ define("torii/bootstrap/session",
     }
   });
 define("torii/bootstrap/torii", 
-  ["torii/torii","torii/providers/linked-in-oauth2","torii/providers/google-oauth2","torii/providers/facebook-connect","torii/providers/facebook-oauth2","torii/adapters/application","torii/providers/twitter-oauth1","torii/providers/github-oauth2","torii/providers/azure-ad-oauth2","torii/services/popup","exports"],
-  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __dependency9__, __dependency10__, __exports__) {
+  ["torii/torii","torii/providers/linked-in-oauth2","torii/providers/google-oauth2","torii/providers/facebook-connect","torii/providers/facebook-oauth2","torii/adapters/application","torii/providers/twitter-oauth1","torii/providers/github-oauth2","torii/providers/azure-ad-oauth2","torii/providers/stripe-connect","torii/services/popup","exports"],
+  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __dependency9__, __dependency10__, __dependency11__, __exports__) {
     "use strict";
     var Torii = __dependency1__["default"];
     var LinkedInOauth2Provider = __dependency2__["default"];
@@ -158,8 +158,9 @@ define("torii/bootstrap/torii",
     var TwitterProvider = __dependency7__["default"];
     var GithubOauth2Provider = __dependency8__["default"];
     var AzureAdOauth2Provider = __dependency9__["default"];
+    var StripeConnectProvider = __dependency10__["default"];
 
-    var PopupService = __dependency10__["default"];
+    var PopupService = __dependency11__["default"];
 
     __exports__["default"] = function(container){
       container.register('torii:main', Torii);
@@ -170,6 +171,7 @@ define("torii/bootstrap/torii",
       container.register('torii-provider:twitter', TwitterProvider);
       container.register('torii-provider:github-oauth2', GithubOauth2Provider);
       container.register('torii-provider:azure-ad-oauth2', AzureAdOauth2Provider);
+      container.register('torii-provider:stripe-connect', StripeConnectProvider);
       container.register('torii-adapter:application', ApplicationAdapter);
 
       container.register('torii-service:popup', PopupService);
@@ -813,6 +815,10 @@ define("torii/providers/facebook-connect",
         $.getScript('//connect.facebook.net/en_US/sdk.js');
       }).then(function(){
         window.fbAsyncInit = original;
+        if (window.fbAsyncInit) {
+          window.fbAsyncInit.hasRun = true;
+          window.fbAsyncInit();
+        }
       });
 
       return fbPromise;
@@ -1261,6 +1267,31 @@ define("torii/providers/oauth2-code",
     });
 
     __exports__["default"] = Oauth2;
+  });
+define("torii/providers/stripe-connect", 
+  ["torii/providers/oauth2-code","torii/configuration","exports"],
+  function(__dependency1__, __dependency2__, __exports__) {
+    "use strict";
+    var Oauth2 = __dependency1__["default"];
+    var configurable = __dependency2__.configurable;
+
+    __exports__["default"] = Oauth2.extend({
+      name:       'stripe-connect',
+      baseUrl:    'https://connect.stripe.com/oauth/authorize',
+
+      // additional url params that this provider requires
+      requiredUrlParams: [],
+
+      responseParams: ['code'],
+
+      scope: 'read_write',
+
+      redirectUri: configurable('redirectUri', function() {
+        // A hack that allows redirectUri to be configurable
+        // but default to the superclass
+        return this._super();
+      })
+    });
   });
 define("torii/providers/twitter-oauth1", 
   ["torii/providers/oauth1","exports"],
