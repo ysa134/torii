@@ -56,9 +56,7 @@ module.exports = function(grunt) {
     'es3_safe_recast:all',
     'uglify:noVersion',
     'uglify:withVersion',
-    'usebanner:addVersion',
-    'copy:appAddOn',
-    'copy:vendorAddOn'
+    'usebanner:addVersion'
   ]);
 
   // Custom YUIDoc task
