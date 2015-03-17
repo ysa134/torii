@@ -1,4 +1,4 @@
-[![Torii Build Status](https://circleci.com/gh/Vestorly/torii.png?circle-token=9bdd2f37dbcb0be85f82a6b1ac61b9333b68625b "Torii Build Status")](https://circleci.com/gh/Vestorly/torii)
+[![Torii Build Status](https://circleci.com/gh/Vestorly/torii.png?circle-token=9bdd2f37dbcb0be85f82a6b1ac61b9333b68625b "Torii Build Status")](https://circleci.com/gh/Vestorly/torii) [![Ember Observer Score](http://emberobserver.com/badges/torii.svg)](http://emberobserver.com/addons/torii)
 
 Torii is a set of clean abstractions for authentication in [Ember.js](http://emberjs.com/)
 applications. Torii is built with **providers** (authentication against a platform), a
