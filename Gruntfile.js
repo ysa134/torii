@@ -2,7 +2,7 @@ module.exports = function(grunt) {
   var path = require('path');
 
   require('load-grunt-tasks')(grunt);
-  
+
   var config = require('load-grunt-config')(grunt, {
     configPath: path.join(process.cwd(), 'tasks/options'),
     init: false
