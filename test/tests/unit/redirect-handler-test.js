@@ -5,7 +5,7 @@ var originalClose = window.close;
 
 module('RedirectHandler - Unit', {
   setup: function(){
-    window.name = 'torii-auth';
+    window.name = 'torii_auth';
     window.opener = {
       name: 'torii-opener',
       postMessage: Ember.K
