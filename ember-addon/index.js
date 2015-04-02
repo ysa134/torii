@@ -2,10 +2,9 @@
 
 module.exports = {
   name: 'torii',
-  init: function(app) {
+  init: function() {
     this.treePaths.app = '../lib/torii';
     this.treePaths.addon = '../lib/torii';
-    this.app = app;
   },
 
   treeForApp: function treeForApp(tree) {
@@ -24,7 +23,7 @@ module.exports = {
 
     // Use a build-time check to output a warning if Torii is not
     // conigured.
-    var config = this.project.config(this.app.env);
+    var config = this.project.config(proccess.env.EMBER_ENV);
     if (!config.torii) {
       console.warn("Torii is installed but not configured in config/environment.js!");
     } else {
@@ -35,7 +34,7 @@ module.exports = {
         files: ['modules/torii/configuration.js'],
         patterns: [{
           match: /get\(window, 'ENV\.torii'\)/,
-          replacement: 'require("'+this.app.name+'/config/environment")["default"].torii'
+          replacement: 'require("'+this.project.name()+'/config/environment")["default"].torii'
         }]
       });
     }
