@@ -64,7 +64,7 @@ module.exports = function(environment) {
       providers: {
         'facebook-oauth2': {
           apiKey:      'facebook-app-id',
-          redirectUri: document.location.href
+          redirectUri: '/my-custom-landing-uri' // default is the current URL
         }
       }
     }
