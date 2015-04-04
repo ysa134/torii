@@ -1,6 +1,6 @@
 /**
- * Torii version: 0.3.2
- * Built: Mon Mar 16 2015 10:40:05 GMT-0400 (EDT)
+ * Torii version: 0.3.3
+ * Built: Fri Apr 03 2015 21:03:47 GMT-0400 (EDT)
  */
 (function() {
 
@@ -370,7 +370,7 @@ define("torii/lib/query-string",
 
         this.optionalUrlParams.forEach(function(param){
           if (this.urlParams.indexOf(param) > -1) {
-            throw "Required parameters cannot also be optional: '" + param + "'";
+            throw new Error("Required parameters cannot also be optional: '" + param + "'");
           }
         }, this);
       },
@@ -716,6 +716,8 @@ define("torii/providers/azure-ad-oauth2",
     var Oauth2 = __dependency1__["default"];
     var configurable = __dependency2__.configurable;
 
+    var computed = Ember.computed;
+
     /**
      * This class implements authentication against AzureAD
      * using the OAuth2 authorization flow in a popup window.
@@ -724,9 +726,9 @@ define("torii/providers/azure-ad-oauth2",
     var AzureAdOauth2 = Oauth2.extend({
       name: 'azure-ad-oauth2',
 
-      baseUrl: function() {
+      baseUrl: computed(function() {
         return 'https://login.windows.net/' + this.get('tennantId') + '/oauth2/authorize';
-      }.property(),
+      }),
 
       tennantId: configurable('tennantId', 'common'),
 
@@ -737,9 +739,9 @@ define("torii/providers/azure-ad-oauth2",
 
       responseMode: configurable('responseMode', null),
 
-      responseParams: function () {
+      responseParams: computed(function () {
         return [ this.get('responseType') ];
-      }.property(),
+      }),
 
       state: 'STATE',
 
@@ -762,6 +764,8 @@ define("torii/providers/base",
     "use strict";
     var requiredProperty = __dependency1__["default"];
 
+    var computed = Ember.computed;
+
     /**
      * The base class for all torii providers
      * @class BaseProvider
@@ -779,9 +783,9 @@ define("torii/providers/base",
        * that holds config information for this provider.
        * @property {string} configNamespace
        */
-      configNamespace: function(){
+      configNamespace: computed('name', function(){
         return 'providers.'+this.get('name');
-      }.property('name')
+      })
 
     });
 
@@ -801,6 +805,7 @@ define("torii/providers/facebook-connect",
     var Provider = __dependency1__["default"];
     var configurable = __dependency2__.configurable;
 
+    var on = Ember.on;
     var fbPromise;
 
     function fbLoad(settings){
@@ -875,9 +880,9 @@ define("torii/providers/facebook-connect",
       // Load Facebook's script eagerly, so that the window.open
       // in FB.login will be part of the same JS frame as the
       // click itself.
-      loadFbLogin: function(){
+      loadFbLogin: on('init', function(){
         fbLoad( this.settings() );
-      }.on('init')
+      })
 
     });
 
@@ -912,7 +917,7 @@ define("torii/providers/facebook-oauth2",
         return this._super().then(function(authData){
           if (authData.authorizationCode && authData.authorizationCode === '200') {
             // indication that the user hit 'cancel', not 'ok'
-            throw 'User canceled authorization';
+            throw new Error('User canceled authorization');
           }
 
           return authData;
@@ -1102,8 +1107,8 @@ define("torii/providers/oauth2-bearer",
           });
 
           if (missingResponseParams.length){
-            throw "The response from the provider is missing " +
-                  "these required response params: " + responseParams.join(', ');
+            throw new Error("The response from the provider is missing " +
+                  "these required response params: " + responseParams.join(', '));
           }
 
           return {
@@ -1125,6 +1130,8 @@ define("torii/providers/oauth2-code",
     var configurable = __dependency2__.configurable;
     var QueryString = __dependency3__["default"];
     var requiredProperty = __dependency4__["default"];
+
+    var computed = Ember.computed;
 
     function currentUrl(){
       return [window.location.protocol,
@@ -1207,9 +1214,9 @@ define("torii/providers/oauth2-code",
       */
       responseParams: requiredProperty(),
 
-      redirectUri: function(){
+      redirectUri: computed(function(){
         return currentUrl();
-      }.property(),
+      }),
 
       buildQueryString: function(){
         var requiredParams = this.get('requiredUrlParams'),
@@ -1253,8 +1260,8 @@ define("torii/providers/oauth2-code",
           });
 
           if (missingResponseParams.length){
-            throw "The response from the provider is missing " +
-                  "these required response params: " + responseParams.join(', ');
+            throw new Error("The response from the provider is missing " +
+                  "these required response params: " + responseParams.join(', '));
           }
 
           return {
@@ -1354,6 +1361,8 @@ define("torii/services/popup",
     "use strict";
     var ParseQueryString = __dependency1__["default"];
 
+    var on = Ember.on;
+
     var postMessageFixed;
     var postMessageDomain = window.location.protocol+'//'+window.location.host;
     var postMessagePrefix = "__torii_message:";
@@ -1448,7 +1457,7 @@ define("torii/services/popup",
           }
 
           var optionsString = stringifyOptions(prepareOptions(options || {}));
-          service.popup = window.open(url, 'torii-auth', optionsString);
+          service.popup = window.open(url, 'torii_auth', optionsString);
 
           if (service.popup && !service.popup.closed) {
             service.popup.focus();
@@ -1505,9 +1514,9 @@ define("torii/services/popup",
         }, 35);
       },
 
-      stopPolling: function(){
+      stopPolling: on('didClose', function(){
         Ember.run.cancel(this.polling);
-      }.on('didClose'),
+      }),
 
 
     });
@@ -1520,6 +1529,9 @@ define("torii/session",
     "use strict";
     var createStateMachine = __dependency1__["default"];
 
+    var computed = Ember.computed;
+    var on = Ember.on;
+
     function lookupAdapter(container, authenticationType){
       var adapter = container.lookup('torii-adapter:'+authenticationType);
       if (!adapter) {
@@ -1531,18 +1543,18 @@ define("torii/session",
     var Session = Ember.ObjectProxy.extend({
       state: null,
 
-      stateMachine: function(){
+      stateMachine: computed(function(){
         return createStateMachine(this);
-      }.property(),
+      }),
 
-      setupStateProxy: function(){
+      setupStateProxy: on('init', function(){
         var sm    = this.get('stateMachine'),
             proxy = this;
         sm.on('didTransition', function(){
           proxy.set('content', sm.state);
           proxy.set('currentStateName', sm.currentStateName);
         });
-      }.on('init'),
+      }),
 
       // Make these properties one-way.
       setUnknownProperty: Ember.K,
