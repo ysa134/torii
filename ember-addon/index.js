@@ -23,7 +23,7 @@ module.exports = {
 
     // Use a build-time check to output a warning if Torii is not
     // conigured.
-    var config = this.project.config(proccess.env.EMBER_ENV);
+    var config = this.project.config(process.env.EMBER_ENV);
     if (!config.torii) {
       console.warn("Torii is installed but not configured in config/environment.js!");
     } else {
