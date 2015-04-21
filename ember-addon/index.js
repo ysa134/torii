@@ -27,6 +27,10 @@ module.exports = {
     if (!config.torii) {
       console.warn("Torii is installed but not configured in config/environment.js!");
     } else {
+      var projectPrefix = this.project.name();
+      if (this.project.isEmberCLIAddon()) {
+        projectPrefix = config.modulePrefix;
+      }
       // Use run-time lookup of the ENV via require. This is better than
       // build-time configuration since this code will not be run again if
       // config/environment changes.
@@ -34,7 +38,7 @@ module.exports = {
         files: ['modules/torii/configuration.js'],
         patterns: [{
           match: /get\(window, 'ENV\.torii'\)/,
-          replacement: 'require("'+this.project.name()+'/config/environment")["default"].torii'
+          replacement: 'require("'+projectPrefix+'/config/environment")["default"].torii'
         }]
       });
     }
