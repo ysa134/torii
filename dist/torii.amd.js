@@ -1,6 +1,6 @@
 /**
- * Torii version: 0.3.3
- * Built: Fri Apr 03 2015 21:03:47 GMT-0400 (EDT)
+ * Torii version: 0.3.4
+ * Built: Tue Apr 21 2015 08:43:10 GMT-0400 (EDT)
  */
 define("torii/adapters/application", 
   ["exports"],
@@ -49,26 +49,28 @@ define("torii/bootstrap/session",
     }
   });
 define("torii/bootstrap/torii", 
-  ["torii/torii","torii/providers/linked-in-oauth2","torii/providers/google-oauth2","torii/providers/facebook-connect","torii/providers/facebook-oauth2","torii/adapters/application","torii/providers/twitter-oauth1","torii/providers/github-oauth2","torii/providers/azure-ad-oauth2","torii/providers/stripe-connect","torii/services/popup","exports"],
-  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __dependency9__, __dependency10__, __dependency11__, __exports__) {
+  ["torii/torii","torii/providers/linked-in-oauth2","torii/providers/google-oauth2","torii/providers/google-oauth2-bearer","torii/providers/facebook-connect","torii/providers/facebook-oauth2","torii/adapters/application","torii/providers/twitter-oauth1","torii/providers/github-oauth2","torii/providers/azure-ad-oauth2","torii/providers/stripe-connect","torii/services/popup","exports"],
+  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __dependency9__, __dependency10__, __dependency11__, __dependency12__, __exports__) {
     "use strict";
     var Torii = __dependency1__["default"];
     var LinkedInOauth2Provider = __dependency2__["default"];
     var GoogleOauth2Provider = __dependency3__["default"];
-    var FacebookConnectProvider = __dependency4__["default"];
-    var FacebookOauth2Provider = __dependency5__["default"];
-    var ApplicationAdapter = __dependency6__["default"];
-    var TwitterProvider = __dependency7__["default"];
-    var GithubOauth2Provider = __dependency8__["default"];
-    var AzureAdOauth2Provider = __dependency9__["default"];
-    var StripeConnectProvider = __dependency10__["default"];
+    var GoogleOauth2BearerProvider = __dependency4__["default"];
+    var FacebookConnectProvider = __dependency5__["default"];
+    var FacebookOauth2Provider = __dependency6__["default"];
+    var ApplicationAdapter = __dependency7__["default"];
+    var TwitterProvider = __dependency8__["default"];
+    var GithubOauth2Provider = __dependency9__["default"];
+    var AzureAdOauth2Provider = __dependency10__["default"];
+    var StripeConnectProvider = __dependency11__["default"];
 
-    var PopupService = __dependency11__["default"];
+    var PopupService = __dependency12__["default"];
 
     __exports__["default"] = function(container){
       container.register('torii:main', Torii);
       container.register('torii-provider:linked-in-oauth2', LinkedInOauth2Provider);
       container.register('torii-provider:google-oauth2', GoogleOauth2Provider);
+      container.register('torii-provider:google-oauth2-bearer', GoogleOauth2BearerProvider);
       container.register('torii-provider:facebook-connect', FacebookConnectProvider);
       container.register('torii-provider:facebook-oauth2', FacebookOauth2Provider);
       container.register('torii-provider:twitter', TwitterProvider);
@@ -715,12 +717,14 @@ define("torii/providers/facebook-connect",
       if (fbPromise) { return fbPromise; }
 
       var original = window.fbAsyncInit;
+      var locale = settings.locale;
+      delete settings.locale;
       fbPromise = new Ember.RSVP.Promise(function(resolve, reject){
         window.fbAsyncInit = function(){
           FB.init(settings);
           Ember.run(null, resolve);
         };
-        $.getScript('//connect.facebook.net/en_US/sdk.js');
+        $.getScript('//connect.facebook.net/' + locale + '/sdk.js');
       }).then(function(){
         window.fbAsyncInit = original;
         if (window.fbAsyncInit) {
@@ -747,16 +751,21 @@ define("torii/providers/facebook-connect",
     function fbNormalize(response){
       return {
         userId: response.userID,
-        accessToken: response.accessToken
+        accessToken: response.accessToken,
+        expiresIn: response.expiresIn
       };
     }
 
     var Facebook = Provider.extend({
 
-      // Required settings:
+      // Facebook connect SDK settings:
       name:  'facebook-connect',
       scope: configurable('scope', 'email'),
       appId: configurable('appId'),
+      version: configurable('version', 'v2.2'),
+      xfbml: configurable('xfbml', false),
+      channelUrl: configurable('channelUrl', null),
+      locale: configurable('locale', 'en_US'),
 
       // API:
       //
@@ -774,9 +783,11 @@ define("torii/providers/facebook-connect",
         return {
           status: true,
           cookie: true,
-          xfbml: false,
-          version: 'v2.0',
-          appId: this.get('appId')
+          xfbml: this.get('xfbml'),
+          version: this.get('version'),
+          appId: this.get('appId'),
+          channelUrl: this.get('channelUrl'),
+          locale: this.get('locale')
         };
       },
 
@@ -859,6 +870,41 @@ define("torii/providers/github-oauth2",
     });
 
     __exports__["default"] = GithubOauth2;
+  });
+define("torii/providers/google-oauth2-bearer", 
+  ["torii/providers/oauth2-bearer","torii/configuration","exports"],
+  function(__dependency1__, __dependency2__, __exports__) {
+    "use strict";
+    /**
+     * This class implements authentication against google
+     * using the client-side OAuth2 authorization flow in a popup window.
+     */
+
+    var Oauth2Bearer = __dependency1__["default"];
+    var configurable = __dependency2__.configurable;
+
+    var GoogleOauth2Bearer = Oauth2Bearer.extend({
+
+      name:    'google-oauth2-bearer',
+      baseUrl: 'https://accounts.google.com/o/oauth2/auth',
+
+      // additional params that this provider requires
+      requiredUrlParams: ['state'],
+      optionalUrlParams: ['scope', 'request_visible_actions'],
+
+      requestVisibleActions: configurable('requestVisibleActions', ''),
+
+      responseParams: ['access_token'],
+
+      scope: configurable('scope', 'email'),
+
+      state: configurable('state', 'STATE'),
+
+      redirectUri: configurable('redirectUri',
+                                'http://localhost:8000/oauth2callback')
+    });
+
+    __exports__["default"] = GoogleOauth2Bearer;
   });
 define("torii/providers/google-oauth2", 
   ["torii/providers/oauth2-code","torii/configuration","exports"],
