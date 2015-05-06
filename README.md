@@ -48,7 +48,7 @@ torii.open('facebook') -> #open hook on the facebook provider -> returned author
 ```
 
 This is authentication only against a provider. If your application provides
-an **adapter**, then Torii can also peform **session management** via the
+an **adapter**, then Torii can also perform **session management** via the
 `session` property, injected onto routes and controllers. This example uses
 Facebook's OAuth 2.0 API directly to fetch an authorization code.
 
