@@ -354,7 +354,7 @@ To add a session service in Ember-CLI, simply:
 /* ... */
 ```
 
-Or to do the same in a global configuratoin
+Or to do the same in a global configuration
 
 ```JavaScript
 window.ENV = window.ENV || {};
