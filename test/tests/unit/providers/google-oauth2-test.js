@@ -24,14 +24,16 @@ test("Provider requires an apiKey", function(){
 
 test("Provider generates a URL with required config", function(){
   configuration.providers['google-oauth2'] = {
-    apiKey: 'abcdef'
+    apiKey: 'abcdef',
+    approvalPrompt: 'force'
   };
 
   var expectedUrl = provider.get('baseUrl') + '?' + 'response_type=code' +
           '&client_id=' + 'abcdef' +
           '&redirect_uri=' + encodeURIComponent(provider.get('redirectUri')) +
           '&state=STATE' +
-          '&scope=email';
+          '&scope=email' +
+          '&approval_prompt=force';
 
   equal(provider.buildUrl(),
         expectedUrl,
