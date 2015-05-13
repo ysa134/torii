@@ -1,6 +1,6 @@
 {
   "name": "torii",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "A set of clean abstractions for authentication in Ember.js",
   "main": "ember-addon/index.js",
   "directories": {

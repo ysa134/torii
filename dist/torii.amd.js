@@ -1,6 +1,6 @@
 /**
- * Torii version: 0.3.4
- * Built: Tue Apr 21 2015 08:43:10 GMT-0400 (EDT)
+ * Torii version: 0.3.5
+ * Built: Wed May 13 2015 11:11:45 GMT-0400 (EDT)
  */
 define("torii/adapters/application", 
   ["exports"],
@@ -925,7 +925,7 @@ define("torii/providers/google-oauth2",
 
       // additional params that this provider requires
       requiredUrlParams: ['state'],
-      optionalUrlParams: ['scope', 'request_visible_actions', 'access_type'],
+      optionalUrlParams: ['scope', 'request_visible_actions', 'access_type', 'approval_prompt'],
 
       requestVisibleActions: configurable('requestVisibleActions', ''),
 
@@ -936,6 +936,8 @@ define("torii/providers/google-oauth2",
       scope: configurable('scope', 'email'),
 
       state: configurable('state', 'STATE'),
+
+      approvalPrompt: configurable('approvalPrompt', 'auto'),
 
       redirectUri: configurable('redirectUri',
                                 'http://localhost:8000/oauth2callback')
@@ -1417,8 +1419,11 @@ define("torii/services/popup",
           }
 
           service.one('didClose', function(){
-            reject(new Error(
-              'Popup was closed or authorization was denied'));
+            // If we don't receive a message before the timeout, we fail. Normally,
+            // the message will be received and the window will close immediately.
+            service.timeout = Ember.run.later(service, function() {
+              reject(new Error("Popup was closed, authorization was denied, or a authentication message otherwise not received before the window closed."));
+            }, 100);
           });
 
           Ember.$(window).on('message.torii', function(event){
@@ -1426,7 +1431,9 @@ define("torii/services/popup",
             var toriiMessage = readToriiMessage(message);
             if (toriiMessage) {
               var data = parseMessage(toriiMessage, keys);
-              resolve(data);
+              Ember.run(function() {
+                resolve(data);
+              });
             }
           });
 
@@ -1435,6 +1442,7 @@ define("torii/services/popup",
         })["finally"](function(){
           // didClose will reject this same promise, but it has already resolved.
           service.close();
+          service.clearTimeout();
           window.name = oldName;
           Ember.$(window).off('message.torii');
         });
@@ -1461,6 +1469,12 @@ define("torii/services/popup",
           this.pollPopup();
           this.schedulePolling();
         }, 35);
+      },
+
+      // Clear the timeout, in case it hasn't fired.
+      clearTimeout: function(){
+        Ember.run.cancel(this.timeout);
+        this.timeout = null;
       },
 
       stopPolling: on('didClose', function(){
