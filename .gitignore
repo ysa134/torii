@@ -6,6 +6,7 @@
 /app-addon
 /vendor-addon
 
+.DS_Store
 *.un~
 *.swp
 .ackrc
