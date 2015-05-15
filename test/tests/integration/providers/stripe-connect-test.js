@@ -35,3 +35,31 @@ test("Opens a popup to Stripe", function(){
     });
   });
 });
+
+test("Opens a popup to Stripe with the scope parameter", function(){
+  expect(1);
+  configuration.providers['stripe-connect'].scope = "read_only";
+  mockPopup.open = function(url){
+    ok(
+      url.indexOf("scope=read_only") > -1,
+      "scope is set from config" );
+    return Ember.RSVP.resolve({ code: 'test' });
+  }
+  Ember.run(function(){
+    torii.open('stripe-connect');
+  });
+});
+
+test("Opens a popup to Stripe with the stripe_landing parameter", function(){
+  expect(1);
+  configuration.providers['stripe-connect'].stripeLanding = "login";
+  mockPopup.open = function(url){
+    ok(
+      url.indexOf("stripe_landing=login") > -1,
+      "stripe_landing is set from config" );
+    return Ember.RSVP.resolve({ code: 'test' });
+  }
+  Ember.run(function(){
+    torii.open('stripe-connect');
+  });
+});
