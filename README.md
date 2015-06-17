@@ -9,7 +9,7 @@
 
 **tl;dr;** Use the torii 0.3.X if your application is using Ember 1.11 or older.
 
-# What is torii?
+# What is Torii?
 
 Torii is a set of clean abstractions for authentication in [Ember.js](http://emberjs.com/)
 applications. Torii is built with **providers** (authentication against a platform), a
