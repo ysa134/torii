@@ -1,6 +1,6 @@
 /**
- * Torii version: 0.3.5
- * Built: Wed May 13 2015 11:11:45 GMT-0400 (EDT)
+ * Torii version: 0.4.0
+ * Built: Wed Jun 17 2015 12:47:28 GMT-0400 (EDT)
  */
 define("torii/adapters/application", 
   ["exports"],
@@ -171,16 +171,6 @@ define("torii/initializers/initialize-torii",
       name: 'torii',
       initialize: function(container, app){
         bootstrapTorii(container);
-
-        // Walk all configured providers and eagerly instantiate
-        // them. This gives providers with initialization side effects
-        // like facebook-connect a chance to load up assets.
-        for (var key in  configuration.providers) {
-          if (configuration.providers.hasOwnProperty(key)) {
-            container.lookup('torii-provider:'+key);
-          }
-        }
-
         app.inject('route', 'torii', 'torii:main');
       }
     };
@@ -191,6 +181,27 @@ define("torii/initializers/initialize-torii",
 
     __exports__["default"] = initializer;
   });
+define("torii/instance-initializers/walk-providers", 
+  ["torii/configuration","exports"],
+  function(__dependency1__, __exports__) {
+    "use strict";
+    var configuration = __dependency1__["default"];
+
+    __exports__["default"] = {
+      name: 'torii-walk-providers',
+      initialize: function(appInstance){
+        // Walk all configured providers and eagerly instantiate
+        // them. This gives providers with initialization side effects
+        // like facebook-connect a chance to load up assets.
+        for (var key in  configuration.providers) {
+          if (configuration.providers.hasOwnProperty(key)) {
+            appInstance.container.lookup('torii-provider:'+key);
+          }
+        }
+
+      }
+    };
+  });
 define("torii/lib/load-initializer", 
   ["exports"],
   function(__exports__) {
@@ -199,6 +210,17 @@ define("torii/lib/load-initializer",
     __exports__["default"] = function(initializer){
       Ember.onLoad('Ember.Application', function(Application){
         Application.initializer(initializer);
+      });
+    }
+  });
+define("torii/lib/load-instance-initializer", 
+  ["exports"],
+  function(__exports__) {
+    "use strict";
+    /* global Ember */
+    __exports__["default"] = function(instanceInitializer){
+      Ember.onLoad('Ember.Application', function(Application){
+        Application.instanceInitializer(instanceInitializer);
       });
     }
   });
@@ -600,18 +622,21 @@ define("torii/lib/state-machine",
     __exports__["default"] = StateMachine;
   });
 define("torii/load-initializers", 
-  ["torii/lib/load-initializer","torii/initializers/initialize-torii","torii/initializers/initialize-torii-callback","torii/initializers/initialize-torii-session","exports"],
-  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __exports__) {
+  ["torii/lib/load-initializer","torii/lib/load-instance-initializer","torii/initializers/initialize-torii","torii/initializers/initialize-torii-callback","torii/initializers/initialize-torii-session","torii/instance-initializers/walk-providers","exports"],
+  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __exports__) {
     "use strict";
     var loadInitializer = __dependency1__["default"];
-    var initializeTorii = __dependency2__["default"];
-    var initializeToriiCallback = __dependency3__["default"];
-    var initializeToriiSession = __dependency4__["default"];
+    var loadInstanceInitializer = __dependency2__["default"];
+    var initializeTorii = __dependency3__["default"];
+    var initializeToriiCallback = __dependency4__["default"];
+    var initializeToriiSession = __dependency5__["default"];
+    var walkProviders = __dependency6__["default"];
 
     __exports__["default"] = function(){
       loadInitializer(initializeToriiCallback);
       loadInitializer(initializeTorii);
       loadInitializer(initializeToriiSession);
+      loadInstanceInitializer(walkProviders);
     }
   });
 define("torii/providers/azure-ad-oauth2", 
@@ -925,7 +950,7 @@ define("torii/providers/google-oauth2",
 
       // additional params that this provider requires
       requiredUrlParams: ['state'],
-      optionalUrlParams: ['scope', 'request_visible_actions', 'access_type', 'approval_prompt'],
+      optionalUrlParams: ['scope', 'request_visible_actions', 'access_type', 'approval_prompt', 'hd'],
 
       requestVisibleActions: configurable('requestVisibleActions', ''),
 
@@ -940,7 +965,9 @@ define("torii/providers/google-oauth2",
       approvalPrompt: configurable('approvalPrompt', 'auto'),
 
       redirectUri: configurable('redirectUri',
-                                'http://localhost:8000/oauth2callback')
+                                'http://localhost:8000/oauth2callback'),
+
+      hd: configurable('hd', '')
     });
 
     __exports__["default"] = GoogleOauth2;
@@ -1239,10 +1266,12 @@ define("torii/providers/stripe-connect",
 
       // additional url params that this provider requires
       requiredUrlParams: [],
+      optionalUrlParams: ['stripe_landing'],
 
       responseParams: ['code'],
 
-      scope: 'read_write',
+      scope: configurable('scope', 'read_write'),
+      stripeLanding: configurable('stripeLanding', ''),
 
       redirectUri: configurable('redirectUri', function() {
         // A hack that allows redirectUri to be configurable
@@ -1408,7 +1437,7 @@ define("torii/services/popup",
           }
 
           var optionsString = stringifyOptions(prepareOptions(options || {}));
-          service.popup = window.open(url, 'torii_auth', optionsString);
+          service.popup = window.open(url, '_blank', optionsString);
 
           if (service.popup && !service.popup.closed) {
             service.popup.focus();
