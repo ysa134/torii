@@ -1,5 +1,16 @@
 [![Torii Build Status](https://circleci.com/gh/Vestorly/torii.png?circle-token=9bdd2f37dbcb0be85f82a6b1ac61b9333b68625b "Torii Build Status")](https://circleci.com/gh/Vestorly/torii) [![Ember Observer Score](http://emberobserver.com/badges/torii.svg)](http://emberobserver.com/addons/torii)
 
+# Compatibilty Matrix
+
+|  Torii    | Ember   | Ember-Data         |
+|-----------|---------|--------------------|
+| v0.3.X    | <= 1.13 | <= 1.0.0.beta19.2  |
+| v0.4.X    | >= 1.12 | >= 1.0.0.beta19.2  |
+
+**tl;dr;** Use the torii 0.3.X if your application is using Ember 1.11 or older.
+
+# What is torii?
+
 Torii is a set of clean abstractions for authentication in [Ember.js](http://emberjs.com/)
 applications. Torii is built with **providers** (authentication against a platform), a
 **session manager** (for maintaining the current user), and **adapters** (to persist
