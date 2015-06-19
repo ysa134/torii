@@ -1,6 +1,6 @@
 /**
- * Torii version: 0.4.0
- * Built: Wed Jun 17 2015 12:47:28 GMT-0400 (EDT)
+ * Torii version: 0.4.1
+ * Built: Fri Jun 19 2015 19:40:00 GMT-0400 (EDT)
  */
 define("torii/adapters/application", 
   ["exports"],
@@ -84,8 +84,12 @@ define("torii/bootstrap/torii",
       container.injection('torii-provider', 'popup', 'torii-service:popup');
 
       if (window.DS) {
-        container.injection('torii-provider', 'store', 'store:main');
-        container.injection('torii-adapter', 'store', 'store:main');
+        var storeFactoryName = 'store:main';
+        if (container.has('service:store')) {
+          storeFactoryName = 'service:store';
+        }
+        container.injection('torii-provider', 'store', storeFactoryName);
+        container.injection('torii-adapter', 'store', storeFactoryName);
       }
 
       return container;
