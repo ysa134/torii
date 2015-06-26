@@ -63,3 +63,17 @@ test("Opens a popup to Stripe with the stripe_landing parameter", function(){
     torii.open('stripe-connect');
   });
 });
+
+test("Opens a popup to Stripe with the always_prompt parameter", function(){
+  expect(1);
+  configuration.providers['stripe-connect'].alwaysPrompt = 'true';
+  mockPopup.open = function(url){
+    ok(
+      url.indexOf("always_prompt=true") > -1,
+      "always_prompt is set from config" );
+    return Ember.RSVP.resolve({ code: 'test' });
+  }
+  Ember.run(function(){
+    torii.open('stripe-connect');
+  });
+});
