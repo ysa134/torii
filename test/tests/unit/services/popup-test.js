@@ -1,17 +1,38 @@
 import Popup from 'torii/services/popup';
+import PopupIdSerializer from 'torii/lib/popup-id-serializer';
 
 var popup;
 var originalWindowOpen = window.open;
 
-var mockWindow = {
-  focus: Ember.K,
-  close: Ember.K
+var buildMockWindow = function(windowName){
+  windowName = windowName || "";
+  return {
+    name: windowName,
+    focus: Ember.K,
+    close: Ember.K
+  };
+};
+
+var buildPopupIdGenerator = function(popupId){
+  return {
+    generate: function(){
+      return popupId;
+    }
+  }
+};
+
+var buildMockStorageEvent = function(popupId, redirectUrl){
+  return Ember.$.Event('storage', {
+    originalEvent: {
+      key: PopupIdSerializer.serialize(popupId),
+      newValue: redirectUrl
+    }
+  });
 };
 
 module("Popup - Unit", {
   setup: function(){
     popup = new Popup();
-    window.name = 'original-window-name';
   },
   teardown: function(){
     window.open = originalWindowOpen;
@@ -20,22 +41,30 @@ module("Popup - Unit", {
 });
 
 asyncTest("open resolves based on popup window", function(){
-  var expectedUrl = 'http://authServer',
-      expectedData = "__torii_message:http://someurl.com?code=fr";
+  expect(6);
+  var expectedUrl = 'http://authServer';
+  var redirectUrl = "http://localserver?code=fr"
+  var popupId = '09123-asdf';
+  var mockWindow = null
 
-  window.open = function(url){
+  popup = new Popup({popupIdGenerator: buildPopupIdGenerator(popupId)});
+
+  window.open = function(url, name){
     ok(true, 'calls window.open');
     equal(url, expectedUrl, 'opens with expected url');
-    equal(window.name, 'torii-opener', 'Correct name is set on the opener');
 
+    mockWindow = buildMockWindow(name);
     return mockWindow;
   };
 
   Ember.run(function(){
     popup.open(expectedUrl, ['code']).then(function(data){
       ok(true, 'resolves promise');
-      equal(window.name, 'original-window-name', 'opener window\'s name is reset');
+      equal(popupId, PopupIdSerializer.deserialize(mockWindow.name), "sets the window's name properly");
       deepEqual(data, {code: 'fr'}, 'resolves with expected data');
+      deepEqual(null,
+          localStorage.getItem(PopupIdSerializer.serialize(popupId)),
+          "removes the key from local storage");
       start();
     }, function(){
       ok(false, 'rejected the open promise');
@@ -43,15 +72,17 @@ asyncTest("open resolves based on popup window", function(){
     });
   });
 
-  window.postMessage(expectedData, '*');
+
+  localStorage.setItem(PopupIdSerializer.serialize(popupId), redirectUrl);
+  // Need to manually trigger storage event, since it doesn't fire in the current window
+  Ember.$(window).trigger(buildMockStorageEvent(popupId, redirectUrl));
 });
 
 asyncTest("open rejects when window does not open", function(){
-  var closedWindow = Ember.copy(mockWindow);
+  var closedWindow = buildMockWindow();
   closedWindow.closed = true;
   window.open = function(url){
     ok(true, 'calls window.open');
-    equal(window.name, 'torii-opener', 'Correct name is set on the opener');
     return closedWindow;
   };
 
@@ -61,16 +92,15 @@ asyncTest("open rejects when window does not open", function(){
       start();
     }, function(){
       ok(true, 'rejected the open promise');
-      equal(window.name, 'original-window-name', 'opener window\'s name is reset');
       start();
     });
   });
 });
 
-asyncTest("open does not resolve when recieving the wrong message", function(){
+asyncTest("open does not resolve when receiving a storage event for the wrong popup id", function(){
   window.open = function(url){
     ok(true, 'calls window.open');
-    return mockWindow;
+    return buildMockWindow();
   };
 
   var promise = Ember.run(function(){
@@ -83,14 +113,21 @@ asyncTest("open does not resolve when recieving the wrong message", function(){
     });
   });
 
-  window.postMessage('somenotvaliddata', '*');
+  localStorage.setItem(PopupIdSerializer.serialize("invalid"), "http://authServer");
+  // Need to manually trigger storage event, since it doesn't fire in the current window
+  Ember.$(window).trigger(buildMockStorageEvent("invalid", "http://authServer"));
+
   setTimeout(function(){
     ok(!promise.isFulfilled, 'promise is not fulfulled by invalid data');
+    deepEqual("http://authServer",
+        localStorage.getItem(PopupIdSerializer.serialize("invalid")),
+        "doesn't remove the key from local storage");
     start();
   },10);
 });
 
 asyncTest("open rejects when window closes", function(){
+  var mockWindow = buildMockWindow()
   window.open = function(){
     ok(true, 'calls window.open');
     return mockWindow;
