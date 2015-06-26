@@ -330,6 +330,7 @@ Torii comes with several providers already included:
   * Facebook Connect (via FB SDK) ([Dev Site](https://developers.facebook.com/) | [Docs](https://developers.facebook.com/docs/))
   * Facebook OAuth2 ([Dev Site](https://developers.facebook.com/) | [Docs](https://developers.facebook.com/docs/facebook-login/manually-build-a-login-flow/))
   * Stripe Connect (OAuth2) ([Dev Site](https://stripe.com/docs) | [Docs](https://stripe.com/docs/connect))
+  * Edmodo Connect (OAuth2) ([Dev Site](https://developers.edmodo.com/) | [Docs](https://developers.edmodo.com/edmodo-connect/docs/))
   * **Authoring custom providers is designed to be easy** - You are encouraged to author your own.
 
 ### Supporting OAuth 1.0a
