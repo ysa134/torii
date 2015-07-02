@@ -4,8 +4,8 @@
 
 |  Torii    | Ember   | Ember-Data         |
 |-----------|---------|--------------------|
-| v0.3.X    | <= 1.13 | <= 1.0.0.beta19.2  |
-| v0.4.X    | >= 1.12 | >= 1.0.0.beta19.2  |
+| v0.3.X and before    | <= 1.13 | <= 1.0.0.beta19.2  |
+| v0.4.X and after     | >= 1.12 | >= 1.0.0.beta19.2  |
 
 **tl;dr;** Use the torii 0.3.X if your application is using Ember 1.11 or older.
 
