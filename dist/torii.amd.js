@@ -1,6 +1,6 @@
 /**
- * Torii version: 0.4.1
- * Built: Fri Jun 19 2015 19:40:00 GMT-0400 (EDT)
+ * Torii version: 0.5.0
+ * Built: Thu Jul 02 2015 11:33:04 GMT-0400 (EDT)
  */
 define("torii/adapters/application", 
   ["exports"],
@@ -49,8 +49,8 @@ define("torii/bootstrap/session",
     }
   });
 define("torii/bootstrap/torii", 
-  ["torii/torii","torii/providers/linked-in-oauth2","torii/providers/google-oauth2","torii/providers/google-oauth2-bearer","torii/providers/facebook-connect","torii/providers/facebook-oauth2","torii/adapters/application","torii/providers/twitter-oauth1","torii/providers/github-oauth2","torii/providers/azure-ad-oauth2","torii/providers/stripe-connect","torii/services/popup","exports"],
-  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __dependency9__, __dependency10__, __dependency11__, __dependency12__, __exports__) {
+  ["torii/torii","torii/providers/linked-in-oauth2","torii/providers/google-oauth2","torii/providers/google-oauth2-bearer","torii/providers/facebook-connect","torii/providers/facebook-oauth2","torii/adapters/application","torii/providers/twitter-oauth1","torii/providers/github-oauth2","torii/providers/azure-ad-oauth2","torii/providers/stripe-connect","torii/providers/edmodo-connect","torii/services/popup","exports"],
+  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __dependency9__, __dependency10__, __dependency11__, __dependency12__, __dependency13__, __exports__) {
     "use strict";
     var Torii = __dependency1__["default"];
     var LinkedInOauth2Provider = __dependency2__["default"];
@@ -63,8 +63,9 @@ define("torii/bootstrap/torii",
     var GithubOauth2Provider = __dependency9__["default"];
     var AzureAdOauth2Provider = __dependency10__["default"];
     var StripeConnectProvider = __dependency11__["default"];
+    var EdmodoConnectProvider = __dependency12__["default"];
 
-    var PopupService = __dependency12__["default"];
+    var PopupService = __dependency13__["default"];
 
     __exports__["default"] = function(container){
       container.register('torii:main', Torii);
@@ -77,6 +78,7 @@ define("torii/bootstrap/torii",
       container.register('torii-provider:github-oauth2', GithubOauth2Provider);
       container.register('torii-provider:azure-ad-oauth2', AzureAdOauth2Provider);
       container.register('torii-provider:stripe-connect', StripeConnectProvider);
+      container.register('torii-provider:edmodo-connect', EdmodoConnectProvider);
       container.register('torii-adapter:application', ApplicationAdapter);
 
       container.register('torii-service:popup', PopupService);
@@ -139,7 +141,7 @@ define("torii/initializers/initialize-torii-callback",
       before: 'torii',
       initialize: function(container, app){
         app.deferReadiness();
-        RedirectHandler.handle(window.location.toString())["catch"](function(){
+        RedirectHandler.handle(window)["catch"](function(){
           app.advanceReadiness();
         });
       }
@@ -254,6 +256,28 @@ define("torii/lib/parse-query-string",
         return data;
       }
     });
+  });
+define("torii/lib/popup-id-serializer", 
+  ["exports"],
+  function(__exports__) {
+    "use strict";
+    var PopupIdSerializer = {
+      serialize: function(popupId){
+        return "torii-popup:" + popupId;
+      },
+
+      deserialize: function(serializedPopupId){
+        if (!serializedPopupId){
+          return null;
+        }
+
+        var match = serializedPopupId.match(/^(torii-popup:)(.*)/);
+        return match ? match[2] : null;
+      },
+    };
+
+
+    __exports__["default"] = PopupIdSerializer;
   });
 define("torii/lib/query-string", 
   ["exports"],
@@ -625,6 +649,26 @@ define("torii/lib/state-machine",
 
     __exports__["default"] = StateMachine;
   });
+define("torii/lib/uuid-generator", 
+  ["exports"],
+  function(__exports__) {
+    "use strict";
+    var UUIDGenerator = {
+      generate: function() {
+        var d = new Date().getTime();
+        var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+          var r = (d + Math.random()*16)%16 | 0;
+          d = Math.floor(d/16);
+          return (c==='x' ? r : (r&0x3|0x8)).toString(16);
+        });
+        return uuid;
+      },
+
+
+    };
+
+    __exports__["default"] = UUIDGenerator;
+  });
 define("torii/load-initializers", 
   ["torii/lib/load-initializer","torii/lib/load-instance-initializer","torii/initializers/initialize-torii","torii/initializers/initialize-torii-callback","torii/initializers/initialize-torii-session","torii/instance-initializers/walk-providers","exports"],
   function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __exports__) {
@@ -724,6 +768,29 @@ define("torii/providers/base",
     });
 
     __exports__["default"] = Base;
+  });
+define("torii/providers/edmodo-connect", 
+  ["torii/providers/oauth2-bearer","torii/configuration","exports"],
+  function(__dependency1__, __dependency2__, __exports__) {
+    "use strict";
+    var Oauth2Bearer = __dependency1__["default"];
+    var configurable = __dependency2__.configurable;
+
+    /*
+    * This class implements authentication against Edmodo
+    * with the token flow. For more information see
+    * https://developers.edmodo.com/edmodo-connect/docs/#connecting-your-application
+    * */
+    __exports__["default"] = Oauth2Bearer.extend({
+      name: 'edmodo-connect',
+      baseUrl: 'https://api.edmodo.com/oauth/authorize',
+      responseParams: ['access_token'],
+
+      /* Configurable parameters */
+      redirectUri: configurable('redirectUri'),
+      // See https://developers.edmodo.com/edmodo-connect/docs/#connecting-your-application for the full list of scopes
+      scope: configurable('scope', 'basic')
+    });
   });
 define("torii/providers/facebook-connect", 
   ["torii/providers/base","torii/configuration","exports"],
@@ -1270,12 +1337,13 @@ define("torii/providers/stripe-connect",
 
       // additional url params that this provider requires
       requiredUrlParams: [],
-      optionalUrlParams: ['stripe_landing'],
+      optionalUrlParams: ['stripe_landing', 'always_prompt'],
 
       responseParams: ['code'],
 
       scope: configurable('scope', 'read_write'),
       stripeLanding: configurable('stripeLanding', ''),
+      alwaysPrompt: configurable('alwaysPrompt', 'false'),
 
       redirectUri: configurable('redirectUri', function() {
         // A hack that allows redirectUri to be configurable
@@ -1295,7 +1363,7 @@ define("torii/providers/twitter-oauth1",
     });
   });
 define("torii/redirect-handler", 
-  ["./services/popup","exports"],
+  ["./lib/popup-id-serializer","exports"],
   function(__dependency1__, __exports__) {
     "use strict";
     /**
@@ -1306,23 +1374,30 @@ define("torii/redirect-handler",
      * and should postMessage this data to window.opener
      */
 
-    var postMessageFixed = __dependency1__.postMessageFixed;
-    var readToriiMessage = __dependency1__.readToriiMessage;
+    var PopupIdSerializer = __dependency1__["default"];
+
 
     var RedirectHandler = Ember.Object.extend({
 
-      init: function(url){
-        this.url = url;
+      init: function(windowObject){
+        this.windowObject = windowObject;
       },
 
       run: function(){
-        var url = this.url;
+        var windowObject = this.windowObject;
+
         return new Ember.RSVP.Promise(function(resolve, reject){
-          if (window.opener && window.opener.name === 'torii-opener') {
-            postMessageFixed(window.opener, url);
-            window.close();
-          } else {
-            reject('No window.opener');
+          var popupId = PopupIdSerializer.deserialize(windowObject.name);
+
+          if (popupId){
+            var key = PopupIdSerializer.serialize(popupId);
+            var url = windowObject.location.toString();
+
+            windowObject.localStorage.setItem(key, url);
+
+            windowObject.close();
+          } else{
+            reject('Not a torii popup');
           }
         });
       }
@@ -1331,8 +1406,8 @@ define("torii/redirect-handler",
 
     RedirectHandler.reopenClass({
       // untested
-      handle: function(url){
-        var handler = new RedirectHandler(url);
+      handle: function(windowObject){
+        var handler = new RedirectHandler(windowObject);
         return handler.run();
       }
     });
@@ -1340,33 +1415,14 @@ define("torii/redirect-handler",
     __exports__["default"] = RedirectHandler;
   });
 define("torii/services/popup", 
-  ["torii/lib/parse-query-string","exports"],
-  function(__dependency1__, __exports__) {
+  ["torii/lib/parse-query-string","torii/lib/uuid-generator","torii/lib/popup-id-serializer","exports"],
+  function(__dependency1__, __dependency2__, __dependency3__, __exports__) {
     "use strict";
     var ParseQueryString = __dependency1__["default"];
+    var UUIDGenerator = __dependency2__["default"];
+    var PopupIdSerializer = __dependency3__["default"];
 
     var on = Ember.on;
-
-    var postMessageFixed;
-    var postMessageDomain = window.location.protocol+'//'+window.location.host;
-    var postMessagePrefix = "__torii_message:";
-    // in IE11 window.attachEvent was removed.
-    if (window.attachEvent) {
-      postMessageFixed = function postMessageFixed(win, data) {
-        win.postMessageWithFix(postMessagePrefix+data, postMessageDomain);
-      };
-      window.postMessageWithFix = function postMessageWithFix(data, domain) {
-        setTimeout(function(){
-          window.postMessage(data, domain);
-        }, 0);
-      };
-    } else {
-      postMessageFixed = function postMessageFixed(win, data) {
-        win.postMessage(postMessagePrefix+data, postMessageDomain);
-      };
-    }
-
-    __exports__.postMessageFixed = postMessageFixed;
 
     function stringifyOptions(options){
       var optionsStrings = [];
@@ -1402,14 +1458,6 @@ define("torii/services/popup",
       }, options);
     }
 
-    function readToriiMessage(message){
-      if (message && typeof message === 'string' && message.indexOf(postMessagePrefix) === 0) {
-        return message.slice(postMessagePrefix.length);
-      }
-    }
-
-    __exports__.readToriiMessage = readToriiMessage;
-
     function parseMessage(url, keys){
       var parser = new ParseQueryString(url, keys),
           data = parser.parse();
@@ -1417,6 +1465,12 @@ define("torii/services/popup",
     }
 
     var Popup = Ember.Object.extend(Ember.Evented, {
+
+      init: function(options){
+        this._super.apply(this, arguments);
+        options = options || {};
+        this.popupIdGenerator = options.popupIdGenerator || UUIDGenerator;
+      },
 
       // Open a popup window. Returns a promise that resolves or rejects
       // accoring to if the popup is redirected with arguments in the URL.
@@ -1431,17 +1485,17 @@ define("torii/services/popup",
         var service   = this,
             lastPopup = this.popup;
 
-        var oldName = window.name;
-        // Is checked by the popup to see if it was opened by Torii
-        window.name = 'torii-opener';
 
         return new Ember.RSVP.Promise(function(resolve, reject){
           if (lastPopup) {
             service.close();
           }
 
+          var popupId = service.popupIdGenerator.generate();
+
           var optionsString = stringifyOptions(prepareOptions(options || {}));
-          service.popup = window.open(url, '_blank', optionsString);
+          var windowName = PopupIdSerializer.serialize(popupId);
+          service.popup = window.open(url, windowName, optionsString);
 
           if (service.popup && !service.popup.closed) {
             service.popup.focus();
@@ -1459,11 +1513,13 @@ define("torii/services/popup",
             }, 100);
           });
 
-          Ember.$(window).on('message.torii', function(event){
-            var message = event.originalEvent.data;
-            var toriiMessage = readToriiMessage(message);
-            if (toriiMessage) {
-              var data = parseMessage(toriiMessage, keys);
+          Ember.$(window).on('storage.torii', function(event){
+            var storageEvent = event.originalEvent;
+
+            var popupIdFromEvent = PopupIdSerializer.deserialize(storageEvent.key);
+            if (popupId === popupIdFromEvent){
+              var data = parseMessage(storageEvent.newValue, keys);
+              localStorage.removeItem(storageEvent.key);
               Ember.run(function() {
                 resolve(data);
               });
@@ -1476,8 +1532,7 @@ define("torii/services/popup",
           // didClose will reject this same promise, but it has already resolved.
           service.close();
           service.clearTimeout();
-          window.name = oldName;
-          Ember.$(window).off('message.torii');
+          Ember.$(window).off('storage.torii');
         });
       },
 
@@ -1513,7 +1568,6 @@ define("torii/services/popup",
       stopPolling: on('didClose', function(){
         Ember.run.cancel(this.polling);
       }),
-
 
     });
 
