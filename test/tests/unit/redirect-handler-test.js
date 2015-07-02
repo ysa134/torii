@@ -1,32 +1,31 @@
 import RedirectHandler from 'torii/redirect-handler';
 
-var originalPostMessage = window.postMessage;
-var originalClose = window.close;
+function buildMockWindow(windowName, url){
+  return {
+    name: windowName,
+    location: {
+      toString: function(){
+        return url;
+      }
+    },
+    localStorage: {
+      setItem: Ember.K,
+      getItem: Ember.K
+    },
+    close: Ember.K
+  };
+}
 
-module('RedirectHandler - Unit', {
-  setup: function(){
-    window.name = '_blank';
-    window.opener = {
-      name: 'torii-opener',
-      postMessage: Ember.K
-    };
-    window.close = Ember.K;
-  },
-  teardown: function(){
-    window.name = null;
-    window.opener = null;
-    window.postMessage = originalPostMessage;
-    window.close = originalClose;
-  }
-});
+module('RedirectHandler - Unit');
 
 test('exists', function(){
   ok(RedirectHandler);
 });
 
-test('handles a url', function(){
-  var url = "http://authServer?code=123451235fw";
-  var handler = new RedirectHandler(url);
+test("handles a tori-popup window with a url", function(){
+
+  var mockWindow = buildMockWindow("torii-popup:abc123", "http://authServer?code=1234512345fw");
+  var handler = new RedirectHandler(mockWindow);
 
   Ember.run(function(){
     handler.run().then(function(){}, function(error){
@@ -37,11 +36,10 @@ test('handles a url', function(){
   ok(!handler.isFulfilled, "hangs the return promise forever");
 });
 
-test('rejects a url', function(){
-  window.opener = null;
+test('rejects the promise if the window is not named like a torii popup', function(){
 
-  var url = "http://authServer";
-  var handler = new RedirectHandler(url);
+  var mockWindow = buildMockWindow("", "http://authServer?code=1234512345fw");
+  var handler = new RedirectHandler(mockWindow);
 
   Ember.run(function(){
     handler.run().then(function(){
@@ -52,16 +50,27 @@ test('rejects a url', function(){
   });
 });
 
-test('does not post a message', function(){
-  var url = "http://authServer";
-  var handler = new RedirectHandler(url);
+test("sets the local storage when it's a torii popup", function(){
+  expect(2);
+  var mockWindow = buildMockWindow("torii-popup:abc123", "http://authServer?code=1234512345fw");
+  mockWindow.localStorage.setItem = function(key, value) {
+    equal(key, "torii-popup:abc123");
+    equal(value, "http://authServer?code=1234512345fw");
+  }
 
-  window.opener = {
-    name: 'some-other-name',
-    postMessage: function(message, origin){
-      ok(false, "message was received");
-    }
-  };
+  var handler = new RedirectHandler(mockWindow);
+
+  handler.run();
+});
+
+test('does not set local storage when not a torii popup', function(){
+  expect(1);
+  var mockWindow = buildMockWindow("", "http://authServer?code=1234512345fw");
+  mockWindow.localStorage.setItem = function(key, value) {
+    ok(false, "storage was set unexpectedly");
+  }
+
+  var handler = new RedirectHandler(mockWindow);
 
   Ember.run(function(){
     handler.run().then(function(){
@@ -72,51 +81,36 @@ test('does not post a message', function(){
   });
 });
 
-test('closes the window on no data in url', function(){
+test('closes the window when a torii popup', function(){
   expect(1);
-  var url = "http://authServer";
-  var handler = new RedirectHandler(url);
 
-  window.close = function(){
+  var mockWindow = buildMockWindow("torii-popup:abc123", "http://authServer?code=1234512345fw");
+
+  var handler = new RedirectHandler(mockWindow);
+
+  mockWindow.close = function(){
     ok(true, "Window was closed");
   };
 
   Ember.run(function(){
-    handler.run().then(function(){
-      ok(false, "run handler succeeded on a popup");
-    }, function(error){
-      ok(false, "run handler rejects a popup without a name (should hang)");
+    handler.run();
+  });
+});
+
+test('does not close the window when a not torii popup', function(){
+  expect(1);
+
+  var mockWindow = buildMockWindow("", "http://authServer?code=1234512345fw");
+
+  var handler = new RedirectHandler(mockWindow);
+
+  mockWindow.close = function(){
+    ok(false, "Window was closed unexpectedly");
+  };
+
+  Ember.run(function(){
+    handler.run().then(function(){}, function(error){
+      ok(true, "error handler is called");
     });
-  });
-});
-
-test('posts a message', function(){
-  var code = "d29f2jf20j",
-      url = "http://authServer?code="+code,
-      handler = new RedirectHandler(url);
-
-  window.opener = {
-    name: 'torii-opener',
-    postMessage: function(message, origin){
-      equal(message, "__torii_message:"+url, "posts back the url");
-    }
-  };
-
-  Ember.run(function(){
-    handler.run();
-  });
-});
-
-test('closes the window', function(){
-  var code = "d29f2jf20j",
-      url = "http://authServer?code="+code,
-      handler = new RedirectHandler(url);
-
-  window.close = function(){
-    ok(true, "Window was closed");
-  };
-
-  Ember.run(function(){
-    handler.run();
   });
 });
