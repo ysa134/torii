@@ -1,6 +1,6 @@
 /**
- * Torii version: 0.5.0
- * Built: Thu Jul 02 2015 11:33:04 GMT-0400 (EDT)
+ * Torii version: 0.5.1
+ * Built: Fri Jul 10 2015 15:59:11 GMT-0400 (EDT)
  */
 define("torii/adapters/application", 
   ["exports"],
@@ -1363,8 +1363,8 @@ define("torii/providers/twitter-oauth1",
     });
   });
 define("torii/redirect-handler", 
-  ["./lib/popup-id-serializer","exports"],
-  function(__dependency1__, __exports__) {
+  ["./lib/popup-id-serializer","./services/popup","exports"],
+  function(__dependency1__, __dependency2__, __exports__) {
     "use strict";
     /**
      * RedirectHandler will attempt to find
@@ -1375,7 +1375,7 @@ define("torii/redirect-handler",
      */
 
     var PopupIdSerializer = __dependency1__["default"];
-
+    var CURRENT_REQUEST_KEY = __dependency2__.CURRENT_REQUEST_KEY;
 
     var RedirectHandler = Ember.Object.extend({
 
@@ -1387,13 +1387,11 @@ define("torii/redirect-handler",
         var windowObject = this.windowObject;
 
         return new Ember.RSVP.Promise(function(resolve, reject){
-          var popupId = PopupIdSerializer.deserialize(windowObject.name);
-
-          if (popupId){
-            var key = PopupIdSerializer.serialize(popupId);
+          var pendingRequestKey = windowObject.localStorage.getItem(CURRENT_REQUEST_KEY);
+          windowObject.localStorage.removeItem(CURRENT_REQUEST_KEY);
+          if (pendingRequestKey) {
             var url = windowObject.location.toString();
-
-            windowObject.localStorage.setItem(key, url);
+            windowObject.localStorage.setItem(pendingRequestKey, url);
 
             windowObject.close();
           } else{
@@ -1422,6 +1420,8 @@ define("torii/services/popup",
     var UUIDGenerator = __dependency2__["default"];
     var PopupIdSerializer = __dependency3__["default"];
 
+    var CURRENT_REQUEST_KEY = '__torii_request';
+    __exports__.CURRENT_REQUEST_KEY = CURRENT_REQUEST_KEY;
     var on = Ember.on;
 
     function stringifyOptions(options){
@@ -1494,8 +1494,9 @@ define("torii/services/popup",
           var popupId = service.popupIdGenerator.generate();
 
           var optionsString = stringifyOptions(prepareOptions(options || {}));
-          var windowName = PopupIdSerializer.serialize(popupId);
-          service.popup = window.open(url, windowName, optionsString);
+          var pendingRequestKey = PopupIdSerializer.serialize(popupId);
+          localStorage.setItem(CURRENT_REQUEST_KEY, pendingRequestKey);
+          service.popup = window.open(url, pendingRequestKey, optionsString);
 
           if (service.popup && !service.popup.closed) {
             service.popup.focus();
@@ -1506,6 +1507,11 @@ define("torii/services/popup",
           }
 
           service.one('didClose', function(){
+            var pendingRequestKey = localStorage.getItem(CURRENT_REQUEST_KEY);
+            if (pendingRequestKey) {
+              localStorage.removeItem(pendingRequestKey);
+              localStorage.removeItem(CURRENT_REQUEST_KEY);
+            }
             // If we don't receive a message before the timeout, we fail. Normally,
             // the message will be received and the window will close immediately.
             service.timeout = Ember.run.later(service, function() {
