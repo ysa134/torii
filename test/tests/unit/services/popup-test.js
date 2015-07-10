@@ -1,5 +1,6 @@
 import Popup from 'torii/services/popup';
 import PopupIdSerializer from 'torii/lib/popup-id-serializer';
+import { CURRENT_REQUEST_KEY } from 'torii/services/popup';
 
 var popup;
 var originalWindowOpen = window.open;
@@ -33,15 +34,17 @@ var buildMockStorageEvent = function(popupId, redirectUrl){
 module("Popup - Unit", {
   setup: function(){
     popup = new Popup();
+    localStorage.removeItem(CURRENT_REQUEST_KEY);
   },
   teardown: function(){
+    localStorage.removeItem(CURRENT_REQUEST_KEY);
     window.open = originalWindowOpen;
     Ember.run(popup, 'destroy');
   }
 });
 
 asyncTest("open resolves based on popup window", function(){
-  expect(6);
+  expect(8);
   var expectedUrl = 'http://authServer';
   var redirectUrl = "http://localserver?code=fr"
   var popupId = '09123-asdf';
@@ -53,6 +56,10 @@ asyncTest("open resolves based on popup window", function(){
     ok(true, 'calls window.open');
     equal(url, expectedUrl, 'opens with expected url');
 
+    equal(PopupIdSerializer.serialize(popupId),
+        localStorage.getItem(CURRENT_REQUEST_KEY),
+        "adds the key to the current request item");
+
     mockWindow = buildMockWindow(name);
     return mockWindow;
   };
@@ -62,7 +69,10 @@ asyncTest("open resolves based on popup window", function(){
       ok(true, 'resolves promise');
       equal(popupId, PopupIdSerializer.deserialize(mockWindow.name), "sets the window's name properly");
       deepEqual(data, {code: 'fr'}, 'resolves with expected data');
-      deepEqual(null,
+      equal(null,
+          localStorage.getItem(CURRENT_REQUEST_KEY),
+          "removes the key from local storage");
+      equal(null,
           localStorage.getItem(PopupIdSerializer.serialize(popupId)),
           "removes the key from local storage");
       start();
