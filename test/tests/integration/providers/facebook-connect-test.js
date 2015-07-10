@@ -35,3 +35,15 @@ test("Opens facebook connect session", function(){
     });
   });
 });
+
+test("Returns the scopes granted when configured", function(){
+  $.getScript = function(){
+    window.fbAsyncInit();
+  };
+  configuration.providers['facebook-connect'].returnScopes = true;
+  Ember.run(function(){
+    torii.open('facebook-connect').then(function(data){
+      equal('email', data.grantedScopes);
+    });
+  });
+});
