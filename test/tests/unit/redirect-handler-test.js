@@ -1,4 +1,5 @@
 import RedirectHandler from 'torii/redirect-handler';
+import { CURRENT_REQUEST_KEY } from 'torii/services/popup';
 
 function buildMockWindow(windowName, url){
   return {
@@ -9,8 +10,9 @@ function buildMockWindow(windowName, url){
       }
     },
     localStorage: {
-      setItem: Ember.K,
-      getItem: Ember.K
+      setItem: function() {},
+      getItem: function() {},
+      removeItem: function() {}
     },
     close: Ember.K
   };
@@ -22,9 +24,23 @@ test('exists', function(){
   ok(RedirectHandler);
 });
 
-test("handles a tori-popup window with a url", function(){
+test("handles a tori-popup window with a current request key in localStorage and url", function(){
+  expect(2);
 
-  var mockWindow = buildMockWindow("torii-popup:abc123", "http://authServer?code=1234512345fw");
+  var keyForReturn = 'some-key';
+  var url = 'http://authServer?code=1234512345fw';
+
+  var mockWindow = buildMockWindow("torii-popup:abc123", url);
+  mockWindow.localStorage.getItem = function(key) {
+    if (key === CURRENT_REQUEST_KEY) {
+      return keyForReturn;
+    }
+  }
+  mockWindow.localStorage.setItem = function(key, val) {
+    if (key === keyForReturn) {
+      equal(val, url, 'url is set for parent window');
+    }
+  }
   var handler = new RedirectHandler(mockWindow);
 
   Ember.run(function(){
@@ -36,7 +52,7 @@ test("handles a tori-popup window with a url", function(){
   ok(!handler.isFulfilled, "hangs the return promise forever");
 });
 
-test('rejects the promise if the window is not named like a torii popup', function(){
+test('rejects the promise if there is no request key', function(){
 
   var mockWindow = buildMockWindow("", "http://authServer?code=1234512345fw");
   var handler = new RedirectHandler(mockWindow);
@@ -48,19 +64,6 @@ test('rejects the promise if the window is not named like a torii popup', functi
       ok(true, "run handler rejects a url without data");
     });
   });
-});
-
-test("sets the local storage when it's a torii popup", function(){
-  expect(2);
-  var mockWindow = buildMockWindow("torii-popup:abc123", "http://authServer?code=1234512345fw");
-  mockWindow.localStorage.setItem = function(key, value) {
-    equal(key, "torii-popup:abc123");
-    equal(value, "http://authServer?code=1234512345fw");
-  }
-
-  var handler = new RedirectHandler(mockWindow);
-
-  handler.run();
 });
 
 test('does not set local storage when not a torii popup', function(){
@@ -81,10 +84,15 @@ test('does not set local storage when not a torii popup', function(){
   });
 });
 
-test('closes the window when a torii popup', function(){
+test('closes the window when a torii popup with request', function(){
   expect(1);
 
   var mockWindow = buildMockWindow("torii-popup:abc123", "http://authServer?code=1234512345fw");
+  mockWindow.localStorage.getItem = function(key) {
+    if (key === CURRENT_REQUEST_KEY) {
+      return 'some-key';
+    }
+  }
 
   var handler = new RedirectHandler(mockWindow);
 
