@@ -5,6 +5,7 @@ module.exports = {
   init: function() {
     this.treePaths.app = '../lib/torii';
     this.treePaths.addon = '../lib/torii';
+    this.treePaths['test-support'] = '../test-support';
   },
 
   treeForApp: function treeForApp(tree) {
