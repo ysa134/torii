@@ -1,5 +1,5 @@
 import startApp from 'test/helpers/start-app';
-import {stubValidSession} from 'torii/helpers/testing';
+import {stubValidSession} from 'test-support/helpers/testing';
 
 var app, container, session;
 

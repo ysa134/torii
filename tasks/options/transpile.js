@@ -1,6 +1,6 @@
 function nameFor(path) {
   var result,  match;
-  if (match = path.match(/^(?:lib|test|test\/tests)\/(.*?)(?:\.js)?$/)) {
+  if (match = path.match(/^(?:lib|test|test\/tests|test-support)\/(.*?)(?:\.js)?$/)) {
     result = match[1];
   } else {
     result = path;
@@ -31,7 +31,8 @@ module.exports = {
       'test/test-loader.js',
       'test/helpers/*.js',
       'test/tests.js',
-      'test/**/*-test.js'
+      'test/**/*-test.js',
+      'test-support/**/*.js'
     ],
     dest: 'tmp/tests/amd'
   }
