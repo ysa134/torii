@@ -443,7 +443,7 @@ valid session. Torii inculdes a test helper for this.
 First you need to import the `stubValidSession` helper method.
 
 ```javascript
-import {stubValidSession} from 'your-app-name/test/helpers/torii';
+import {stubValidSession} from 'your-app-name/tests/helpers/torii';
 ```
 
 And then you can call it passing in the test `application` and the object that
