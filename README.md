@@ -469,17 +469,6 @@ test('shows something when signed in', function(assert) {
 });
 ```
 
-with `index.hbs`
-
-```handlebars
-{{#if session.isAuthenticated}}
-  <p>Signed in as : {{session.currentUser.handle}}</p>
-{{else}}
-   <button {{action "signIn" "github"}}>Sign in with github</button>
-{{/if}}
-```
-
-
 ## Running the tests locally
 
   * Clone the repo `git clone git@github.com:Vestorly/torii.git`, `cd torii/`
