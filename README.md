@@ -437,7 +437,7 @@ then the session object will fall back to using the `application` adapter.
 
 ## Test Helpers
 
-For testing code that interacts with torii it can be usefull to stub a
+For testing code that interacts with torii it can be useful to stub a
 valid session. Torii inculdes a test helper for this.
 
 First you need to import the `stubValidSession` helper method.
@@ -454,41 +454,17 @@ stubValidSession(application, {handle : 'testguy', uid : 'xyz'});
 ```
 
 ```javascript
-import Ember from 'ember';
-import {
-  module,
-  test
-} from 'qunit';
-import startApp from 'your-app/tests/helpers/start-app';
+
 import {stubValidSession} from 'your-app/tests/helpers/torii';
 
-var application;
+// test boilerplate
 
-module('Acceptance: Index', {
-  beforeEach: function() {
-    application = startApp();
-  },
-
-  afterEach: function() {
-    Ember.run(application, 'destroy');
-  }
-});
-
-test('visiting / when signed out should prompt you to sign in', function(assert) {
+test('shows something when signed in', function(assert) {
+  stubValidSession(application, {object});
   visit('/');
 
   andThen(function() {
-    assert.equal(find('button:contains(Sign in with github)').length, 1);
-  });
-});
-
-test('visiting / when signed in should not prompt you to sign in', function(assert) {
-  stubValidSession(application, {handle : 'testguy', uid : 'xyz'});
-  visit('/');
-
-  andThen(function() {
-    assert.equal(find('button:contains(Sign in with github)').length, 0);
-    assert.equal(find('p:contains(Signed in as : testguy)').length, 1);
+    // make assertions here assuming that the session is set with the object passed above...
   });
 });
 ```
