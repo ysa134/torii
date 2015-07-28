@@ -1,6 +1,6 @@
 import Popup from 'torii/services/popup';
 import PopupIdSerializer from 'torii/lib/popup-id-serializer';
-import { CURRENT_REQUEST_KEY } from 'torii/services/popup';
+import { CURRENT_REQUEST_KEY } from 'torii/mixins/services-mixin';
 
 var popup;
 var originalWindowOpen = window.open;
