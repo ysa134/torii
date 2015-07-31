@@ -22,7 +22,7 @@ module.exports = {
     this.replace = this.replace || require('broccoli-string-replace');
 
     // Use a build-time check to output a warning if Torii is not
-    // conigured.
+    // configured.
     var config = this.project.config(process.env.EMBER_ENV);
     if (!config.torii) {
       console.warn("Torii is installed but not configured in config/environment.js!");
