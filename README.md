@@ -435,6 +435,40 @@ Torii will first look for an adapter matching the provider name passed to
 for an adapter at `torii-adapters/geocities`). If there is no matching adapter,
 then the session object will fall back to using the `application` adapter.
 
+## Test Helpers
+
+For testing code that interacts with torii it can be useful to stub a
+valid session. Torii inculdes a test helper for this.
+
+First you need to import the `stubValidSession` helper method.
+
+```javascript
+import {stubValidSession} from 'your-app-name/tests/helpers/torii';
+```
+
+And then you can call it passing in the test `application` and the object that
+should be assigned as the `currentUser` in the session.
+
+```javascript
+stubValidSession(application, {handle : 'testguy', uid : 'xyz'});
+```
+
+```javascript
+
+import {stubValidSession} from 'your-app/tests/helpers/torii';
+
+// test boilerplate
+
+test('shows something when signed in', function(assert) {
+  stubValidSession(application, {object});
+  visit('/');
+
+  andThen(function() {
+    // make assertions here assuming that the session is set with the object passed above...
+  });
+});
+```
+
 ## Running the tests locally
 
   * Clone the repo `git clone git@github.com:Vestorly/torii.git`, `cd torii/`
