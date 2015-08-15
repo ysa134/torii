@@ -11,7 +11,7 @@ var originalConfiguration = configuration.providers['facebook-connect'],
 module('Facebook Connect - Integration', {
   setup: function(){
     container = toriiContainer();
-    torii = container.lookup('torii:main');
+    torii = container.lookup('service:torii');
     configuration.providers['facebook-connect'] = {appId: 'dummy'};
     window.FB = buildFBMock();
   },

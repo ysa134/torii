@@ -19,7 +19,7 @@ module('Google Bearer- Integration', {
     container.register('torii-service:mock-popup', mockPopup, {instantiate: false});
     container.injection('torii-provider', 'popup', 'torii-service:mock-popup');
 
-    torii = container.lookup("torii:main");
+    torii = container.lookup("service:torii");
     configuration.providers['google-oauth2-bearer'] = {apiKey: 'dummy'};
   },
   teardown: function(){

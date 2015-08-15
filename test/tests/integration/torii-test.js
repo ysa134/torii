@@ -10,7 +10,7 @@ module('Torii - Integration', {
 
     container.register('torii-provider:dummy-success', DummySuccessProvider);
     container.register('torii-provider:dummy-failure', DummyFailureProvider);
-    torii = container.lookup('torii:main');
+    torii = container.lookup('service:torii');
   },
   teardown: function(){
     Ember.run(container, 'destroy');

@@ -18,7 +18,7 @@ module('Facebook OAuth2 - Integration', {
     container.register('torii-service:mock-popup', mockPopup, {instantiate: false});
     container.injection('torii-provider', 'popup', 'torii-service:mock-popup');
 
-    torii = container.lookup("torii:main");
+    torii = container.lookup("service:torii");
     configuration.providers['facebook-oauth2'] = {apiKey: 'dummy'};
   },
   teardown: function(){

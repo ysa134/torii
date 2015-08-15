@@ -24,7 +24,7 @@ module('Oauth1 - Integration', {
 
     container.register('torii-provider:'+providerName, OAuth1Provider);
 
-    torii = container.lookup("torii:main");
+    torii = container.lookup("service:torii");
     configuration.providers[providerName] = {requestTokenUri: requestTokenUri};
   },
   teardown: function(){
