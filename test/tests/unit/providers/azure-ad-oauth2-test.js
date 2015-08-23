@@ -30,7 +30,7 @@ test("Provider generates a URL with required config", function(){
   var expectedUrl = provider.get('baseUrl') + '?' + 'response_type=code' +
           '&client_id=' + 'abcdef' +
           '&redirect_uri=' + encodeURIComponent(provider.get('redirectUri')) +
-          '&state=STATE' +
+          '&state=' + provider.get('state') +
           '&api-version=1.0';
 
   equal(provider.buildUrl(),
@@ -47,7 +47,7 @@ test("Provider generates a URL with required config including the tennantId", fu
   var expectedUrl = provider.get('baseUrl') + '?' + 'response_type=code' +
           '&client_id=' + 'abcdef' +
           '&redirect_uri=' + encodeURIComponent(provider.get('redirectUri')) +
-          '&state=STATE' +
+          '&state=' + provider.get('state') +
           '&api-version=1.0';
 
   equal(provider.buildUrl(),
@@ -69,7 +69,7 @@ test("Provider generates a URL with required config when using id_token", functi
   var expectedUrl = provider.get('baseUrl') + '?' + 'response_type=id_token' +
           '&client_id=' + 'abcdef' +
           '&redirect_uri=' + encodeURIComponent(provider.get('redirectUri')) +
-          '&state=STATE' +
+          '&state=' + provider.get('state') +
           '&api-version=1.0' +
           '&scope=openid%20email' +
           '&response_mode=query';

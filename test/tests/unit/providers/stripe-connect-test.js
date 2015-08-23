@@ -2,38 +2,37 @@ var provider;
 
 import configuration from 'torii/configuration';
 
-import GoogleProvider from 'torii/providers/google-oauth2';
+import StripeConnectProvider from 'torii/providers/stripe-connect';
 
-module('Unit - GoogleAuth2Provider', {
+module('Unit - StripeConnectProvider', {
   setup: function(){
-    configuration.providers['google-oauth2'] = {};
-    provider = new GoogleProvider();
+    configuration.providers['stripe-connect'] = {};
+    provider = new StripeConnectProvider();
   },
   teardown: function(){
     Ember.run(provider, 'destroy');
-    configuration.providers['google-oauth2'] = {};
+    configuration.providers['stripe-connect'] = {};
   }
 });
 
 test("Provider requires an apiKey", function(){
-  configuration.providers['google-oauth2'] = {};
+  configuration.providers['stripe-connect'] = {};
   throws(function(){
     provider.buildUrl();
-  }, /Expected configuration value providers.google-oauth2.apiKey to be defined!/);
+  }, /Expected configuration value providers.stripe-connect.apiKey to be defined!/);
 });
 
 test("Provider generates a URL with required config", function(){
-  configuration.providers['google-oauth2'] = {
+  configuration.providers['stripe-connect'] = {
     apiKey: 'abcdef',
-    approvalPrompt: 'force'
   };
 
   var expectedUrl = provider.get('baseUrl') + '?' + 'response_type=code' +
           '&client_id=' + 'abcdef' +
           '&redirect_uri=' + encodeURIComponent(provider.get('redirectUri')) +
           '&state=' + provider.get('state') +
-          '&scope=email' +
-          '&approval_prompt=force';
+          '&scope=read_write' +
+          '&always_prompt=false';
 
   equal(provider.buildUrl(),
         expectedUrl,
@@ -41,23 +40,20 @@ test("Provider generates a URL with required config", function(){
 });
 
 test("Provider generates a URL with optional parameters", function(){
-  configuration.providers['google-oauth2'] = {
+  configuration.providers['stripe-connect'] = {
     apiKey: 'abcdef',
-    approvalPrompt: 'force',
-    requestVisibleActions: 'http://some-url.com',
-    accessType: 'offline',
-    hd: 'google.com'
+    scope: 'read_only',
+    stripeLanding: 'login',
+    alwaysPrompt: true
   };
 
   var expectedUrl = provider.get('baseUrl') + '?' + 'response_type=code' +
           '&client_id=' + 'abcdef' +
           '&redirect_uri=' + encodeURIComponent(provider.get('redirectUri')) +
           '&state=' + provider.get('state') +
-          '&scope=email' +
-          '&request_visible_actions=' + encodeURIComponent('http://some-url.com') +
-          '&access_type=offline' +
-          '&approval_prompt=force' +
-          '&hd=google.com';
+          '&scope=read_only' +
+          '&stripe_landing=login' +
+          '&always_prompt=true';
 
   equal(provider.buildUrl(),
         expectedUrl,

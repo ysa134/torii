@@ -44,6 +44,7 @@ test("Provider generates a URL with required config", function(){
   var expectedUrl = provider.get('baseUrl') + '?' + 'response_type=token' +
           '&client_id=' + 'abcdef' +
           '&redirect_uri=' + encodeURIComponent('http://localhost:4200/edmodo/callback') +
+          '&state=' + encodeURIComponent(provider.get('state')) +
           '&scope=basic';
 
   equal(provider.buildUrl(),
