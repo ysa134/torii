@@ -7,7 +7,7 @@ var MockPopup = function(options) {
   this.state = options.state;
 };
 
-MockPopup.prototype.open = function(url){
+MockPopup.prototype.open = function(url, keys){
   this.opened = true;
 
   var parser = new ParseQueryString(url, ['state']),
@@ -18,7 +18,13 @@ MockPopup.prototype.open = function(url){
     state = this.state;
   }
 
-  return Ember.RSVP.resolve({ code: 'test', state: state });
+  var response = { code: 'test' };
+
+  if (keys.indexOf('state') !== -1) {
+    response.state = state;
+  }
+
+  return Ember.RSVP.resolve(response);
 };
 
 export default MockPopup;
