@@ -10,10 +10,10 @@ var Provider = BaseProvider.extend({
   name: 'mock-oauth2',
   baseUrl: 'http://example.com',
   redirectUri: 'http://foo',
-  responseParams: ['access_token']
+  responseParams: ['state', 'access_token']
 });
 
-module('MockOauth2Provider (oauth2-code subclass) - Unit', {
+module('MockOauth2Provider (oauth2-bearer subclass) - Unit', {
   setup: function(){
     configuration.providers['mock-oauth2'] = {};
     provider = new Provider();
@@ -68,7 +68,7 @@ test('Provider#open throws when any required response params are missing', funct
     open: function(url, responseParams){
       ok(true, 'calls popup.open');
 
-      return Ember.RSVP.resolve({});
+      return Ember.RSVP.resolve({state: 'state'});
     }
   };
 
@@ -79,8 +79,8 @@ test('Provider#open throws when any required response params are missing', funct
       ok(false, '#open should not resolve');
     }).catch(function(e){
       ok(true, 'failed');
-      var regex = /missing these required response params.*access_token/i;
-      ok(regex.test(e), 'error message includes "missing these required response params"');
+      var message = e.toString().split('\n')[0];
+      equal(message, 'Error: The response from the provider is missing these required response params: access_token');
     });
   });
 });
