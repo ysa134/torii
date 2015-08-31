@@ -47,3 +47,14 @@ test("Returns the scopes granted when configured", function(){
     });
   });
 });
+
+test("Supports custom auth_type on login", function(){
+  $.getScript = function(){
+    window.fbAsyncInit();
+  };
+  Ember.run(function(){
+    torii.open('facebook-connect', {authType: 'rerequest'}).then(function(data){
+      equal(5678, data.expiresIn, 'expriesIn extended when rerequest found');
+    });
+  });
+});
