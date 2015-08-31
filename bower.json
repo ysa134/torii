@@ -3,9 +3,18 @@
   "version": "0.5.1",
   "description": "A set of clean abstractions for authentication in Ember.js",
   "authors": [
-    {"name": "Matt Beale", "email": "matt.beale@madhatted.com"},
-    {"name": "Cory Forsyth", "email": "cory.forsyth@gmail.com"},
-    {"name": "Vestorly", "email": "hello@vestorly.com"}
+    {
+      "name": "Matt Beale",
+      "email": "matt.beale@madhatted.com"
+    },
+    {
+      "name": "Cory Forsyth",
+      "email": "cory.forsyth@gmail.com"
+    },
+    {
+      "name": "Vestorly",
+      "email": "hello@vestorly.com"
+    }
   ],
   "homepage": "http://vestorly.github.io/torii/",
   "keywords": [
@@ -40,14 +49,13 @@
     "url": "git://github.com/Vestorly/torii.git"
   },
   "dependencies": {
-    "ember": "^1.3.0"
+    "ember": ">= 1.8.1"
   },
   "devDependencies": {
-    "handlebars": "^1.3.0",
     "jquery": ">= 1.9.1",
     "qunit": "^1.12.0",
     "ember-qunit": "~0.1.5",
-    "ember-resolver": "git://github.com/stefanpenner/ember-jj-abrams-resolver.git#master",
+    "ember-resolver": "ember-cli/ember-resolver#v0.1.21",
     "loader": "git://github.com/stefanpenner/loader.js#1.0.0"
   }
 }

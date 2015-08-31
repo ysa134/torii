@@ -58,10 +58,12 @@ export default Ember.Route.extend({
 torii.open('facebook') -> #open hook on the facebook provider -> returned authorization
 ```
 
-This is authentication only against a provider. If your application provides
-an **adapter**, then Torii can also perform **session management** via the
-`session` property, injected onto routes and controllers. This example uses
-Facebook's OAuth 2.0 API directly to fetch an authorization code.
+## Session Management
+
+Torii can perform **session management** via the `session` service, injected onto
+routes and controllers. You can activate *session management* by specifying `sessionServiceName` in your `config/environment.js` and providing an **adapter** which Torii will use to extract session information from a new opened authorization.
+
+This example uses Facebook's OAuth 2.0 API directly to fetch an authorization code.
 
 ```JavaScript
 /* jshint node: true */
@@ -144,6 +146,89 @@ session.open('facebook') -> #open hook on the facebook provider -> #open hook on
 ```
 
 Note that the adapter section is left entirely to your application.
+
+## Router DSL
+
+Torii includes a mechanism for specifying authenticated routes via the `Router.map` and a common implementation of authentication flow for your application.
+
+The authentication flow is as follows:
+
+1. In Application Route, check if the user is logged in by calling ApplicationRoute#checkLogin which calls `this.session.fetch()`.
+2. When entering an authenticated route,
+    Attempt to authenticate by calling `this.session.fetch()`
+      If successful,
+        allow the transition to finish
+      otherwise,
+        interrupt the transition and send "accessDenied" action
+
+This example uses Facebook's OAuth 2.0 API and the authenticatedRoute DSL.
+
+```JavaScript
+/* jshint node: true */
+// config/environment.js
+module.exports = function(environment) {
+  var ENV = {
+    /* ... */
+    torii: {
+      // a 'session' property will be injected on routes and controllers
+      sessionServiceName: 'session',
+      providers: {
+        'facebook-oauth2': {
+          apiKey:      'facebook-app-id',
+          redirectUri: '/my-custom-landing-uri' // default is the current URL
+        }
+      }
+    }
+  };
+  return ENV;
+};
+```
+
+```JavaScript
+// app/router.js
+Router.map(function(){
+    this.authenticatedRoute('my-account');
+    this.route('login');
+});
+```
+
+```JavaScript
+// app/routes/application.js
+export default Ember.Route.extend({
+  actions: {
+    accessDenied: function() {
+      this.transitionTo('login');
+    }
+  }
+});
+```
+
+```JavaScript
+// app/torii-adapters/application.js
+export default Ember.Object.extend({
+  open: function(authentication){
+    var authorizationCode = authentication.authorizationCode;
+    return new Ember.RSVP.Promise(function(resolve, reject){
+      Ember.$.ajax({
+        url: 'api/session',
+        data: { 'facebook-auth-code': authorizationCode },
+        dataType: 'json',
+        success: Ember.run.bind(null, resolve),
+        error: Ember.run.bind(null, reject)
+      });
+    }).then(function(user){
+      // The returned object is merged onto the session (basically). Here
+      // you may also want to persist the new session with cookies or via
+      // localStorage.
+      return {
+        currentUser: user
+      };
+    });
+  }
+});
+```
+
+The session will automatically be populated if the user is logged in, otherwise the user will be redirected to the login page.
 
 ## Using Torii
 
