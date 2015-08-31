@@ -1,4 +1,4 @@
-import Torii from 'torii/torii';
+import Torii from 'torii/services/torii';
 
 module('Torii');
 

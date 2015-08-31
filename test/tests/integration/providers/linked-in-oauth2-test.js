@@ -17,7 +17,7 @@ module('Linked In - Integration', {
     container.register('torii-service:fail-popup', failPopup, {instantiate: false});
     container.injection('torii-provider', 'popup', 'torii-service:mock-popup');
 
-    torii = container.lookup("torii:main");
+    torii = container.lookup("service:torii");
     configuration.providers['linked-in-oauth2'] = {apiKey: 'dummy'};
   },
   teardown: function(){

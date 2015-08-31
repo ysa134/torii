@@ -17,7 +17,7 @@ module('Stripe Connect - Integration', {
     container.register('torii-service:fail-popup', failPopup, {instantiate: false});
     container.injection('torii-provider', 'popup', 'torii-service:mock-popup');
 
-    torii = container.lookup("torii:main");
+    torii = container.lookup("service:torii");
     configuration.providers['stripe-connect'] = {apiKey: 'dummy'};
   },
   teardown: function(){

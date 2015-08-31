@@ -15,18 +15,18 @@ module('Testing Helper - Acceptance', {
 
 
 test("sessions are not authenticated by default", function(){
-  session = container.lookup("torii:session");
+  session = container.lookup("service:session");
   ok(!session.get('isAuthenticated'),"session is not authenticated");
 });
 
 test("#stubValidSession should stub a session that isAuthenticated", function(){
   stubValidSession(app, { id : 42 });
-  session = container.lookup("torii:session");
+  session = container.lookup("service:session");
   ok(session.get('isAuthenticated'),"session is authenticated");
 });
 
 test("#stubValidSession should stub a session with the userData supplied", function(){
   stubValidSession(app, { id : 42 });
-  session = container.lookup("torii:session");
+  session = container.lookup("service:session");
   equal(session.get('currentUser.id'), 42,"session contains the correct currentUser");
 });

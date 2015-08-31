@@ -15,8 +15,8 @@ module('Session - Acceptance', {
   setup: function(){
     app = startApp({loadInitializers: true});
     container = app.__container__;
-    torii   = container.lookup("torii:main");
-    session = container.lookup("torii:session");
+    torii   = container.lookup("service:torii");
+    session = container.lookup("service:session");
     adapter = container.lookup("torii-adapter:application");
 
     container.register('torii-provider:dummy-failure', DummyFailureProvider);
