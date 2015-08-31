@@ -2,27 +2,26 @@ var torii, container;
 
 import toriiContainer from 'test/helpers/torii-container';
 import configuration from 'torii/configuration';
+import MockPopup from 'test/helpers/mock-popup';
 
 var originalConfiguration = configuration.providers['stripe-connect'];
 
-var opened, mockPopup = {
-  open: function(){
-    opened = true;
-    return Ember.RSVP.resolve({ code: 'test' });
-  }
-};
+var mockPopup = new MockPopup();
+
+var failPopup = new MockPopup({ state: 'invalid-state' });
 
 module('Stripe Connect - Integration', {
   setup: function(){
     container = toriiContainer();
     container.register('torii-service:mock-popup', mockPopup, {instantiate: false});
+    container.register('torii-service:fail-popup', failPopup, {instantiate: false});
     container.injection('torii-provider', 'popup', 'torii-service:mock-popup');
 
     torii = container.lookup("torii:main");
     configuration.providers['stripe-connect'] = {apiKey: 'dummy'};
   },
   teardown: function(){
-    opened = false;
+    mockPopup.opened = false;
     configuration.providers['stripe-connect'] = originalConfiguration;
     Ember.run(container, 'destroy');
   }
@@ -31,49 +30,18 @@ module('Stripe Connect - Integration', {
 test("Opens a popup to Stripe", function(){
   Ember.run(function(){
     torii.open('stripe-connect').finally(function(){
-      ok(opened, "Popup service is opened");
+      ok(mockPopup.opened, "Popup service is opened");
     });
   });
 });
 
-test("Opens a popup to Stripe with the scope parameter", function(){
-  expect(1);
-  configuration.providers['stripe-connect'].scope = "read_only";
-  mockPopup.open = function(url){
-    ok(
-      url.indexOf("scope=read_only") > -1,
-      "scope is set from config" );
-    return Ember.RSVP.resolve({ code: 'test' });
-  }
-  Ember.run(function(){
-    torii.open('stripe-connect');
-  });
-});
+test('Validates the state parameter in the response', function(){
+  container.injection('torii-provider', 'popup', 'torii-service:fail-popup');
 
-test("Opens a popup to Stripe with the stripe_landing parameter", function(){
-  expect(1);
-  configuration.providers['stripe-connect'].stripeLanding = "login";
-  mockPopup.open = function(url){
-    ok(
-      url.indexOf("stripe_landing=login") > -1,
-      "stripe_landing is set from config" );
-    return Ember.RSVP.resolve({ code: 'test' });
-  }
   Ember.run(function(){
-    torii.open('stripe-connect');
-  });
-});
-
-test("Opens a popup to Stripe with the always_prompt parameter", function(){
-  expect(1);
-  configuration.providers['stripe-connect'].alwaysPrompt = 'true';
-  mockPopup.open = function(url){
-    ok(
-      url.indexOf("always_prompt=true") > -1,
-      "always_prompt is set from config" );
-    return Ember.RSVP.resolve({ code: 'test' });
-  }
-  Ember.run(function(){
-    torii.open('stripe-connect');
+    torii.open('stripe-connect').then(null, function(e){
+      ok(/has an incorrect session state/.test(e.message),
+         'authentication fails due to invalid session state response');
+    });
   });
 });

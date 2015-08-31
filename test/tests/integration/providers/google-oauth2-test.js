@@ -2,28 +2,26 @@ var torii, container;
 
 import toriiContainer from 'test/helpers/torii-container';
 import configuration from 'torii/configuration';
+import MockPopup from 'test/helpers/mock-popup';
 
 var originalConfiguration = configuration.providers['google-oauth2'];
 
-var opened, mockPopup;
+var mockPopup = new MockPopup();
+
+var failPopup = new MockPopup({ state: 'invalid-state' });
 
 module('Google - Integration', {
   setup: function(){
-    mockPopup = {
-      open: function(){
-        opened = true;
-        return Ember.RSVP.resolve({ code: 'test' });
-      }
-    };
     container = toriiContainer();
     container.register('torii-service:mock-popup', mockPopup, {instantiate: false});
+    container.register('torii-service:fail-popup', failPopup, {instantiate: false});
     container.injection('torii-provider', 'popup', 'torii-service:mock-popup');
 
     torii = container.lookup("torii:main");
     configuration.providers['google-oauth2'] = {apiKey: 'dummy'};
   },
   teardown: function(){
-    opened = false;
+    mockPopup.opened = false;
     configuration.providers['google-oauth2'] = originalConfiguration;
     Ember.run(container, 'destroy');
   }
@@ -32,49 +30,18 @@ module('Google - Integration', {
 test("Opens a popup to Google", function(){
   Ember.run(function(){
     torii.open('google-oauth2').finally(function(){
-      ok(opened, "Popup service is opened");
+      ok(mockPopup.opened, "Popup service is opened");
     });
   });
 });
 
-test("Opens a popup to Google with request_visible_actions", function(){
-  expect(1);
-  configuration.providers['google-oauth2'].requestVisibleActions = "http://some-url.com";
-  mockPopup.open = function(url){
-    ok(
-      url.indexOf("request_visible_actions=http%3A%2F%2Fsome-url.com") > -1,
-      "request_visible_actions is present" );
-    return Ember.RSVP.resolve({ code: 'test' });
-  }
-  Ember.run(function(){
-    torii.open('google-oauth2');
-  });
-});
+test('Validates the state parameter in the response', function(){
+  container.injection('torii-provider', 'popup', 'torii-service:fail-popup');
 
-test("Opens a popup to Google with access_type parameter", function(){
-  expect(1);
-  configuration.providers['google-oauth2'].accessType = "offline";
-  mockPopup.open = function(url){
-    ok(
-      url.indexOf("access_type=offline") > -1,
-      "access_type parameter is present" );
-    return Ember.RSVP.resolve({ code: 'test' });
-  }
   Ember.run(function(){
-    torii.open('google-oauth2');
-  });
-});
-
-test("Opens a popup to Google with hd parameter", function(){
-  expect(1);
-  configuration.providers['google-oauth2'].hd = "google.com";
-  mockPopup.open = function(url){
-    ok(
-      url.indexOf("hd=google.com") > -1,
-      "hd parameter is present" );
-    return Ember.RSVP.resolve({ code: 'test' });
-  }
-  Ember.run(function(){
-    torii.open('google-oauth2');
+    torii.open('google-oauth2').then(null, function(e){
+      ok(/has an incorrect session state/.test(e.message),
+         'authentication fails due to invalid session state response');
+    });
   });
 });

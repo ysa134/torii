@@ -30,7 +30,7 @@ test("Provider generates a URL with required config", function(){
   var expectedUrl = provider.get('baseUrl') + '?' + 'response_type=token' +
           '&client_id=' + 'abcdef' +
           '&redirect_uri=' + encodeURIComponent(provider.get('redirectUri')) +
-          '&state=STATE' +
+          '&state=' + provider.get('state') +
           '&scope=email';
 
   equal(provider.buildUrl(),

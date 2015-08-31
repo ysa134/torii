@@ -31,7 +31,7 @@ module('MockOauth2Provider (oauth2-code subclass) - Unit', {
   teardown: function(){
     Ember.run(provider, 'destroy');
     configuration.providers['mock-oauth2'] = originalConfiguration;
-    configuration.providers['mock-oauth2'] = originalTokenConfiguration;
+    configuration.providers['mock-oauth2-token'] = originalTokenConfiguration;
   }
 });
 
@@ -54,7 +54,8 @@ test("Provider generates a URL with required config", function(){
   configuration.providers['mock-oauth2'] = {
     apiKey: 'dummyKey'
   };
-  equal(provider.buildUrl(), 'http://example.com?response_type=code&client_id=dummyKey&redirect_uri=http%3A%2F%2Ffoo',
+  var state = provider.get('state');
+  equal(provider.buildUrl(), 'http://example.com?response_type=code&client_id=dummyKey&redirect_uri=http%3A%2F%2Ffoo&state=' + state,
         'generates the correct URL');
 });
 
@@ -63,7 +64,8 @@ test("Provider generates a URL with optional scope", function(){
     apiKey: 'dummyKey',
     scope: 'someScope'
   };
-  equal(provider.buildUrl(), 'http://example.com?response_type=code&client_id=dummyKey&redirect_uri=http%3A%2F%2Ffoo&scope=someScope',
+  var state = provider.get('state');
+  equal(provider.buildUrl(), 'http://example.com?response_type=code&client_id=dummyKey&redirect_uri=http%3A%2F%2Ffoo&state=' + state + '&scope=someScope',
         'generates the correct URL');
 });
 
@@ -102,12 +104,13 @@ test('should use the value of provider.responseType as key for the authorization
   configuration.providers['mock-oauth2-token'] = {
     apiKey: 'dummyKey',
     scope: 'someScope',
+    state: 'test-state'
   };
 
   var mockPopup = {
     open: function(url, responseParams){
       ok(true, 'calls popup.open');
-      return Ember.RSVP.resolve({ 'token_id': 'test', 'authorization_code': 'pief' });
+      return Ember.RSVP.resolve({ 'token_id': 'test', 'authorization_code': 'pief', 'state': 'test-state' });
     }
   };
 
@@ -118,4 +121,33 @@ test('should use the value of provider.responseType as key for the authorization
       ok(res.authorizationCode === 'test', 'authenticationToken present')
     });
   });
+});
+
+test('provider generates a random state parameter', function(){
+  expect(1);
+
+  var state = provider.get('state');
+
+  ok(/^[A-Za-z0-9]{16}$/.test(state), 'state is 16 random characters');
+});
+
+test('provider caches the generated random state', function(){
+  expect(1);
+
+  var state = provider.get('state');
+
+  equal(provider.get('state'), state, 'random state value is cached');
+});
+
+test('can override state property', function(){
+  expect(1);
+
+  configuration.providers['mock-oauth2'] = {
+    state: 'insecure-fixed-state'
+  };
+
+  var state = provider.get('state');
+
+  equal(state, 'insecure-fixed-state',
+        'specified state property is set');
 });

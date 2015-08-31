@@ -13,7 +13,7 @@ var Provider = BaseProvider.extend({
   responseParams: ['access_token']
 });
 
-module('MockOauth2Provider (oauth2-code subclass) - Unit', {
+module('MockOauth2Provider (oauth2-bearer subclass) - Unit', {
   setup: function(){
     configuration.providers['mock-oauth2'] = {};
     provider = new Provider();
@@ -43,7 +43,7 @@ test("Provider generates a URL with required config", function(){
   configuration.providers['mock-oauth2'] = {
     apiKey: 'dummyKey'
   };
-  equal(provider.buildUrl(), 'http://example.com?response_type=token&client_id=dummyKey&redirect_uri=http%3A%2F%2Ffoo',
+  equal(provider.buildUrl(), 'http://example.com?response_type=token&client_id=dummyKey&redirect_uri=http%3A%2F%2Ffoo&state=' + provider.get('state'),
         'generates the correct URL');
 });
 
@@ -52,7 +52,7 @@ test("Provider generates a URL with optional scope", function(){
     apiKey: 'dummyKey',
     scope: 'someScope'
   };
-  equal(provider.buildUrl(), 'http://example.com?response_type=token&client_id=dummyKey&redirect_uri=http%3A%2F%2Ffoo&scope=someScope',
+  equal(provider.buildUrl(), 'http://example.com?response_type=token&client_id=dummyKey&redirect_uri=http%3A%2F%2Ffoo&state=' + provider.get('state') + '&scope=someScope',
         'generates the correct URL');
 });
 
