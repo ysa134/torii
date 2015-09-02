@@ -1,6 +1,6 @@
 /**
- * Torii version: 0.5.1
- * Built: Fri Jul 10 2015 15:59:11 GMT-0400 (EDT)
+ * Torii version: 0.6.0-beta1
+ * Built: Tue Sep 01 2015 23:16:52 GMT-0400 (EDT)
  */
 define("torii/adapters/application", 
   ["exports"],
@@ -33,42 +33,66 @@ define("torii/adapters/application",
 
     __exports__["default"] = ApplicationAdapter;
   });
+define("torii/bootstrap/routing", 
+  ["torii/routing/application-route-mixin","torii/routing/authenticated-route-mixin","exports"],
+  function(__dependency1__, __dependency2__, __exports__) {
+    "use strict";
+    var ApplicationRouteMixin = __dependency1__["default"];
+    var AuthenticatedRouteMixin = __dependency2__["default"];
+
+    __exports__["default"] = function(container, authenticatedRoutes){
+
+      var ApplicationRoute = container.lookup('route:application');
+      ApplicationRoute.reopen(ApplicationRouteMixin);
+
+      for (var i = 0; i < authenticatedRoutes.length; i++) {
+        var routeName = authenticatedRoutes[i];
+        var factoryName = 'route:' + routeName;
+        var routeClass = container.lookup(factoryName);
+        routeClass.reopen(AuthenticatedRouteMixin);
+      }
+
+      return container;
+    }
+  });
 define("torii/bootstrap/session", 
-  ["torii/session","exports"],
+  ["torii/services/torii-session","exports"],
   function(__dependency1__, __exports__) {
     "use strict";
-    var Session = __dependency1__["default"];
+    var ToriiSessionService = __dependency1__["default"];
 
     __exports__["default"] = function(container, sessionName){
-      container.register('torii:session', Session);
-      container.injection('torii:session', 'torii', 'torii:main');
-      container.injection('route',      sessionName, 'torii:session');
-      container.injection('controller', sessionName, 'torii:session');
+      var sessionFactoryName = 'service:' + sessionName;
+      container.register(sessionFactoryName, ToriiSessionService);
+      container.injection(sessionFactoryName, 'torii', 'service:torii');
+      container.injection('route',      sessionName, sessionFactoryName);
+      container.injection('controller', sessionName, sessionFactoryName);
 
       return container;
     }
   });
 define("torii/bootstrap/torii", 
-  ["torii/torii","torii/providers/linked-in-oauth2","torii/providers/google-oauth2","torii/providers/google-oauth2-bearer","torii/providers/facebook-connect","torii/providers/facebook-oauth2","torii/adapters/application","torii/providers/twitter-oauth1","torii/providers/github-oauth2","torii/providers/azure-ad-oauth2","torii/providers/stripe-connect","torii/providers/edmodo-connect","torii/services/popup","exports"],
+  ["torii/providers/linked-in-oauth2","torii/providers/google-oauth2","torii/providers/google-oauth2-bearer","torii/providers/facebook-connect","torii/providers/facebook-oauth2","torii/adapters/application","torii/providers/twitter-oauth1","torii/providers/github-oauth2","torii/providers/azure-ad-oauth2","torii/providers/stripe-connect","torii/providers/edmodo-connect","torii/services/torii","torii/services/popup","exports"],
   function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __dependency9__, __dependency10__, __dependency11__, __dependency12__, __dependency13__, __exports__) {
     "use strict";
-    var Torii = __dependency1__["default"];
-    var LinkedInOauth2Provider = __dependency2__["default"];
-    var GoogleOauth2Provider = __dependency3__["default"];
-    var GoogleOauth2BearerProvider = __dependency4__["default"];
-    var FacebookConnectProvider = __dependency5__["default"];
-    var FacebookOauth2Provider = __dependency6__["default"];
-    var ApplicationAdapter = __dependency7__["default"];
-    var TwitterProvider = __dependency8__["default"];
-    var GithubOauth2Provider = __dependency9__["default"];
-    var AzureAdOauth2Provider = __dependency10__["default"];
-    var StripeConnectProvider = __dependency11__["default"];
-    var EdmodoConnectProvider = __dependency12__["default"];
+    var LinkedInOauth2Provider = __dependency1__["default"];
+    var GoogleOauth2Provider = __dependency2__["default"];
+    var GoogleOauth2BearerProvider = __dependency3__["default"];
+    var FacebookConnectProvider = __dependency4__["default"];
+    var FacebookOauth2Provider = __dependency5__["default"];
+    var ApplicationAdapter = __dependency6__["default"];
+    var TwitterProvider = __dependency7__["default"];
+    var GithubOauth2Provider = __dependency8__["default"];
+    var AzureAdOauth2Provider = __dependency9__["default"];
+    var StripeConnectProvider = __dependency10__["default"];
+    var EdmodoConnectProvider = __dependency11__["default"];
 
+    var ToriiService = __dependency12__["default"];
     var PopupService = __dependency13__["default"];
 
-    __exports__["default"] = function(container){
-      container.register('torii:main', Torii);
+    __exports__["default"] = function(container) {
+      container.register('service:torii', ToriiService);
+
       container.register('torii-provider:linked-in-oauth2', LinkedInOauth2Provider);
       container.register('torii-provider:google-oauth2', GoogleOauth2Provider);
       container.register('torii-provider:google-oauth2-bearer', GoogleOauth2BearerProvider);
@@ -161,7 +185,9 @@ define("torii/initializers/initialize-torii-session",
       initialize: function(container){
         if (configuration.sessionServiceName) {
           bootstrapSession(container, configuration.sessionServiceName);
-          container.injection('adapter', configuration.sessionServiceName, 'torii:session');
+
+          var sessionFactoryName = 'service:' + configuration.sessionServiceName;
+          container.injection('adapter', configuration.sessionServiceName, sessionFactoryName);
         }
       }
     };
@@ -177,7 +203,7 @@ define("torii/initializers/initialize-torii",
       name: 'torii',
       initialize: function(container, app){
         bootstrapTorii(container);
-        app.inject('route', 'torii', 'torii:main');
+        app.inject('route', 'torii', 'service:torii');
       }
     };
 
@@ -186,6 +212,31 @@ define("torii/initializers/initialize-torii",
     }
 
     __exports__["default"] = initializer;
+  });
+define("torii/instance-initializers/setup-routes", 
+  ["torii/configuration","torii/bootstrap/routing","torii/router-dsl-ext","exports"],
+  function(__dependency1__, __dependency2__, __dependency3__, __exports__) {
+    "use strict";
+    var configuration = __dependency1__["default"];
+    var bootstrapRouting = __dependency2__["default"];
+
+    __exports__["default"] = {
+      name: 'torii-setup-routes',
+      initialize: function(appInstance){
+        if (configuration.sessionServiceName) {
+          var router = appInstance.get('router');
+          var setupRoutes = function(){
+            var authenticatedRoutes = router.router.authenticatedRoutes;
+            var hasAuthenticatedRoutes = !Ember.isEmpty(authenticatedRoutes);
+            if (hasAuthenticatedRoutes) {
+              bootstrapRouting(appInstance.container, authenticatedRoutes);
+            }
+            router.off('willTransition', setupRoutes);
+          };
+          router.on('willTransition', setupRoutes);
+        }
+      }
+    };
   });
 define("torii/instance-initializers/walk-providers", 
   ["torii/configuration","exports"],
@@ -356,6 +407,21 @@ define("torii/lib/query-string",
       }
     });
   });
+define("torii/lib/random-url-safe", 
+  ["exports"],
+  function(__exports__) {
+    "use strict";
+    __exports__["default"] = function randomUrlSafe(length) {
+      var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      var result = '';
+
+      for (var i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+
+      return result;
+    }
+  });
 define("torii/lib/required-property", 
   ["exports"],
   function(__exports__) {
@@ -379,7 +445,7 @@ define("torii/lib/state-machine",
      */
 
     var a_slice = Array.prototype.slice;
-    var o_keys = Ember.keys;
+    var o_keys = Object.keys;
 
     function makeArray(entry){
       if (entry.constructor === Array) {
@@ -670,21 +736,23 @@ define("torii/lib/uuid-generator",
     __exports__["default"] = UUIDGenerator;
   });
 define("torii/load-initializers", 
-  ["torii/lib/load-initializer","torii/lib/load-instance-initializer","torii/initializers/initialize-torii","torii/initializers/initialize-torii-callback","torii/initializers/initialize-torii-session","torii/instance-initializers/walk-providers","exports"],
-  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __exports__) {
+  ["torii/lib/load-initializer","torii/lib/load-instance-initializer","torii/initializers/initialize-torii","torii/initializers/initialize-torii-callback","torii/initializers/initialize-torii-session","torii/instance-initializers/setup-routes","torii/instance-initializers/walk-providers","exports"],
+  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __exports__) {
     "use strict";
     var loadInitializer = __dependency1__["default"];
     var loadInstanceInitializer = __dependency2__["default"];
     var initializeTorii = __dependency3__["default"];
     var initializeToriiCallback = __dependency4__["default"];
     var initializeToriiSession = __dependency5__["default"];
-    var walkProviders = __dependency6__["default"];
+    var setupRoutes = __dependency6__["default"];
+    var walkProviders = __dependency7__["default"];
 
     __exports__["default"] = function(){
       loadInitializer(initializeToriiCallback);
       loadInitializer(initializeTorii);
       loadInitializer(initializeToriiSession);
       loadInstanceInitializer(walkProviders);
+      loadInstanceInitializer(setupRoutes);
     }
   });
 define("torii/providers/azure-ad-oauth2", 
@@ -711,17 +779,15 @@ define("torii/providers/azure-ad-oauth2",
       tennantId: configurable('tennantId', 'common'),
 
       // additional url params that this provider requires
-      requiredUrlParams: ['state', 'api-version', 'client_id'],
+      requiredUrlParams: ['api-version', 'client_id'],
 
       optionalUrlParams: ['scope', 'nonce', 'response_mode'],
 
       responseMode: configurable('responseMode', null),
 
       responseParams: computed(function () {
-        return [ this.get('responseType') ];
+        return [ this.get('responseType'), 'state' ];
       }),
-
-      state: 'STATE',
 
       apiVersion: '1.0',
 
@@ -832,7 +898,7 @@ define("torii/providers/facebook-connect",
       return fbPromise;
     }
 
-    function fbLogin(scope){
+    function fbLogin(scope, returnScopes, authType){
       return new Ember.RSVP.Promise(function(resolve, reject){
         FB.login(function(response){
           if (response.authResponse) {
@@ -840,16 +906,20 @@ define("torii/providers/facebook-connect",
           } else {
             Ember.run(null, reject, response.status);
           }
-        }, { scope: scope });
+        }, { scope: scope, return_scopes: returnScopes, auth_type: authType });
       });
     }
 
     function fbNormalize(response){
-      return {
+      var normalized = {
         userId: response.userID,
         accessToken: response.accessToken,
         expiresIn: response.expiresIn
       };
+      if (response.grantedScopes) {
+        normalized.grantedScopes = response.grantedScopes;
+      }
+      return normalized;
     }
 
     var Facebook = Provider.extend({
@@ -857,6 +927,7 @@ define("torii/providers/facebook-connect",
       // Facebook connect SDK settings:
       name:  'facebook-connect',
       scope: configurable('scope', 'email'),
+      returnScopes: configurable('returnScopes', false),
       appId: configurable('appId'),
       version: configurable('version', 'v2.2'),
       xfbml: configurable('xfbml', false),
@@ -865,12 +936,15 @@ define("torii/providers/facebook-connect",
 
       // API:
       //
-      open: function(){
+      open: function(options){
+        if (options === undefined) options = {};
         var scope = this.get('scope');
+        var authType = options.authType;
+        var returnScopes = this.get('returnScopes');
 
         return fbLoad( this.settings() )
           .then(function(){
-            return fbLogin(scope);
+            return fbLogin(scope, returnScopes, authType);
           })
           .then(fbNormalize);
       },
@@ -912,7 +986,7 @@ define("torii/providers/facebook-oauth2",
       // Additional url params that this provider requires
       requiredUrlParams: ['display'],
 
-      responseParams: ['code'],
+      responseParams: ['code', 'state'],
 
       scope:        configurable('scope', 'email'),
 
@@ -951,12 +1025,7 @@ define("torii/providers/github-oauth2",
       name:       'github-oauth2',
       baseUrl:    'https://github.com/login/oauth/authorize',
 
-      // additional url params that this provider requires
-      requiredUrlParams: ['state'],
-
-      responseParams: ['code'],
-
-      state: 'STATE',
+      responseParams: ['code', 'state'],
 
       redirectUri: configurable('redirectUri', function(){
         // A hack that allows redirectUri to be configurable
@@ -985,7 +1054,6 @@ define("torii/providers/google-oauth2-bearer",
       baseUrl: 'https://accounts.google.com/o/oauth2/auth',
 
       // additional params that this provider requires
-      requiredUrlParams: ['state'],
       optionalUrlParams: ['scope', 'request_visible_actions'],
 
       requestVisibleActions: configurable('requestVisibleActions', ''),
@@ -993,8 +1061,6 @@ define("torii/providers/google-oauth2-bearer",
       responseParams: ['access_token'],
 
       scope: configurable('scope', 'email'),
-
-      state: configurable('state', 'STATE'),
 
       redirectUri: configurable('redirectUri',
                                 'http://localhost:8000/oauth2callback')
@@ -1020,18 +1086,15 @@ define("torii/providers/google-oauth2",
       baseUrl: 'https://accounts.google.com/o/oauth2/auth',
 
       // additional params that this provider requires
-      requiredUrlParams: ['state'],
       optionalUrlParams: ['scope', 'request_visible_actions', 'access_type', 'approval_prompt', 'hd'],
 
       requestVisibleActions: configurable('requestVisibleActions', ''),
 
       accessType: configurable('accessType', ''),
 
-      responseParams: ['code'],
+      responseParams: ['code', 'state'],
 
       scope: configurable('scope', 'email'),
-
-      state: configurable('state', 'STATE'),
 
       approvalPrompt: configurable('approvalPrompt', 'auto'),
 
@@ -1060,12 +1123,7 @@ define("torii/providers/linked-in-oauth2",
       name:       'linked-in-oauth2',
       baseUrl:    'https://www.linkedin.com/uas/oauth2/authorization',
 
-      // additional url params that this provider requires
-      requiredUrlParams: ['state'],
-
-      responseParams: ['code'],
-
-      state: 'STATE',
+      responseParams: ['code', 'state'],
 
       redirectUri: configurable('redirectUri', function(){
         // A hack that allows redirectUri to be configurable
@@ -1157,7 +1215,7 @@ define("torii/providers/oauth2-bearer",
 
           if (missingResponseParams.length){
             throw new Error("The response from the provider is missing " +
-                  "these required response params: " + responseParams.join(', '));
+                  "these required response params: " + missingResponseParams.join(', '));
           }
 
           return {
@@ -1172,13 +1230,14 @@ define("torii/providers/oauth2-bearer",
     __exports__["default"] = Oauth2Bearer;
   });
 define("torii/providers/oauth2-code", 
-  ["torii/providers/base","torii/configuration","torii/lib/query-string","torii/lib/required-property","exports"],
-  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __exports__) {
+  ["torii/providers/base","torii/configuration","torii/lib/query-string","torii/lib/required-property","torii/lib/random-url-safe","exports"],
+  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __exports__) {
     "use strict";
     var Provider = __dependency1__["default"];
     var configurable = __dependency2__.configurable;
     var QueryString = __dependency3__["default"];
     var requiredProperty = __dependency4__["default"];
+    var randomUrlSafe = __dependency5__["default"];
 
     var computed = Ember.computed;
 
@@ -1219,7 +1278,7 @@ define("torii/providers/oauth2-code",
        *
        * @property {array} requiredUrlParams
        */
-      requiredUrlParams: ['response_type', 'client_id', 'redirect_uri'],
+      requiredUrlParams: ['response_type', 'client_id', 'redirect_uri', 'state'],
 
       /**
        * Parameters that may be included in the 3rd-party provider's url that we build.
@@ -1245,6 +1304,20 @@ define("torii/providers/oauth2-code",
 
       scope:        configurable('scope', null),
       clientId:     configurable('clientId', function () { return this.get('apiKey'); }),
+
+      state:        configurable('state', function () { return this.get('randomState'); }),
+
+      _randomState: null,
+      randomState: computed('_randomState', function() {
+        var state = this.get('_randomState');
+
+        if (!state) {
+          state = randomUrlSafe(16);
+          this.set('_randomState', state);
+        }
+
+        return state;
+      }),
 
       /**
        * The oauth response type we expect from the third party provider. Hardcoded to 'code' for oauth2-code flows
@@ -1297,7 +1370,9 @@ define("torii/providers/oauth2-code",
             url         = this.buildUrl(),
             redirectUri = this.get('redirectUri'),
             responseParams = this.get('responseParams'),
-            responseType = this.get('responseType');
+            responseType = this.get('responseType'),
+            state = this.get('state'),
+            shouldCheckState = responseParams.indexOf('state') !== -1;
 
         return this.get('popup').open(url, responseParams).then(function(authData){
           var missingResponseParams = [];
@@ -1310,7 +1385,13 @@ define("torii/providers/oauth2-code",
 
           if (missingResponseParams.length){
             throw new Error("The response from the provider is missing " +
-                  "these required response params: " + responseParams.join(', '));
+                  "these required response params: " + missingResponseParams.join(', '));
+          }
+
+          if (shouldCheckState && authData.state !== state) {
+            throw new Error('The response from the provider has an incorrect ' +
+                            'session state param: should be "' + state + '", ' +
+                            'but is "' + authData.state + '"');
           }
 
           return {
@@ -1339,7 +1420,7 @@ define("torii/providers/stripe-connect",
       requiredUrlParams: [],
       optionalUrlParams: ['stripe_landing', 'always_prompt'],
 
-      responseParams: ['code'],
+      responseParams: ['code', 'state'],
 
       scope: configurable('scope', 'read_write'),
       stripeLanding: configurable('stripeLanding', ''),
@@ -1411,6 +1492,87 @@ define("torii/redirect-handler",
     });
 
     __exports__["default"] = RedirectHandler;
+  });
+define("torii/router-dsl-ext", 
+  [],
+  function() {
+    "use strict";
+    var Router = Ember.Router;
+    var proto = Ember.RouterDSL.prototype;
+
+    var currentMap = null;
+
+    proto.authenticatedRoute = function() {
+      this.route.apply(this, arguments);
+      currentMap.push(arguments[0]);
+    };
+
+    Router.reopen({
+      _initRouterJs: function() {
+        currentMap = [];
+        this._super();
+        this.router.authenticatedRoutes = currentMap;
+      }
+    });
+  });
+define("torii/routing/application-route-mixin", 
+  ["exports"],
+  function(__exports__) {
+    "use strict";
+    __exports__["default"] = Ember.Mixin.create({
+      beforeModel: function (transition) {
+        var route = this;
+        var superBefore = this._super.apply(this, arguments);
+        if (superBefore && superBefore.then) {
+          return superBefore.then(function() {
+            return route.checkLogin(transition);
+          });
+        } else {
+          return route.checkLogin(transition);
+        }
+      },
+      checkLogin: function () {
+        return this.session.fetch()["catch"](function(){
+            // no-op, cause no session is ok
+          });
+      }
+    });
+  });
+define("torii/routing/authenticated-route-mixin", 
+  ["exports"],
+  function(__exports__) {
+    "use strict";
+    __exports__["default"] = Ember.Mixin.create({
+      beforeModel: function (transition) {
+        var route = this;
+        var superBefore = this._super.apply(this, arguments);
+        if (superBefore && superBefore.then) {
+          return superBefore.then(function() {
+            return route.authenticate(transition);
+          });
+        } else {
+          return route.authenticate(transition);
+        }
+      },
+      authenticate: function (transition) {
+        var route = this;
+        var isAuthenticated = this.get('session.isAuthenticated');
+        if (isAuthenticated === undefined) {
+          this.session.attemptedTransition = transition;
+          return this.session.fetch()["catch"](function() {
+              return route.accessDenied(transition);
+            });
+        } else if (isAuthenticated) {
+          // no-op; cause the user is already authenticated
+          return Ember.RSVP.resolve();
+        } else {
+          return this.accessDenied(transition);
+        }
+      },
+      accessDenied: function (transition) {
+        transition.send('accessDenied');
+      }
+    });
   });
 define("torii/services/popup", 
   ["torii/lib/parse-query-string","torii/lib/uuid-generator","torii/lib/popup-id-serializer","exports"],
@@ -1579,7 +1741,7 @@ define("torii/services/popup",
 
     __exports__["default"] = Popup;
   });
-define("torii/session", 
+define("torii/services/torii-session", 
   ["torii/session/state-machine","exports"],
   function(__dependency1__, __exports__) {
     "use strict";
@@ -1596,7 +1758,7 @@ define("torii/session",
       return adapter;
     }
 
-    var Session = Ember.ObjectProxy.extend({
+    __exports__["default"] = Ember.Service.extend(Ember._ProxyMixin, {
       state: null,
 
       stateMachine: computed(function(){
@@ -1679,10 +1841,89 @@ define("torii/session",
           return Ember.RSVP.reject(error);
         });
       }
-
     });
+  });
+define("torii/services/torii", 
+  ["exports"],
+  function(__exports__) {
+    "use strict";
+    function lookupProvider(container, providerName){
+      return container.lookup('torii-provider:'+providerName);
+    }
 
-    __exports__["default"] = Session;
+    function proxyToProvider(methodName, requireMethod){
+      return function(providerName, options){
+        var container = this.container;
+        var provider = lookupProvider(container, providerName);
+        if (!provider) {
+          throw new Error("Expected a provider named '"+providerName+"' " +
+                          ", did you forget to register it?");
+        }
+
+        if (!provider[methodName]) {
+          if (requireMethod) {
+            throw new Error("Expected provider '"+providerName+"' to define " +
+                            "the '"+methodName+"' method.");
+          } else {
+            return Ember.RSVP.Promise.resolve({});
+          }
+        }
+        return new Ember.RSVP.Promise(function(resolve, reject){
+          resolve( provider[methodName](options) );
+        });
+      };
+    }
+
+    /**
+     * Torii is an engine for authenticating against various
+     * providers. For example, you can open a session with
+     * Linked In via Oauth2 and authorization codes by doing
+     * the following:
+     *
+     *     Torii.open('linked-in-oauth2').then(function(authData){
+     *       console.log(authData.authorizationCode);
+     *     });
+     *
+     * For traditional authentication flows, you will often use
+     * Torii via the Torii.Session API.
+     *
+     * @class Torii
+     */
+    __exports__["default"] = Ember.Service.extend({
+
+      /**
+       * Open an authorization against an API. A promise resolving
+       * with an authentication response object is returned. These
+       * response objects,  are found in the "torii/authentications"
+       * namespace.
+       *
+       * @method open
+       * @param {String} providerName The provider to open
+       * @return {Ember.RSVP.Promise} Promise resolving to an authentication object
+       */
+      open:  proxyToProvider('open', true),
+
+      /**
+       * Return a promise which will resolve if the provider has
+       * already been opened.
+       *
+       * @method fetch
+       * @param {String} providerName The provider to open
+       * @return {Ember.RSVP.Promise} Promise resolving to an authentication object
+       */
+      fetch:  proxyToProvider('fetch'),
+
+      /**
+       * Return a promise which will resolve when the provider has been
+       * closed. Closing a provider may not always be a meaningful action,
+       * and may be better handled by torii's session management instead.
+       *
+       * @method close
+       * @param {String} providerName The provider to open
+       * @return {Ember.RSVP.Promise} Promise resolving when the provider is closed
+       */
+      close:  proxyToProvider('close')
+    });
   });
 define("torii/session/state-machine", 
   ["torii/lib/state-machine","exports"],
@@ -1771,88 +2012,4 @@ define("torii/session/state-machine",
       sm.session = session;
       return sm;
     }
-  });
-define("torii/torii", 
-  ["exports"],
-  function(__exports__) {
-    "use strict";
-    function lookupProvider(container, providerName){
-      return container.lookup('torii-provider:'+providerName);
-    }
-
-    function proxyToProvider(methodName, requireMethod){
-      return function(providerName, options){
-        var container = this.container;
-        var provider = lookupProvider(container, providerName);
-        if (!provider) {
-          throw new Error("Expected a provider named '"+providerName+"' " +
-                          ", did you forget to register it?");
-        }
-
-        if (!provider[methodName]) {
-          if (requireMethod) {
-            throw new Error("Expected provider '"+providerName+"' to define " +
-                            "the '"+methodName+"' method.");
-          } else {
-            return Ember.RSVP.Promise.resolve({});
-          }
-        }
-        return new Ember.RSVP.Promise(function(resolve, reject){
-          resolve( provider[methodName](options) );
-        });
-      };
-    }
-
-    /**
-     * Torii is an engine for authenticating against various
-     * providers. For example, you can open a session with
-     * Linked In via Oauth2 and authorization codes by doing
-     * the following:
-     *
-     *     Torii.open('linked-in-oauth2').then(function(authData){
-     *       console.log(authData.authorizationCode);
-     *     });
-     *
-     * For traditional authentication flows, you will often use
-     * Torii via the Torii.Session API.
-     *
-     * @class Torii
-     */
-    var Torii = Ember.Object.extend({
-
-      /**
-       * Open an authorization against an API. A promise resolving
-       * with an authentication response object is returned. These
-       * response objects,  are found in the "torii/authentications"
-       * namespace.
-       *
-       * @method open
-       * @param {String} providerName The provider to open
-       * @return {Ember.RSVP.Promise} Promise resolving to an authentication object
-       */
-      open:  proxyToProvider('open', true),
-
-      /**
-       * Return a promise which will resolve if the provider has
-       * already been opened.
-       *
-       * @method fetch
-       * @param {String} providerName The provider to open
-       * @return {Ember.RSVP.Promise} Promise resolving to an authentication object
-       */
-      fetch:  proxyToProvider('fetch'),
-
-      /**
-       * Return a promise which will resolve when the provider has been
-       * closed. Closing a provider may not always be a meaningful action,
-       * and may be better handled by torii's session management instead.
-       *
-       * @method close
-       * @param {String} providerName The provider to open
-       * @return {Ember.RSVP.Promise} Promise resolving when the provider is closed
-       */
-      close:  proxyToProvider('close')
-    });
-
-    __exports__["default"] = Torii;
   });
