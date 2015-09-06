@@ -1,6 +1,6 @@
 /**
- * Torii version: 0.6.0
- * Built: Tue Sep 01 2015 23:20:24 GMT-0400 (EDT)
+ * Torii version: 0.6.0-beta.2
+ * Built: Sun Sep 06 2015 12:43:22 GMT-0400 (EDT)
  */
 define("torii/adapters/application", 
   ["exports"],
