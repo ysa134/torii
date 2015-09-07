@@ -1,11 +1,11 @@
 import startApp from 'test/helpers/start-app';
-import {stubValidSession} from 'test-support/helpers/torii';
+import { stubValidSession } from 'test-support/helpers/torii';
 
 var app, container, session;
 
 module('Testing Helper - Acceptance', {
   setup: function(){
-    app = startApp({loadInitializers: true});
+    app = startApp({ loadInitializers: true });
     container = app.__container__;
   },
   teardown: function(){
@@ -20,13 +20,13 @@ test("sessions are not authenticated by default", function(){
 });
 
 test("#stubValidSession should stub a session that isAuthenticated", function(){
-  stubValidSession(app, { id : 42 });
+  stubValidSession(app, { id: 42 });
   session = container.lookup("service:session");
   ok(session.get('isAuthenticated'),"session is authenticated");
 });
 
 test("#stubValidSession should stub a session with the userData supplied", function(){
-  stubValidSession(app, { id : 42 });
+  stubValidSession(app, { id: 42 });
   session = container.lookup("service:session");
-  equal(session.get('currentUser.id'), 42,"session contains the correct currentUser");
+  equal(session.get('id'), 42,"session contains the correct currentUser");
 });

@@ -1,8 +1,8 @@
-export function stubValidSession(application,currentUser) {
+export function stubValidSession(application,sessionData) {
   var session = application.__container__.lookup('service:session');
   var sm = session.get('stateMachine');
   Ember.run(function() {
-    sm.transitionTo('authenticated');
-    session.set('content.currentUser', currentUser);
+    sm.send('startOpen');
+    sm.send('finishOpen', sessionData);
   });
 }
