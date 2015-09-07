@@ -523,29 +523,37 @@ then the session object will fall back to using the `application` adapter.
 ## Test Helpers
 
 For testing code that interacts with torii it can be useful to stub a
-valid session. Torii inculdes a test helper for this.
+valid session. Torii inculdes a test helper for stubbing sessions during
+acceptance testing.
 
-First you need to import the `stubValidSession` helper method.
+Import the `stubValidSession` helper method.
 
 ```javascript
-import {stubValidSession} from 'your-app-name/tests/helpers/torii';
+import { stubValidSession } from 'your-app-name/tests/helpers/torii';
 ```
 
-And then you can call it passing in the test `application` and the object that
-should be assigned as the `currentUser` in the session.
+Pass the test `application`, and a second argument that is treated like the
+return value from an adapter `open` or `fetch` hook. The properties become
+accessible on the session itself.
 
 ```javascript
-stubValidSession(application, {handle : 'testguy', uid : 'xyz'});
+stubValidSession(application, {
+  currentUser: {
+    handle: 'testguy',
+    uid: 'xyz'
+  }
+});
 ```
 
+A more complete example follows:
+
 ```javascript
+import { stubValidSession } from 'your-app/tests/helpers/torii';
 
-import {stubValidSession} from 'your-app/tests/helpers/torii';
-
-// test boilerplate
+/* test boilerplate */
 
 test('shows something when signed in', function(assert) {
-  stubValidSession(application, {object});
+  stubValidSession(application, {currentUser});
   visit('/');
 
   andThen(function() {
