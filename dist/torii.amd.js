@@ -1,6 +1,6 @@
 /**
- * Torii version: 0.6.0-beta.3
- * Built: Mon Sep 07 2015 18:05:04 GMT-0400 (EDT)
+ * Torii version: 0.6.0-beta.4
+ * Built: Mon Sep 07 2015 23:00:35 GMT-0400 (EDT)
  */
 define("torii/adapters/application", 
   ["exports"],
@@ -40,19 +40,27 @@ define("torii/bootstrap/routing",
     var ApplicationRouteMixin = __dependency1__["default"];
     var AuthenticatedRouteMixin = __dependency2__["default"];
 
+    var AuthenticatedRoute = null;
+
+    function reopenOrRegister(container, factoryName, mixin) {
+      var factory = container.lookup(factoryName);
+      if (factory) {
+        factory.reopen(mixin);
+      } else {
+        if (!AuthenticatedRoute) {
+          AuthenticatedRoute = Ember.Route.extend(AuthenticatedRouteMixin);
+        }
+        container.register(factoryName, AuthenticatedRoute);
+      }
+    }
+
     __exports__["default"] = function(container, authenticatedRoutes){
-
-      var ApplicationRoute = container.lookup('route:application');
-      ApplicationRoute.reopen(ApplicationRouteMixin);
-
+      reopenOrRegister(container, 'route:application', ApplicationRouteMixin);
       for (var i = 0; i < authenticatedRoutes.length; i++) {
         var routeName = authenticatedRoutes[i];
         var factoryName = 'route:' + routeName;
-        var routeClass = container.lookup(factoryName);
-        routeClass.reopen(AuthenticatedRouteMixin);
+        reopenOrRegister(container, factoryName, AuthenticatedRouteMixin);
       }
-
-      return container;
     }
   });
 define("torii/bootstrap/session", 
@@ -258,6 +266,16 @@ define("torii/instance-initializers/walk-providers",
 
       }
     };
+  });
+define("torii/lib/container-utils", 
+  ["exports"],
+  function(__exports__) {
+    "use strict";
+    function registerFactory(container, factoryName, factory) {
+      container.register(factoryName, factory);
+    }
+
+    __exports__.registerFactory = registerFactory;
   });
 define("torii/lib/load-initializer", 
   ["exports"],
