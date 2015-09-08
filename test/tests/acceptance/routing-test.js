@@ -97,6 +97,26 @@ test('authenticated routes get authenticate method', function(assert){
   });
 });
 
+test('lazyily created authenticated routes get authenticate method', function(assert){
+  assert.expect(2);
+  configuration.sessionServiceName = 'session';
+
+  var checkLoginCalled = false;
+
+  return bootApp({
+    map: function() {
+      this.route('home');
+      this.authenticatedRoute('account');
+    }
+  }).then(function(){
+    var applicationRoute = app.__container__.lookup('route:application');
+    var authenticatedRoute = app.__container__.lookup('route:account');
+
+    assert.ok(applicationRoute.checkLogin, "checkLogin function is present");
+    assert.ok(authenticatedRoute.authenticate, "authenticate function is present");
+  });
+});
+
 function bootApp(attrs) {
   var map = attrs.map || function(){};
   var containerSetup = attrs.container || function() {};
