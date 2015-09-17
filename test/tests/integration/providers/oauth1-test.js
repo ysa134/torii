@@ -2,7 +2,7 @@ import toriiContainer from 'test/helpers/torii-container';
 import OAuth1Provider from 'torii/providers/oauth1';
 import configuration from 'torii/configuration';
 
-var torii, container;
+var torii, container, registry;
 
 var opened, openedUrl, mockPopup = {
   open: function(url){
@@ -18,11 +18,13 @@ var originalConfiguration = configuration.providers[providerName];
 
 module('Oauth1 - Integration', {
   setup: function(){
-    container = toriiContainer();
-    container.register('torii-service:mock-popup', mockPopup, {instantiate: false});
-    container.injection('torii-provider', 'popup', 'torii-service:mock-popup');
+    var results = toriiContainer();
+    registry = results[0];
+    container = results[1];
+    registry.register('torii-service:mock-popup', mockPopup, {instantiate: false});
+    registry.injection('torii-provider', 'popup', 'torii-service:mock-popup');
 
-    container.register('torii-provider:'+providerName, OAuth1Provider);
+    registry.register('torii-provider:'+providerName, OAuth1Provider);
 
     torii = container.lookup("service:torii");
     configuration.providers[providerName] = {requestTokenUri: requestTokenUri};

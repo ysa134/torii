@@ -1,4 +1,4 @@
-var torii, container;
+var torii, container, registry;
 
 import toriiContainer from 'test/helpers/torii-container';
 import configuration from 'torii/configuration';
@@ -12,10 +12,12 @@ var failPopup = new MockPopup({ state: 'invalid-state' });
 
 module('Github - Integration', {
   setup: function(){
-    container = toriiContainer();
-    container.register('torii-service:mock-popup', mockPopup, {instantiate: false});
-    container.register('torii-service:fail-popup', failPopup, {instantiate: false});
-    container.injection('torii-provider', 'popup', 'torii-service:mock-popup');
+    var results = toriiContainer();
+    registry = results[0];
+    container = results[1];
+    registry.register('torii-service:mock-popup', mockPopup, {instantiate: false});
+    registry.register('torii-service:fail-popup', failPopup, {instantiate: false});
+    registry.injection('torii-provider', 'popup', 'torii-service:mock-popup');
 
     torii = container.lookup("service:torii");
     configuration.providers['github-oauth2'] = {apiKey: 'dummy'};
@@ -36,7 +38,7 @@ test("Opens a popup to GitHub", function(){
 });
 
 test('Validates the state parameter in the response', function(){
-  container.injection('torii-provider', 'popup', 'torii-service:fail-popup');
+  registry.injection('torii-provider', 'popup', 'torii-service:fail-popup');
 
   Ember.run(function(){
     torii.open('github-oauth2').then(null, function(e){

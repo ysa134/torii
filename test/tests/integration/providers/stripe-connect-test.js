@@ -10,12 +10,16 @@ var mockPopup = new MockPopup();
 
 var failPopup = new MockPopup({ state: 'invalid-state' });
 
+var registry, container;
+
 module('Stripe Connect - Integration', {
   setup: function(){
-    container = toriiContainer();
-    container.register('torii-service:mock-popup', mockPopup, {instantiate: false});
-    container.register('torii-service:fail-popup', failPopup, {instantiate: false});
-    container.injection('torii-provider', 'popup', 'torii-service:mock-popup');
+    var results = toriiContainer();
+    registry = results[0];
+    container = results[1];
+    registry.register('torii-service:mock-popup', mockPopup, {instantiate: false});
+    registry.register('torii-service:fail-popup', failPopup, {instantiate: false});
+    registry.injection('torii-provider', 'popup', 'torii-service:mock-popup');
 
     torii = container.lookup("service:torii");
     configuration.providers['stripe-connect'] = {apiKey: 'dummy'};
@@ -36,7 +40,7 @@ test("Opens a popup to Stripe", function(){
 });
 
 test('Validates the state parameter in the response', function(){
-  container.injection('torii-provider', 'popup', 'torii-service:fail-popup');
+  registry.injection('torii-provider', 'popup', 'torii-service:fail-popup');
 
   Ember.run(function(){
     torii.open('stripe-connect').then(null, function(e){

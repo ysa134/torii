@@ -1,4 +1,4 @@
-var container, torii;
+var container, torii, registry;
 
 import toriiContainer from 'test/helpers/torii-container';
 import DummySuccessProvider from 'test/helpers/dummy-success-provider';
@@ -6,10 +6,11 @@ import DummyFailureProvider from 'test/helpers/dummy-failure-provider';
 
 module('Torii - Integration', {
   setup: function(){
-    container = toriiContainer();
-
-    container.register('torii-provider:dummy-success', DummySuccessProvider);
-    container.register('torii-provider:dummy-failure', DummyFailureProvider);
+    var results = toriiContainer();
+    registry = results[0];
+    container = results[1];
+    registry.register('torii-provider:dummy-success', DummySuccessProvider);
+    registry.register('torii-provider:dummy-failure', DummyFailureProvider);
     torii = container.lookup('service:torii');
   },
   teardown: function(){
@@ -39,7 +40,7 @@ test("torii fails to open a dummy-failure provider", function(){
 });
 
 test("torii fetches a dummy-success provider", function(){
-  container.register('torii-provider:with-fetch', DummySuccessProvider.extend({
+  registry.register('torii-provider:with-fetch', DummySuccessProvider.extend({
     fetch: Ember.RSVP.Promise.resolve
   }));
   Ember.run(function(){
@@ -52,7 +53,7 @@ test("torii fetches a dummy-success provider", function(){
 });
 
 test("torii fails to fetch a dummy-failure provider", function(){
-  container.register('torii-provider:with-fetch', DummyFailureProvider.extend({
+  registry.register('torii-provider:with-fetch', DummyFailureProvider.extend({
     fetch: Ember.RSVP.Promise.reject
   }));
   Ember.run(function(){
@@ -65,7 +66,7 @@ test("torii fails to fetch a dummy-failure provider", function(){
 });
 
 test("torii closes a dummy-success provider", function(){
-  container.register('torii-provider:with-close', DummySuccessProvider.extend({
+  registry.register('torii-provider:with-close', DummySuccessProvider.extend({
     fetch: Ember.RSVP.Promise.resolve
   }));
   Ember.run(function(){
@@ -78,7 +79,7 @@ test("torii closes a dummy-success provider", function(){
 });
 
 test("torii fails to close a dummy-failure provider", function(){
-  container.register('torii-provider:with-close', DummyFailureProvider.extend({
+  registry.register('torii-provider:with-close', DummyFailureProvider.extend({
     fetch: Ember.RSVP.Promise.reject
   }));
   Ember.run(function(){
@@ -104,7 +105,7 @@ test('raises on a bad provider name', function(){
 });
 
 test('raises when calling undefined #open', function(){
-  container.register('torii-provider:without-open', DummyFailureProvider.extend({
+  registry.register('torii-provider:without-open', DummyFailureProvider.extend({
     open: null
   }));
   var thrown = false, message;

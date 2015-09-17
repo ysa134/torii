@@ -1,4 +1,4 @@
-var container, session, user, adapter;
+var container, session, user, adapter, registry;
 
 import toriiContainer from 'test/helpers/torii-container';
 import SessionService from 'torii/services/torii-session';
@@ -8,11 +8,13 @@ import DummyFailureProvider from 'test/helpers/dummy-failure-provider';
 
 module('Session (open) - Integration', {
   setup: function(){
-    container = toriiContainer();
-    container.register('service:session', SessionService);
-    container.register('torii-provider:dummy-success', DummySuccessProvider);
-    container.register('torii-provider:dummy-failure', DummyFailureProvider);
-    container.injection('service:session', 'torii', 'service:torii');
+    var results = toriiContainer();
+    registry = results[0];
+    container = results[1];
+    registry.register('service:session', SessionService);
+    registry.register('torii-provider:dummy-success', DummySuccessProvider);
+    registry.register('torii-provider:dummy-failure', DummyFailureProvider);
+    registry.injection('service:session', 'torii', 'service:torii');
     session = container.lookup('service:session');
   },
   teardown: function(){
@@ -36,14 +38,14 @@ test("starting auth sets isOpening to true", function(){
     return oldOpen.apply(this, arguments);
   };
 
-  container.register("torii-adapter:dummy-success", DummyAdapter);
+  registry.register("torii-adapter:dummy-success", DummyAdapter);
   Ember.run(function(){
     session.open('dummy-success');
   });
 });
 
 test("successful auth sets isAuthenticated to true", function(){
-  container.register("torii-adapter:dummy-success", DummyAdapter);
+  registry.register("torii-adapter:dummy-success", DummyAdapter);
   Ember.run(function(){
     session.open('dummy-success').then(function(){
       ok(!session.get('isOpening'), 'session is no longer opening');
@@ -68,9 +70,11 @@ test("failed auth sets isAuthenticated to false, sets error", function(){
 
 module('Session (close) - Integration', {
   setup: function(){
-    container = toriiContainer();
-    container.register('service:session', SessionService);
-    container.injection('service:session', 'torii', 'service:torii');
+    var results = toriiContainer();
+    registry = results[0];
+    container = results[1];
+    registry.register('service:session', SessionService);
+    registry.injection('service:session', 'torii', 'service:torii');
     session = container.lookup('service:session');
     adapter = container.lookup('torii-adapter:application');
 
