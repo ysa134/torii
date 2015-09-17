@@ -1,4 +1,4 @@
-var torii, container;
+var torii, container, registry;
 
 import toriiContainer from 'test/helpers/torii-container';
 import configuration from 'torii/configuration';
@@ -15,9 +15,11 @@ module('Google Bearer- Integration', {
         return Ember.RSVP.resolve({ access_token: 'test' });
       }
     };
-    container = toriiContainer();
-    container.register('torii-service:mock-popup', mockPopup, {instantiate: false});
-    container.injection('torii-provider', 'popup', 'torii-service:mock-popup');
+    var results = toriiContainer();
+    registry = results[0];
+    container = results[1];
+    registry.register('torii-service:mock-popup', mockPopup, {instantiate: false});
+    registry.injection('torii-provider', 'popup', 'torii-service:mock-popup');
 
     torii = container.lookup("service:torii");
     configuration.providers['google-oauth2-bearer'] = {apiKey: 'dummy'};
@@ -46,7 +48,7 @@ test("Opens a popup to Google with request_visible_actions", function(){
       url.indexOf("request_visible_actions=http%3A%2F%2Fsome-url.com") > -1,
       "request_visible_actions is present" );
     return Ember.RSVP.resolve({ access_token: 'test' });
-  }
+  };
   Ember.run(function(){
     torii.open('google-oauth2-bearer');
   });

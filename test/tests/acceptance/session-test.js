@@ -19,8 +19,8 @@ module('Session - Acceptance', {
     session = container.lookup("service:session");
     adapter = container.lookup("torii-adapter:application");
 
-    container.register('torii-provider:dummy-failure', DummyFailureProvider);
-    container.register('torii-provider:dummy-success', DummySuccessProvider);
+    app.register('torii-provider:dummy-failure', DummyFailureProvider);
+    app.register('torii-provider:dummy-success', DummySuccessProvider);
   },
   teardown: function(){
     Ember.run(app, 'destroy');
@@ -51,7 +51,7 @@ test("#open dummy-success session fails on signed in state", function(){
 });
 
 test("#open dummy-success session successfully opens", function(){
-  container.register("torii-adapter:dummy-success", DummyAdapter);
+  app.register("torii-adapter:dummy-success", DummyAdapter);
   Ember.run(function(){
     session.open('dummy-success').then(function(){
       ok(true, 'resolves promise');
@@ -85,7 +85,7 @@ test("#fetch dummy-success session raises must-implement on application adapter"
 });
 
 test("#fetch dummy-success session fails on signed in state", function(){
-  container.register("torii-adapter:dummy-success", DummyAdapter);
+  app.register("torii-adapter:dummy-success", DummyAdapter);
   signIn();
   Ember.run(function(){
     session.fetch('dummy-success').then(function(){
@@ -98,7 +98,7 @@ test("#fetch dummy-success session fails on signed in state", function(){
 });
 
 test("#fetch dummy-success session successfully opens", function(){
-  container.register("torii-adapter:dummy-success", DummyAdapter);
+  app.register("torii-adapter:dummy-success", DummyAdapter);
   Ember.run(function(){
     session.fetch('dummy-success').then(function(){
       ok(true, 'resolves promise');
@@ -112,7 +112,7 @@ test("#fetch dummy-success session successfully opens", function(){
 
 test("#fetch session passes options to adapter", function(){
   var adapterFetchCalledWith = null;
-  container.register("torii-adapter:dummy-success", DummyAdapter.extend({
+  app.register("torii-adapter:dummy-success", DummyAdapter.extend({
     fetch: function(options){
       adapterFetchCalledWith = options;
       return this._super(options);
@@ -204,7 +204,7 @@ test("#close dummy-success session passes options to application adapter", funct
 test("#close dummy-success session uses named adapter when present", function(){
   signIn({currentUser: {email: 'some@email.com'}});
   var correctAdapterCalled = false;
-  container.register("torii-adapter:dummy-success", DummyAdapter.extend({
+  app.register("torii-adapter:dummy-success", DummyAdapter.extend({
     close: function() {
       correctAdapterCalled = true;
       return this._super();

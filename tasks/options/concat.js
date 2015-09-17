@@ -32,7 +32,7 @@ module.exports = {
   browser: {
     src: [
       'wrap/browser.start',
-      'bower_components/loader/loader.js',
+      'bower_components/loader.js/loader.js',
       'dist/<%= pkg.name %>.amd.js',
       'wrap/browser.end'
     ],

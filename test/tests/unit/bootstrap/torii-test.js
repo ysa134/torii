@@ -1,10 +1,12 @@
-import bootstrapTorii from 'torii/bootstrap/torii';
+import toriiContainer from 'test/helpers/torii-container';
 
-var container;
+var container, registry;
 
 module("boostrapTorii", {
   setup: function(){
-    container = new Ember.Container();
+    var results = toriiContainer();
+    registry = results[0];
+    container = results[1];
   },
   teardown: function(){
     Ember.run(container, 'destroy');
@@ -12,7 +14,6 @@ module("boostrapTorii", {
 });
 
 test("inject popup onto providers", function(){
-  container.register('torii-provider:foo', Ember.Object.extend());
-  bootstrapTorii(container);
+  registry.register('torii-provider:foo', Ember.Object.extend());
   ok(container.lookup('torii-provider:foo').get('popup'), 'Popup is set');
 });

@@ -33,8 +33,6 @@ function startApp(attrs) {
     App.injectTestHelpers();
   });
 
-  App.reset(); // this shouldn't be needed, i want to be able to "start an app at a specific URL"
-
   return App;
 }
 

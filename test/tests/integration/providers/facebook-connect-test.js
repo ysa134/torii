@@ -1,4 +1,4 @@
-var torii, container;
+var torii, container, registry;
 
 import buildFBMock from 'test/helpers/build-fb-mock';
 import toriiContainer from 'test/helpers/torii-container';
@@ -10,7 +10,9 @@ var originalConfiguration = configuration.providers['facebook-connect'],
 
 module('Facebook Connect - Integration', {
   setup: function(){
-    container = toriiContainer();
+    var results = toriiContainer();
+    registry = results[0];
+    container = results[1];
     torii = container.lookup('service:torii');
     configuration.providers['facebook-connect'] = {appId: 'dummy'};
     window.FB = buildFBMock();
