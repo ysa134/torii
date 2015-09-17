@@ -125,9 +125,16 @@
         }
       });
 
-      Ember.Handlebars.registerBoundHelper('inspect-object', function(obj){
-        return Ember.String.htmlSafe(JSON.stringify(obj));
-      });
+      if (Ember.Helper) {
+        App.InspectObjectHelper = Ember.Helper.helper(function(params) {
+          var obj = params[0];
+          return Ember.String.htmlSafe(JSON.stringify(obj));
+        });
+      } else { // Ember < 1.13
+        Ember.Handlebars.registerBoundHelper('inspect-object', function(obj){
+          return Ember.String.htmlSafe(JSON.stringify(obj));
+        });
+      }
     </script>
   </body>
 </html>
