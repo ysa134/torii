@@ -16,7 +16,7 @@ var Provider = BaseProvider.extend({
 module('MockOauth2Provider (oauth2-bearer subclass) - Unit', {
   setup: function(){
     configuration.providers['mock-oauth2'] = {};
-    provider = new Provider();
+    provider = Provider.create();
   },
   teardown: function(){
     Ember.run(provider, 'destroy');

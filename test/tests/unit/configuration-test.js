@@ -17,7 +17,7 @@ var originalConfiguration = configuration.test,
 
 module('Configuration - Unit', {
   setup: function(){
-    testable = new Testable();
+    testable = Testable.create();
   },
   teardown: function(){
     configuration.test = originalConfiguration;

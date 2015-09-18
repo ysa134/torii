@@ -1,9 +1,13 @@
 import startApp from 'test/helpers/start-app';
 import configuration from 'torii/configuration';
-import {
-  lookup,
-  lookupFactory
-} from 'torii/lib/container-utils';
+
+function lookup(app, key) {
+  return app.__container__.lookup(key);
+}
+
+function lookupFactory(app, key) {
+  return app.__container__.lookupFactory(key);
+}
 
 var app, originalSessionServiceName;
 

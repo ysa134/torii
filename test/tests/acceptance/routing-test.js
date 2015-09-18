@@ -1,7 +1,10 @@
 import startApp from 'test/helpers/start-app';
 import configuration from 'torii/configuration';
 import AuthenticatedRouteMixin from 'torii/routing/authenticated-route-mixin';
-import { lookup } from 'torii/lib/container-utils';
+
+function lookup(app, key) {
+  return app.__container__.lookup(key);
+}
 
 var app, originalSessionServiceName;
 
@@ -41,7 +44,7 @@ test('ApplicationRoute#checkLogin is not called when no authenticated routes are
   applicationRoute.beforeModel();
   assert.ok(routesConfigured, 'Router map was called');
   assert.ok(!checkLoginCalled, 'checkLogin was not called');
-})
+});
 
 test('ApplicationRoute#checkLogin is called when an authenticated route is present', function(assert){
   assert.expect(2);

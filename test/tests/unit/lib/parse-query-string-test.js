@@ -6,7 +6,7 @@ module('ParseQueryString - Unit');
 
 test('parses each passed key', function(){
   var url = 'http://localhost.dev:3000/xyz/?code=abcdef';
-  var parser = new ParseQueryString(url, ['code']);
+  var parser = ParseQueryString.create({url: url, keys: ['code']});
 
   var result = parser.parse();
   ok(result.code, 'gets code');
@@ -15,7 +15,7 @@ test('parses each passed key', function(){
 
 test('parses keys without the hash fragment', function(){
   var url = 'http://localhost.dev:3000/xyz/?code=abcdef#notCode=other';
-  var parser = new ParseQueryString(url, ['code']);
+  var parser = ParseQueryString.create({url: url, keys: ['code']});
 
   var result = parser.parse();
   ok(result.code, 'gets code');
@@ -24,7 +24,7 @@ test('parses keys without the hash fragment', function(){
 
 test('parses multiple keys', function(){
   var url = 'http://localhost.dev:3000/xyz/?oauth_token=xxx&oauth_verifier=yyy';
-  var parser = new ParseQueryString(url, ['oauth_token','oauth_verifier']);
+  var parser = ParseQueryString.create({url: url, keys: ['oauth_token','oauth_verifier']});
 
   var result = parser.parse();
   ok(result.oauth_token, 'gets token');

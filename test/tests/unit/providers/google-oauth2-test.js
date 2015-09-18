@@ -7,7 +7,7 @@ import GoogleProvider from 'torii/providers/google-oauth2';
 module('Unit - GoogleAuth2Provider', {
   setup: function(){
     configuration.providers['google-oauth2'] = {};
-    provider = new GoogleProvider();
+    provider = GoogleProvider.create();
   },
   teardown: function(){
     Ember.run(provider, 'destroy');
