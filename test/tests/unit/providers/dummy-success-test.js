@@ -4,7 +4,7 @@ import Provider from 'test/helpers/dummy-success-provider';
 
 module('DummySuccessProvider - Unit', {
   setup: function(){
-    provider = new Provider();
+    provider = Provider.create();
   },
   teardown: function(){
     Ember.run(provider, 'destroy');

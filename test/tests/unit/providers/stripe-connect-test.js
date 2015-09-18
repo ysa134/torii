@@ -7,7 +7,7 @@ import StripeConnectProvider from 'torii/providers/stripe-connect';
 module('Unit - StripeConnectProvider', {
   setup: function(){
     configuration.providers['stripe-connect'] = {};
-    provider = new StripeConnectProvider();
+    provider = StripeConnectProvider.create();
   },
   teardown: function(){
     Ember.run(provider, 'destroy');

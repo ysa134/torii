@@ -33,7 +33,7 @@ var buildMockStorageEvent = function(popupId, redirectUrl){
 
 module("Popup - Unit", {
   setup: function(){
-    popup = new Popup();
+    popup = Popup.create();
     localStorage.removeItem(CURRENT_REQUEST_KEY);
   },
   teardown: function(){
@@ -50,7 +50,7 @@ asyncTest("open resolves based on popup window", function(){
   var popupId = '09123-asdf';
   var mockWindow = null
 
-  popup = new Popup({popupIdGenerator: buildPopupIdGenerator(popupId)});
+  popup = Popup.create({popupIdGenerator: buildPopupIdGenerator(popupId)});
 
   window.open = function(url, name){
     ok(true, 'calls window.open');

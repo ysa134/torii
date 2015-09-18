@@ -4,7 +4,7 @@ var adapter;
 
 module("DummyAdapter - Unit", {
   setup: function(){
-    adapter = new DummyAdapter();
+    adapter = DummyAdapter.create();
   },
   teardown: function() {
     Ember.run(adapter, 'destroy');

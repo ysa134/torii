@@ -35,13 +35,13 @@ test("handles a tori-popup window with a current request key in localStorage and
     if (key === CURRENT_REQUEST_KEY) {
       return keyForReturn;
     }
-  }
+  };
   mockWindow.localStorage.setItem = function(key, val) {
     if (key === keyForReturn) {
       equal(val, url, 'url is set for parent window');
     }
-  }
-  var handler = new RedirectHandler(mockWindow);
+  };
+  var handler = RedirectHandler.create({windowObject: mockWindow});
 
   Ember.run(function(){
     handler.run().then(function(){}, function(error){
@@ -55,7 +55,7 @@ test("handles a tori-popup window with a current request key in localStorage and
 test('rejects the promise if there is no request key', function(){
 
   var mockWindow = buildMockWindow("", "http://authServer?code=1234512345fw");
-  var handler = new RedirectHandler(mockWindow);
+  var handler = RedirectHandler.create({windowObject: mockWindow});
 
   Ember.run(function(){
     handler.run().then(function(){
@@ -71,9 +71,9 @@ test('does not set local storage when not a torii popup', function(){
   var mockWindow = buildMockWindow("", "http://authServer?code=1234512345fw");
   mockWindow.localStorage.setItem = function(key, value) {
     ok(false, "storage was set unexpectedly");
-  }
+  };
 
-  var handler = new RedirectHandler(mockWindow);
+  var handler = RedirectHandler.create({windowObject: mockWindow});
 
   Ember.run(function(){
     handler.run().then(function(){
@@ -92,9 +92,9 @@ test('closes the window when a torii popup with request', function(){
     if (key === CURRENT_REQUEST_KEY) {
       return 'some-key';
     }
-  }
+  };
 
-  var handler = new RedirectHandler(mockWindow);
+  var handler = RedirectHandler.create({windowObject: mockWindow});
 
   mockWindow.close = function(){
     ok(true, "Window was closed");
@@ -110,7 +110,7 @@ test('does not close the window when a not torii popup', function(){
 
   var mockWindow = buildMockWindow("", "http://authServer?code=1234512345fw");
 
-  var handler = new RedirectHandler(mockWindow);
+  var handler = RedirectHandler.create({windowObject: mockWindow});
 
   mockWindow.close = function(){
     ok(false, "Window was closed unexpectedly");

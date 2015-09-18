@@ -7,7 +7,7 @@ import AzureAdProvider from 'torii/providers/azure-ad-oauth2';
 module('Unit - AzureAdOAuth2Provider', {
   setup: function(){
     configuration.providers['azure-ad-oauth2'] = {};
-    provider = new AzureAdProvider();
+    provider = AzureAdProvider.create();
   },
   teardown: function(){
     Ember.run(provider, 'destroy');

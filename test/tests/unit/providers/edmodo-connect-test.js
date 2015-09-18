@@ -7,7 +7,7 @@ import EdmodoConnectProvider from 'torii/providers/edmodo-connect';
 module('Unit - EdmodoConnectProvider', {
   setup: function(){
     configuration.providers['edmodo-connect'] = {};
-    provider = new EdmodoConnectProvider();
+    provider = EdmodoConnectProvider.create();
   },
   teardown: function(){
     Ember.run(provider, 'destroy');

@@ -25,14 +25,14 @@ module('QueryString - Unit', {
 });
 
 test('looks up properties by camelized name', function(){
-  var qs = new QueryString(obj, ['client_id']);
+  var qs = QueryString.create({provider: obj, requiredParams: ['client_id']});
 
   equal(qs.toString(), 'client_id='+clientId,
         'sets client_id from clientId property');
 });
 
 test('joins properties with "&"', function(){
-  var qs = new QueryString(obj, ['client_id','response_type']);
+  var qs = QueryString.create({provider: obj, requiredParams: ['client_id','response_type']});
 
   equal(qs.toString(),
         'client_id='+clientId+'&response_type='+responseType,
@@ -40,7 +40,7 @@ test('joins properties with "&"', function(){
 });
 
 test('url encodes values', function(){
-  var qs = new QueryString(obj, ['redirect_uri']);
+  var qs = QueryString.create({provider: obj, requiredParams: ['redirect_uri']});
 
   equal(qs.toString(),
         'redirect_uri=http%3A%2F%2Flocalhost.dev%3A3000%2Fxyz%2Fpdq',
@@ -48,7 +48,7 @@ test('url encodes values', function(){
 });
 
 test('throws error if property exists as non-camelized form', function(){
-  var qs = new QueryString(obj, ['additional_param']);
+  var qs = QueryString.create({provider: obj, requiredParams: ['additional_param']});
 
   throws(function(){
     qs.toString();
@@ -57,7 +57,7 @@ test('throws error if property exists as non-camelized form', function(){
 });
 
 test('throws error if property does not exist', function(){
-  var qs = new QueryString(obj, ['nonexistent_property']);
+  var qs = QueryString.create({provider: obj, requiredParams: ['nonexistent_property']});
 
   throws(function(){
     qs.toString();
@@ -66,7 +66,11 @@ test('throws error if property does not exist', function(){
 });
 
 test('no error thrown when specifying optional properties that do not exist', function(){
-  var qs = new QueryString(obj, [], ['nonexistent_property']);
+  var qs = QueryString.create({
+    provider: obj,
+    requiredParams: [],
+    optionalParams: ['nonexistent_property']
+  });
 
   equal(qs.toString(), '',
         'empty query string with nonexistent optional param');
@@ -74,7 +78,11 @@ test('no error thrown when specifying optional properties that do not exist', fu
 });
 
 test('optional properties is added if it does exist', function(){
-  var qs = new QueryString(obj, [], ['optional_property']);
+  var qs = QueryString.create({
+    provider: obj,
+    requiredParams: [],
+    optionalParams: ['optional_property']
+  });
 
   equal(qs.toString(), 'optional_property='+optionalProperty,
         'optional_property is populated when the value is there');
@@ -82,7 +90,10 @@ test('optional properties is added if it does exist', function(){
 });
 
 test('value of false gets into url', function(){
-  var qs = new QueryString(obj, ['false_prop']);
+  var qs = QueryString.create({
+    provider: obj,
+    requiredParams: ['false_prop']
+  });
 
   equal(qs.toString(), 'false_prop=false',
         'false_prop is in url even when false');
@@ -90,14 +101,21 @@ test('value of false gets into url', function(){
 });
 
 test('uniq-ifies required params', function(){
-  var qs = new QueryString(obj, ['client_id', 'client_id']);
+  var qs = QueryString.create({
+    provider: obj,
+    requiredParams: ['client_id', 'client_id']
+  });
 
   equal(qs.toString(), 'client_id='+clientId,
         'only includes client_id once');
 });
 
 test('uniq-ifies optional params', function(){
-  var qs = new QueryString(obj, [], ['client_id', 'client_id']);
+  var qs = QueryString.create({
+    provider: obj,
+    requiredParams: [],
+    optionalParams: ['client_id', 'client_id']
+  });
 
   equal(qs.toString(), 'client_id='+clientId,
         'only includes client_id once');
@@ -105,6 +123,10 @@ test('uniq-ifies optional params', function(){
 
 test('throws if optionalParams includes any requiredParams', function(){
   throws(function(){
-    var qs = new QueryString(obj, ['client_id'], ['client_id']);
+    var qs = QueryString.create({
+      provider: obj,
+      requiredParams: ['client_id'],
+      optionalParams: ['client_id']
+    });
   }, /required parameters cannot also be optional/i);
 });
