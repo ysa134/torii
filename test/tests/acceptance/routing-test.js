@@ -77,6 +77,36 @@ test('ApplicationRoute#checkLogin is called when an authenticated route is prese
   assert.ok(checkLoginCalled, 'checkLogin was called');
 });
 
+test('ApplicationRoute#checkLogin returns the correct name of the session variable when an authenticated route is present', function(assert){
+  assert.expect(2);
+  configuration.sessionServiceName = 'testName';
+  var routesConfigured = false,
+    sessionFound = false;
+
+  bootApp({
+    map: function() {
+      routesConfigured = true;
+      this.authenticatedRoute('account');
+    },
+    setup: function() {
+      app.register('route:application', Ember.Route.extend());
+      app.register('route:account', Ember.Route.extend());
+    }
+  });
+  var applicationRoute = lookup(app, 'route:application');
+  applicationRoute.reopen({
+    checkLogin: function() {
+      sessionFound = this.get('testName');
+    }
+  });
+  var router = lookup(app, 'router:main');
+  router.location.setURL('/');
+  applicationRoute.beforeModel();
+  assert.ok(routesConfigured, 'Router map was called');
+  assert.ok(sessionFound, 'session was found with custom name');
+
+});
+
 test('authenticated routes get authenticate method', function(assert){
   assert.expect(2);
   configuration.sessionServiceName = 'session';
