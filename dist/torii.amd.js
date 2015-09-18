@@ -1,6 +1,6 @@
 /**
- * Torii version: 0.6.0-beta.4
- * Built: Mon Sep 07 2015 23:00:35 GMT-0400 (EDT)
+ * Torii version: 0.6.0-beta.5
+ * Built: Thu Sep 17 2015 22:48:36 GMT-0400 (EDT)
  */
 define("torii/adapters/application", 
   ["exports"],
@@ -34,32 +34,38 @@ define("torii/adapters/application",
     __exports__["default"] = ApplicationAdapter;
   });
 define("torii/bootstrap/routing", 
-  ["torii/routing/application-route-mixin","torii/routing/authenticated-route-mixin","exports"],
-  function(__dependency1__, __dependency2__, __exports__) {
+  ["torii/routing/application-route-mixin","torii/routing/authenticated-route-mixin","torii/lib/container-utils","exports"],
+  function(__dependency1__, __dependency2__, __dependency3__, __exports__) {
     "use strict";
     var ApplicationRouteMixin = __dependency1__["default"];
     var AuthenticatedRouteMixin = __dependency2__["default"];
+    var lookup = __dependency3__.lookup;
+    var lookupFactory = __dependency3__.lookupFactory;
+    var register = __dependency3__.register;
 
     var AuthenticatedRoute = null;
 
-    function reopenOrRegister(container, factoryName, mixin) {
-      var factory = container.lookup(factoryName);
+    function reopenOrRegister(applicationInstance, factoryName, mixin) {
+      var factory = lookup(applicationInstance, factoryName);
+      var basicFactory;
+
       if (factory) {
         factory.reopen(mixin);
       } else {
+        basicFactory = lookupFactory(applicationInstance, 'route:basic');
         if (!AuthenticatedRoute) {
-          AuthenticatedRoute = Ember.Route.extend(AuthenticatedRouteMixin);
+          AuthenticatedRoute = basicFactory.extend(AuthenticatedRouteMixin);
         }
-        container.register(factoryName, AuthenticatedRoute);
+        register(applicationInstance, factoryName, AuthenticatedRoute);
       }
     }
 
-    __exports__["default"] = function(container, authenticatedRoutes){
-      reopenOrRegister(container, 'route:application', ApplicationRouteMixin);
+    __exports__["default"] = function(applicationInstance, authenticatedRoutes){
+      reopenOrRegister(applicationInstance, 'route:application', ApplicationRouteMixin);
       for (var i = 0; i < authenticatedRoutes.length; i++) {
         var routeName = authenticatedRoutes[i];
         var factoryName = 'route:' + routeName;
-        reopenOrRegister(container, factoryName, AuthenticatedRouteMixin);
+        reopenOrRegister(applicationInstance, factoryName, AuthenticatedRouteMixin);
       }
     }
   });
@@ -69,14 +75,12 @@ define("torii/bootstrap/session",
     "use strict";
     var ToriiSessionService = __dependency1__["default"];
 
-    __exports__["default"] = function(container, sessionName){
+    __exports__["default"] = function(application, sessionName){
       var sessionFactoryName = 'service:' + sessionName;
-      container.register(sessionFactoryName, ToriiSessionService);
-      container.injection(sessionFactoryName, 'torii', 'service:torii');
-      container.injection('route',      sessionName, sessionFactoryName);
-      container.injection('controller', sessionName, sessionFactoryName);
-
-      return container;
+      application.register(sessionFactoryName, ToriiSessionService);
+      application.inject(sessionFactoryName, 'torii', 'service:torii');
+      application.inject('route',      sessionName, sessionFactoryName);
+      application.inject('controller', sessionName, sessionFactoryName);
     }
   });
 define("torii/bootstrap/torii", 
@@ -98,35 +102,33 @@ define("torii/bootstrap/torii",
     var ToriiService = __dependency12__["default"];
     var PopupService = __dependency13__["default"];
 
-    __exports__["default"] = function(container) {
-      container.register('service:torii', ToriiService);
+    __exports__["default"] = function(application) {
+      application.register('service:torii', ToriiService);
 
-      container.register('torii-provider:linked-in-oauth2', LinkedInOauth2Provider);
-      container.register('torii-provider:google-oauth2', GoogleOauth2Provider);
-      container.register('torii-provider:google-oauth2-bearer', GoogleOauth2BearerProvider);
-      container.register('torii-provider:facebook-connect', FacebookConnectProvider);
-      container.register('torii-provider:facebook-oauth2', FacebookOauth2Provider);
-      container.register('torii-provider:twitter', TwitterProvider);
-      container.register('torii-provider:github-oauth2', GithubOauth2Provider);
-      container.register('torii-provider:azure-ad-oauth2', AzureAdOauth2Provider);
-      container.register('torii-provider:stripe-connect', StripeConnectProvider);
-      container.register('torii-provider:edmodo-connect', EdmodoConnectProvider);
-      container.register('torii-adapter:application', ApplicationAdapter);
+      application.register('torii-provider:linked-in-oauth2', LinkedInOauth2Provider);
+      application.register('torii-provider:google-oauth2', GoogleOauth2Provider);
+      application.register('torii-provider:google-oauth2-bearer', GoogleOauth2BearerProvider);
+      application.register('torii-provider:facebook-connect', FacebookConnectProvider);
+      application.register('torii-provider:facebook-oauth2', FacebookOauth2Provider);
+      application.register('torii-provider:twitter', TwitterProvider);
+      application.register('torii-provider:github-oauth2', GithubOauth2Provider);
+      application.register('torii-provider:azure-ad-oauth2', AzureAdOauth2Provider);
+      application.register('torii-provider:stripe-connect', StripeConnectProvider);
+      application.register('torii-provider:edmodo-connect', EdmodoConnectProvider);
+      application.register('torii-adapter:application', ApplicationAdapter);
 
-      container.register('torii-service:popup', PopupService);
+      application.register('torii-service:popup', PopupService);
 
-      container.injection('torii-provider', 'popup', 'torii-service:popup');
+      application.inject('torii-provider', 'popup', 'torii-service:popup');
 
       if (window.DS) {
         var storeFactoryName = 'store:main';
-        if (container.has('service:store')) {
+        if (application.has('service:store')) {
           storeFactoryName = 'service:store';
         }
-        container.injection('torii-provider', 'store', storeFactoryName);
-        container.injection('torii-adapter', 'store', storeFactoryName);
+        application.inject('torii-provider', 'store', storeFactoryName);
+        application.inject('torii-adapter', 'store', storeFactoryName);
       }
-
-      return container;
     }
   });
 define("torii/configuration", 
@@ -139,7 +141,10 @@ define("torii/configuration",
     configuration.providers = configuration.providers || {};
 
     function configurable(configKey, defaultValue){
-      return Ember.computed(function(){
+      return Ember.computed(function configurableComputed(){
+        // Trigger super wrapping in Ember 2.1.
+        // See: https://github.com/emberjs/ember.js/pull/12359
+        this._super = this._super || (function(){ throw new Error('should always have _super'); })();
         var namespace = this.get('configNamespace'),
             fullKey   = namespace ? [namespace, configKey].join('.') : configKey,
             value     = get(configuration, fullKey);
@@ -171,10 +176,13 @@ define("torii/initializers/initialize-torii-callback",
     __exports__["default"] = {
       name: 'torii-callback',
       before: 'torii',
-      initialize: function(container, app){
-        app.deferReadiness();
+      initialize: function(application) {
+        if (arguments[1]) { // Ember < 2.1
+          application = arguments[1];
+        }
+        application.deferReadiness();
         RedirectHandler.handle(window)["catch"](function(){
-          app.advanceReadiness();
+          application.advanceReadiness();
         });
       }
     };
@@ -190,12 +198,15 @@ define("torii/initializers/initialize-torii-session",
       name: 'torii-session',
       after: 'torii',
 
-      initialize: function(container){
+      initialize: function(application) {
+        if (arguments[1]) { // Ember < 2.1
+          application = arguments[1];
+        }
         if (configuration.sessionServiceName) {
-          bootstrapSession(container, configuration.sessionServiceName);
+          bootstrapSession(application, configuration.sessionServiceName);
 
           var sessionFactoryName = 'service:' + configuration.sessionServiceName;
-          container.injection('adapter', configuration.sessionServiceName, sessionFactoryName);
+          application.inject('adapter', configuration.sessionServiceName, sessionFactoryName);
         }
       }
     };
@@ -209,9 +220,12 @@ define("torii/initializers/initialize-torii",
 
     var initializer = {
       name: 'torii',
-      initialize: function(container, app){
-        bootstrapTorii(container);
-        app.inject('route', 'torii', 'service:torii');
+      initialize: function(application) {
+        if (arguments[1]) { // Ember < 2.1
+          application = arguments[1];
+        }
+        bootstrapTorii(application);
+        application.inject('route', 'torii', 'service:torii');
       }
     };
 
@@ -230,14 +244,14 @@ define("torii/instance-initializers/setup-routes",
 
     __exports__["default"] = {
       name: 'torii-setup-routes',
-      initialize: function(appInstance){
+      initialize: function(applicationInstance, registry){
         if (configuration.sessionServiceName) {
-          var router = appInstance.get('router');
+          var router = applicationInstance.get('router');
           var setupRoutes = function(){
             var authenticatedRoutes = router.router.authenticatedRoutes;
             var hasAuthenticatedRoutes = !Ember.isEmpty(authenticatedRoutes);
             if (hasAuthenticatedRoutes) {
-              bootstrapRouting(appInstance.container, authenticatedRoutes);
+              bootstrapRouting(applicationInstance, authenticatedRoutes);
             }
             router.off('willTransition', setupRoutes);
           };
@@ -247,20 +261,21 @@ define("torii/instance-initializers/setup-routes",
     };
   });
 define("torii/instance-initializers/walk-providers", 
-  ["torii/configuration","exports"],
-  function(__dependency1__, __exports__) {
+  ["torii/configuration","torii/lib/container-utils","exports"],
+  function(__dependency1__, __dependency2__, __exports__) {
     "use strict";
     var configuration = __dependency1__["default"];
+    var lookup = __dependency2__.lookup;
 
     __exports__["default"] = {
       name: 'torii-walk-providers',
-      initialize: function(appInstance){
+      initialize: function(applicationInstance){
         // Walk all configured providers and eagerly instantiate
         // them. This gives providers with initialization side effects
         // like facebook-connect a chance to load up assets.
         for (var key in  configuration.providers) {
           if (configuration.providers.hasOwnProperty(key)) {
-            appInstance.container.lookup('torii-provider:'+key);
+            lookup(applicationInstance, 'torii-provider:'+key);
           }
         }
 
@@ -271,11 +286,37 @@ define("torii/lib/container-utils",
   ["exports"],
   function(__exports__) {
     "use strict";
-    function registerFactory(container, factoryName, factory) {
-      container.register(factoryName, factory);
+    function register(applicationInstance, name, factory) {
+      if (applicationInstance && applicationInstance.application) {
+        return applicationInstance.application.register(name, factory);
+      } else {
+        return applicationInstance.registry.register(name, factory);
+      }
     }
 
-    __exports__.registerFactory = registerFactory;
+    __exports__.register = register;
+    function lookupFactory(applicationInstance, name) {
+      if (applicationInstance && applicationInstance.lookupFactory) {
+        return applicationInstance.lookupFactory(name);
+      } else if (applicationInstance && applicationInstance.application) {
+        return applicationInstance.application.__container__.lookupFactory(name);
+      } else {
+        return applicationInstance.container.lookupFactory(name);
+      }
+    }
+
+    __exports__.lookupFactory = lookupFactory;
+    function lookup(applicationInstance, name) {
+      if (applicationInstance && applicationInstance.lookup) {
+        return applicationInstance.lookup(name);
+      } else if (applicationInstance && applicationInstance.application) {
+        return applicationInstance.application.__container__.lookup(name);
+      } else {
+        return applicationInstance.container.lookup(name);
+      }
+    }
+
+    __exports__.lookup = lookup;
   });
 define("torii/lib/load-initializer", 
   ["exports"],
@@ -304,9 +345,8 @@ define("torii/lib/parse-query-string",
   function(__exports__) {
     "use strict";
     __exports__["default"] = Ember.Object.extend({
-      init: function(url, validKeys) {
-        this.url = url;
-        this.validKeys = validKeys;
+      init: function() {
+        this.validKeys = this.keys;
       },
 
       parse: function(){
@@ -387,10 +427,10 @@ define("torii/lib/query-string",
     }
 
     __exports__["default"] = Ember.Object.extend({
-      init: function(obj, urlParams, optionalUrlParams){
-        this.obj               = obj;
-        this.urlParams         = Ember.A(urlParams).uniq();
-        this.optionalUrlParams = Ember.A(optionalUrlParams || []).uniq();
+      init: function() {
+        this.obj               = this.provider;
+        this.urlParams         = Ember.A(this.requiredParams).uniq();
+        this.optionalUrlParams = Ember.A(this.optionalParams || []).uniq();
 
         this.optionalUrlParams.forEach(function(param){
           if (this.urlParams.indexOf(param) > -1) {
@@ -399,7 +439,7 @@ define("torii/lib/query-string",
         }, this);
       },
 
-      toString: function(){
+      toString: function() {
         var urlParams         = this.urlParams,
             optionalUrlParams = this.optionalUrlParams,
             obj               = this.obj,
@@ -811,7 +851,7 @@ define("torii/providers/azure-ad-oauth2",
 
       responseType: configurable('responseType', 'code'),
 
-      redirectUri: configurable('redirectUri', function(){
+      redirectUri: configurable('redirectUri', function azureRedirectUri(){
         // A hack that allows redirectUri to be configurable
         // but default to the superclass
         return this._super();
@@ -1354,7 +1394,7 @@ define("torii/providers/oauth2-code",
       */
       responseParams: requiredProperty(),
 
-      redirectUri: computed(function(){
+      redirectUri: computed(function defaultRedirectUri(){
         return currentUrl();
       }),
 
@@ -1362,7 +1402,11 @@ define("torii/providers/oauth2-code",
         var requiredParams = this.get('requiredUrlParams'),
             optionalParams = this.get('optionalUrlParams');
 
-        var qs = new QueryString(this, requiredParams, optionalParams);
+        var qs = QueryString.create({
+          provider: this,
+          requiredParams: requiredParams,
+          optionalParams: optionalParams
+        });
         return qs.toString();
       },
 
@@ -1478,10 +1522,6 @@ define("torii/redirect-handler",
 
     var RedirectHandler = Ember.Object.extend({
 
-      init: function(windowObject){
-        this.windowObject = windowObject;
-      },
-
       run: function(){
         var windowObject = this.windowObject;
 
@@ -1504,7 +1544,7 @@ define("torii/redirect-handler",
     RedirectHandler.reopenClass({
       // untested
       handle: function(windowObject){
-        var handler = new RedirectHandler(windowObject);
+        var handler = RedirectHandler.create({windowObject: windowObject});
         return handler.run();
       }
     });
@@ -1639,17 +1679,15 @@ define("torii/services/popup",
     }
 
     function parseMessage(url, keys){
-      var parser = new ParseQueryString(url, keys),
+      var parser = ParseQueryString.create({url: url, keys: keys}),
           data = parser.parse();
       return data;
     }
 
     var Popup = Ember.Object.extend(Ember.Evented, {
 
-      init: function(options){
-        this._super.apply(this, arguments);
-        options = options || {};
-        this.popupIdGenerator = options.popupIdGenerator || UUIDGenerator;
+      init: function() {
+        this.popupIdGenerator = this.popupIdGenerator || UUIDGenerator;
       },
 
       // Open a popup window. Returns a promise that resolves or rejects
