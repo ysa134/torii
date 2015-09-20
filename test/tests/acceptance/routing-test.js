@@ -69,7 +69,6 @@ test('ApplicationRoute#checkLogin is called when an authenticated route is prese
       checkLoginCalled = true;
     }
   });
-  // Foo
   var router = lookup(app, 'router:main');
   router.location.setURL('/');
   applicationRoute.beforeModel();
