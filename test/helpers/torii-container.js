@@ -1,6 +1,6 @@
 import bootstrapTorii from 'torii/bootstrap/torii';
 
-export default function toriiContainer(fullNames) {
+export default function toriiContainer(callback) {
   var registry = new Ember.Registry();
   var container = registry.container();
   var mockApp = {
@@ -10,10 +10,13 @@ export default function toriiContainer(fullNames) {
     inject: function() {
       registry.injection.apply(registry, arguments);
     },
-    has: function() {
-      registry.has.apply(registry, arguments);
+    hasRegistration: function() {
+      return registry.has.apply(registry, arguments);
     }
   };
+  if (callback) {
+    callback(registry, container);
+  }
   bootstrapTorii(mockApp);
   return [registry, container];
 }
