@@ -1,6 +1,6 @@
 /**
- * Torii version: 0.6.0-beta.5
- * Built: Thu Sep 17 2015 22:48:36 GMT-0400 (EDT)
+ * Torii version: 0.6.0-beta.6
+ * Built: Sun Sep 20 2015 13:59:59 GMT-0400 (EDT)
  */
 define("torii/adapters/application", 
   ["exports"],
@@ -84,8 +84,8 @@ define("torii/bootstrap/session",
     }
   });
 define("torii/bootstrap/torii", 
-  ["torii/providers/linked-in-oauth2","torii/providers/google-oauth2","torii/providers/google-oauth2-bearer","torii/providers/facebook-connect","torii/providers/facebook-oauth2","torii/adapters/application","torii/providers/twitter-oauth1","torii/providers/github-oauth2","torii/providers/azure-ad-oauth2","torii/providers/stripe-connect","torii/providers/edmodo-connect","torii/services/torii","torii/services/popup","exports"],
-  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __dependency9__, __dependency10__, __dependency11__, __dependency12__, __dependency13__, __exports__) {
+  ["torii/providers/linked-in-oauth2","torii/providers/google-oauth2","torii/providers/google-oauth2-bearer","torii/providers/facebook-connect","torii/providers/facebook-oauth2","torii/adapters/application","torii/providers/twitter-oauth1","torii/providers/github-oauth2","torii/providers/azure-ad-oauth2","torii/providers/stripe-connect","torii/providers/edmodo-connect","torii/services/torii","torii/services/popup","torii/lib/container-utils","exports"],
+  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __dependency9__, __dependency10__, __dependency11__, __dependency12__, __dependency13__, __dependency14__, __exports__) {
     "use strict";
     var LinkedInOauth2Provider = __dependency1__["default"];
     var GoogleOauth2Provider = __dependency2__["default"];
@@ -101,6 +101,8 @@ define("torii/bootstrap/torii",
 
     var ToriiService = __dependency12__["default"];
     var PopupService = __dependency13__["default"];
+
+    var hasRegistration = __dependency14__.hasRegistration;
 
     __exports__["default"] = function(application) {
       application.register('service:torii', ToriiService);
@@ -123,7 +125,7 @@ define("torii/bootstrap/torii",
 
       if (window.DS) {
         var storeFactoryName = 'store:main';
-        if (application.has('service:store')) {
+        if (hasRegistration(application, 'service:store')) {
           storeFactoryName = 'service:store';
         }
         application.inject('torii-provider', 'store', storeFactoryName);
@@ -286,6 +288,15 @@ define("torii/lib/container-utils",
   ["exports"],
   function(__exports__) {
     "use strict";
+    function hasRegistration(application, name) {
+      if (application && application.hasRegistration) {
+        return application.hasRegistration(name);
+      } else {
+        return application.registry.has(name);
+      }
+    }
+
+    __exports__.hasRegistration = hasRegistration;
     function register(applicationInstance, name, factory) {
       if (applicationInstance && applicationInstance.application) {
         return applicationInstance.application.register(name, factory);
@@ -1574,9 +1585,11 @@ define("torii/router-dsl-ext",
     });
   });
 define("torii/routing/application-route-mixin", 
-  ["exports"],
-  function(__exports__) {
+  ["torii/configuration","exports"],
+  function(__dependency1__, __exports__) {
     "use strict";
+    var configuration = __dependency1__["default"];
+
     __exports__["default"] = Ember.Mixin.create({
       beforeModel: function (transition) {
         var route = this;
@@ -1590,16 +1603,18 @@ define("torii/routing/application-route-mixin",
         }
       },
       checkLogin: function () {
-        return this.session.fetch()["catch"](function(){
+        return this.get(configuration.sessionServiceName).fetch()["catch"](function(){
             // no-op, cause no session is ok
           });
       }
     });
   });
 define("torii/routing/authenticated-route-mixin", 
-  ["exports"],
-  function(__exports__) {
+  ["torii/configuration","exports"],
+  function(__dependency1__, __exports__) {
     "use strict";
+    var configuration = __dependency1__["default"];
+
     __exports__["default"] = Ember.Mixin.create({
       beforeModel: function (transition) {
         var route = this;
@@ -1613,11 +1628,12 @@ define("torii/routing/authenticated-route-mixin",
         }
       },
       authenticate: function (transition) {
-        var route = this;
-        var isAuthenticated = this.get('session.isAuthenticated');
+        var route = this,
+          session = this.get(configuration.sessionServiceName),
+          isAuthenticated = this.get(configuration.sessionServiceName + '.isAuthenticated');
         if (isAuthenticated === undefined) {
-          this.session.attemptedTransition = transition;
-          return this.session.fetch()["catch"](function() {
+          session.attemptedTransition = transition;
+          return session.fetch()["catch"](function() {
               return route.accessDenied(transition);
             });
         } else if (isAuthenticated) {
