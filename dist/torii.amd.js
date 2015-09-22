@@ -1,6 +1,6 @@
 /**
- * Torii version: 0.6.0-beta.7
- * Built: Sun Sep 20 2015 14:01:19 GMT-0400 (EDT)
+ * Torii version: 0.6.0-beta.8
+ * Built: Tue Sep 22 2015 09:45:59 GMT-0400 (EDT)
  */
 define("torii/adapters/application", 
   ["exports"],
@@ -1579,7 +1579,7 @@ define("torii/router-dsl-ext",
     Router.reopen({
       _initRouterJs: function() {
         currentMap = [];
-        this._super();
+        this._super.apply(this, arguments);
         this.router.authenticatedRoutes = currentMap;
       }
     });
