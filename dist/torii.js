@@ -1,6 +1,6 @@
 /**
- * Torii version: 0.6.0-beta.8
- * Built: Tue Sep 22 2015 09:45:59 GMT-0400 (EDT)
+ * Torii version: 0.6.0
+ * Built: Fri Sep 25 2015 10:57:45 GMT-0400 (EDT)
  */
 (function() {
 
