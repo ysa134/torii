@@ -149,6 +149,39 @@ test('lazyily created authenticated routes get authenticate method', function(as
   assert.ok(authenticatedRoute.authenticate, "authenticate function is present");
 });
 
+test('session.attemptedTransition is set before redirecting away from authenticated route', function(assert){
+  var done = assert.async();
+  assert.expect(1);
+
+  configuration.sessionServiceName = 'session';
+  var attemptedTransition = null;
+
+  bootApp({
+    map: function() {
+      this.route('public');
+      this.authenticatedRoute('secret');
+    },
+    setup: function() {
+      app.register('route:application', Ember.Route.extend());
+      app.register('route:secret', Ember.Route.extend());
+    }
+  });
+
+  var applicationRoute = lookup(app, 'route:application');
+  applicationRoute.reopen({
+    actions: {
+      accessDenied: function() {
+        attemptedTransition = this.get('session').attemptedTransition;
+      }
+    }
+  });
+
+  visit('/secret').then(function(){
+    assert.ok(!!attemptedTransition, 'attemptedTransition was set');
+    done();
+  });
+});
+
 function bootApp(attrs) {
   var map = attrs.map || function(){};
   var setup = attrs.setup || function() {};
