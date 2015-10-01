@@ -1,6 +1,6 @@
 /**
- * Torii version: 0.6.0
- * Built: Fri Sep 25 2015 10:57:45 GMT-0400 (EDT)
+ * Torii version: 0.6.1
+ * Built: Thu Oct 01 2015 11:31:40 GMT-0400 (EDT)
  */
 (function() {
 
@@ -1831,18 +1831,23 @@ define("torii/routing/authenticated-route-mixin",
       authenticate: function (transition) {
         var route = this,
           session = this.get(configuration.sessionServiceName),
-          isAuthenticated = this.get(configuration.sessionServiceName + '.isAuthenticated');
-        if (isAuthenticated === undefined) {
+          isAuthenticated = this.get(configuration.sessionServiceName + '.isAuthenticated'),
+          hasAttemptedAuth = isAuthenticated !== undefined;
+
+        if (!isAuthenticated) {
           session.attemptedTransition = transition;
-          return session.fetch()
-            .catch(function() {
-              return route.accessDenied(transition);
-            });
-        } else if (isAuthenticated) {
+
+          if (hasAttemptedAuth) {
+            return route.accessDenied(transition);
+          } else {
+            return session.fetch()
+              .catch(function() {
+                return route.accessDenied(transition);
+              });
+          }
+        } else {
           // no-op; cause the user is already authenticated
           return Ember.RSVP.resolve();
-        } else {
-          return this.accessDenied(transition);
         }
       },
       accessDenied: function (transition) {
