@@ -565,7 +565,8 @@ test('shows something when signed in', function(assert) {
 ## Running the tests locally
 
   * Clone the repo `git clone git@github.com:Vestorly/torii.git`, `cd torii/`
-  * `npm install`, which will also run `bower install`
+  * `npm install`
+  * `bower install`
   * `grunt test` for tests.
   * Or, to run tests in the browser:
     * Start the server: `grunt server`
@@ -574,7 +575,8 @@ test('shows something when signed in', function(assert) {
 ## Running the torii examples locally
 
   * Clone the repo `git clone git@github.com:Vestorly/torii.git`, `cd torii/`
-  * `npm install`, which will also run `bower install`
+  * `npm install`
+  * `bower install`
 
 The torii example apps (at facebook, google, linkedin, etc) are all
 configured to use
