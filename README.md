@@ -597,7 +597,7 @@ For more info, see [Hosts at wikipedia](http://en.wikipedia.org/wiki/Hosts_(file
 Now, start your server and visit the page:
 
   * `grunt server`
-  * open `http://torii-example.com/example/basic.html`
+  * open `http://torii-example.com:8000/example/basic.html`
 
 ## Generate docs
 
