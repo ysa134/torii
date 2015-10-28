@@ -50,7 +50,7 @@ asyncTest("open resolves based on popup window", function(){
   var popupId = '09123-asdf';
   var mockWindow = null
 
-  popup = Popup.create({popupIdGenerator: buildPopupIdGenerator(popupId)});
+  popup = new Popup({remoteIdGenerator: buildPopupIdGenerator(popupId)});
 
   window.open = function(url, name){
     ok(true, 'calls window.open');
