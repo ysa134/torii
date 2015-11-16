@@ -318,6 +318,70 @@ via the `torii` property injected onto _routes_, or the `session` property
 injected onto routes and controllers (using the session management feature
 will require you to write an adapter for your application – see notes on session management below).
 
+## Using an iframe instead of a popup
+
+You can configure torii to use an in-page iframe instead of a separate
+popup window for authentication. This can be done on either a global or
+a per-provider basis.
+
+To change this globally set the `remoteServiceName` variable in the main
+torii config to be `'iframe'`.
+
+```JavaScript
+/* jshint node: true */
+// config/environment.js
+module.exports = function(environment) {
+  var ENV = {
+    /* ... */
+    torii: {
+      remoteServiceName: 'iframe',
+      providers: { /* ... */ }
+    }
+  };
+  return ENV;
+};
+```
+
+If you only want the iframe for a single provider you can include the
+`remoteServiceName` value in the configuration for that provider.
+
+```JavaScript
+/* jshint node: true */
+// config/environment.js
+module.exports = function(environment) {
+  var ENV = {
+    /* ... */
+    torii: {
+      // a 'session' property will be injected on routes and controllers
+      sessionServiceName: 'session',
+      providers: {
+        'mycorp-oauth2': {
+          remoteServiceName: 'iframe'
+          /* ... */
+        }
+      }
+    }
+  };
+  return ENV;
+};
+```
+
+Once your provider has been configured you need to tell torii where to
+apend the iframe when you call `session.open`.
+
+For instance:
+
+```JavaScript
+this.get("session")
+  .open("mycorp-oauth2",{ iframeParent : '#signin-modal-content'})
+  .then(function(){
+    // ...
+  });
+```
+
+Of course, the element with the id of `signin-modal-content` needs to be
+currently in the DOM.
+
 ## Providers in Torii
 
 Torii is built with several providers for common cases. If you intend to
