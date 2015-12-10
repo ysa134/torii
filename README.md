@@ -367,7 +367,7 @@ module.exports = function(environment) {
 ```
 
 Once your provider has been configured you need to tell torii where to
-apend the iframe when you call `session.open`.
+append the iframe when you call `session.open`.
 
 For instance:
 
