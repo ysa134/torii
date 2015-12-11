@@ -367,20 +367,51 @@ module.exports = function(environment) {
 ```
 
 Once your provider has been configured you need to tell torii where to
-append the iframe when you call `session.open`.
+append the iframe when you call `session.open` by using the
+`{{torii-iframe-placeholder}}` component. You need to make sure that
+this component is added to the DOM before you call `session.open` and if
+you give the user a way to back out of authentication (by closing a
+modal that contains the iframe, for instance) you need to make sure that
+the component is removed from the DOM so that torii will see that the
+auth flow has been cancelled.
 
-For instance:
+For instance, in `routes/application.js` you might have the following
+`signIn` action:
 
 ```JavaScript
-this.get("session")
-  .open("mycorp-oauth2",{ iframeParent : '#signin-modal-content'})
-  .then(function(){
-    // ...
+signIn: function() {
+  var route = this;
+  // Set a value that will result in the placeholder component being
+  // added to the DOM
+  route.controller.set('signingIn',true);
+  // We need to user Ember.run.next to make sure that the placeholder
+  // component has been added to the DOM before session.open is called
+  Ember.run.next(this,function(){
+    Ember.$('#signin-modal-back').one('click',function(){
+      route.controller.set('signingIn',false);
+    });
+    this.get("session")
+      .open("clickfunnels-oauth2")
+      .then(function(){
+        route.controller.set('signingIn',false);
+      });
   });
+}
 ```
 
-Of course, the element with the id of `signin-modal-content` needs to be
-currently in the DOM.
+Then in `templates/application.hbs` you might have:
+
+```handlebars
+{{#if signingIn}}
+<div id="signin-modal-back">
+  <div id="signin-modal-frame">
+    <div id="signin-modal-content">
+      {{torii-iframe-placeholder}}
+    </div>
+  </div>
+</div>
+{{/if}}
+```
 
 ## Providers in Torii
 
