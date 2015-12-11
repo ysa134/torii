@@ -24,7 +24,7 @@ module.exports = {
 
     var components = new Funnel(tree, {
       srcDir: 'app-components',
-      destDir: 'app-components'
+      destDir: 'components'
     });
 
     return mergeTrees([initializers, instanceInitializers, components]);
