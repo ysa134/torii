@@ -42,7 +42,7 @@ asyncTest("open resolves based on an embedded iframe window", function(){
   var iframeId = '09123-asdf';
   var mockWindow = null
 
-  iframe = new Iframe({remoteIdGenerator: buildIframeIdGenerator(iframeId)});
+  iframe = Iframe.create({remoteIdGenerator: buildIframeIdGenerator(iframeId)});
 
   Ember.run(function(){
     iframe.open(expectedUrl, ['code']).then(function(data){
