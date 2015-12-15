@@ -16,6 +16,8 @@ applications. Torii is built with **providers** (authentication against a platfo
 **session manager** (for maintaining the current user), and **adapters** (to persist
 authentication state).
 
+[![Introduction to Torii](https://i.vimeocdn.com/video/545363474.jpg?mw=640&mh=360&q=70)](https://vimeo.com/146851881)
+
 The API for providers and adapters in Torii is to **open**, by which we mean creating a new
 authorization or authenticating a new session, **fetch**, by which we mean validating
 an existing authorization (like a session stored in cookies), or **close**, where an
