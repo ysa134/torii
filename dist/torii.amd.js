@@ -1,6 +1,6 @@
 /**
- * Torii version: 0.6.1
- * Built: Thu Oct 01 2015 11:31:40 GMT-0400 (EDT)
+ * Torii version: 0.7.0-beta1
+ * Built: Fri Dec 18 2015 16:40:30 GMT-0500 (EST)
  */
 define("torii/adapters/application", 
   ["exports"],
@@ -32,6 +32,14 @@ define("torii/adapters/application",
     });
 
     __exports__["default"] = ApplicationAdapter;
+  });
+define("torii/app-components/torii-iframe-placeholder", 
+  ["torii/components/torii-iframe-placeholder","exports"],
+  function(__dependency1__, __exports__) {
+    "use strict";
+    var toriiIframePlaceholder = __dependency1__["default"];
+
+    __exports__["default"] = toriiIframePlaceholder;
   });
 define("torii/bootstrap/routing", 
   ["torii/routing/application-route-mixin","torii/routing/authenticated-route-mixin","torii/lib/container-utils","exports"],
@@ -84,8 +92,8 @@ define("torii/bootstrap/session",
     }
   });
 define("torii/bootstrap/torii", 
-  ["torii/providers/linked-in-oauth2","torii/providers/google-oauth2","torii/providers/google-oauth2-bearer","torii/providers/facebook-connect","torii/providers/facebook-oauth2","torii/adapters/application","torii/providers/twitter-oauth1","torii/providers/github-oauth2","torii/providers/azure-ad-oauth2","torii/providers/stripe-connect","torii/providers/edmodo-connect","torii/services/torii","torii/services/popup","torii/lib/container-utils","exports"],
-  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __dependency9__, __dependency10__, __dependency11__, __dependency12__, __dependency13__, __dependency14__, __exports__) {
+  ["torii/providers/linked-in-oauth2","torii/providers/google-oauth2","torii/providers/google-oauth2-bearer","torii/providers/facebook-connect","torii/providers/facebook-oauth2","torii/adapters/application","torii/providers/twitter-oauth1","torii/providers/github-oauth2","torii/providers/azure-ad-oauth2","torii/providers/stripe-connect","torii/providers/edmodo-connect","torii/configuration","torii/services/torii","torii/services/popup","torii/services/iframe","torii/lib/container-utils","exports"],
+  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __dependency8__, __dependency9__, __dependency10__, __dependency11__, __dependency12__, __dependency13__, __dependency14__, __dependency15__, __dependency16__, __exports__) {
     "use strict";
     var LinkedInOauth2Provider = __dependency1__["default"];
     var GoogleOauth2Provider = __dependency2__["default"];
@@ -98,11 +106,13 @@ define("torii/bootstrap/torii",
     var AzureAdOauth2Provider = __dependency9__["default"];
     var StripeConnectProvider = __dependency10__["default"];
     var EdmodoConnectProvider = __dependency11__["default"];
+    var configuration = __dependency12__["default"];
 
-    var ToriiService = __dependency12__["default"];
-    var PopupService = __dependency13__["default"];
+    var ToriiService = __dependency13__["default"];
+    var PopupService = __dependency14__["default"];
+    var IframeService = __dependency15__["default"];
 
-    var hasRegistration = __dependency14__.hasRegistration;
+    var hasRegistration = __dependency16__.hasRegistration;
 
     __exports__["default"] = function(application) {
       application.register('service:torii', ToriiService);
@@ -119,9 +129,8 @@ define("torii/bootstrap/torii",
       application.register('torii-provider:edmodo-connect', EdmodoConnectProvider);
       application.register('torii-adapter:application', ApplicationAdapter);
 
+      application.register('torii-service:iframe', IframeService);
       application.register('torii-service:popup', PopupService);
-
-      application.inject('torii-provider', 'popup', 'torii-service:popup');
 
       if (window.DS) {
         var storeFactoryName = 'store:main';
@@ -132,6 +141,16 @@ define("torii/bootstrap/torii",
         application.inject('torii-adapter', 'store', storeFactoryName);
       }
     }
+  });
+define("torii/components/torii-iframe-placeholder", 
+  ["ember","exports"],
+  function(__dependency1__, __exports__) {
+    "use strict";
+    var Ember = __dependency1__["default"];
+
+    __exports__["default"] = Ember.Component.extend({
+      classNames: ['torii-iframe-placeholder']
+    });
   });
 define("torii/configuration", 
   ["exports"],
@@ -275,7 +294,7 @@ define("torii/instance-initializers/walk-providers",
         // Walk all configured providers and eagerly instantiate
         // them. This gives providers with initialization side effects
         // like facebook-connect a chance to load up assets.
-        for (var key in  configuration.providers) {
+        for (var key in configuration.providers) {
           if (configuration.providers.hasOwnProperty(key)) {
             lookup(applicationInstance, 'torii-provider:'+key);
           }
@@ -328,6 +347,15 @@ define("torii/lib/container-utils",
     }
 
     __exports__.lookup = lookup;
+    function getOwner(instance) {
+      if (Ember.getOwner) {
+        return Ember.getOwner(instance);
+      } else {
+        return instance.container;
+      }
+    }
+
+    __exports__.getOwner = getOwner;
   });
 define("torii/lib/load-initializer", 
   ["exports"],
@@ -824,6 +852,139 @@ define("torii/load-initializers",
       loadInstanceInitializer(setupRoutes);
     }
   });
+define("torii/mixins/ui-service-mixin", 
+  ["torii/lib/uuid-generator","torii/lib/popup-id-serializer","torii/lib/parse-query-string","exports"],
+  function(__dependency1__, __dependency2__, __dependency3__, __exports__) {
+    "use strict";
+    var UUIDGenerator = __dependency1__["default"];
+    var PopupIdSerializer = __dependency2__["default"];
+    var ParseQueryString = __dependency3__["default"];
+    var CURRENT_REQUEST_KEY = '__torii_request';
+    __exports__.CURRENT_REQUEST_KEY = CURRENT_REQUEST_KEY;
+    var on = Ember.on;
+
+    function parseMessage(url, keys){
+      var parser = ParseQueryString.create({url: url, keys: keys});
+      var data = parser.parse();
+      return data;
+    }
+
+    var ServicesMixin = Ember.Mixin.create({
+
+      init: function(){
+        this._super.apply(this, arguments);
+        this.remoteIdGenerator = this.remoteIdGenerator || UUIDGenerator;
+      },
+
+      // Open a remote window. Returns a promise that resolves or rejects
+      // accoring to if the iframe is redirected with arguments in the URL.
+      //
+      // For example, an OAuth2 request:
+      //
+      // iframe.open('http://some-oauth.com', ['code']).then(function(data){
+      //   // resolves with data.code, as from http://app.com?code=13124
+      // });
+      //
+      // Services that use this mixin should implement openRemote
+      //
+      open: function(url, keys, options){
+        var service   = this,
+            lastRemote = this.remote;
+
+        return new Ember.RSVP.Promise(function(resolve, reject){
+          if (lastRemote) {
+            service.close();
+          }
+
+          var remoteId = service.remoteIdGenerator.generate();
+
+          var pendingRequestKey = PopupIdSerializer.serialize(remoteId);
+          localStorage.setItem(CURRENT_REQUEST_KEY, pendingRequestKey);
+
+
+          service.openRemote(url, pendingRequestKey, options);
+          service.schedulePolling();
+
+          if (service.remote && !service.remote.closed) {
+            service.remote.focus();
+          } else {
+            reject(new Error(
+              'remote could not open or was closed'));
+            return;
+          }
+
+          service.one('didClose', function(){
+            var pendingRequestKey = localStorage.getItem(CURRENT_REQUEST_KEY);
+            if (pendingRequestKey) {
+              localStorage.removeItem(pendingRequestKey);
+              localStorage.removeItem(CURRENT_REQUEST_KEY);
+            }
+            // If we don't receive a message before the timeout, we fail. Normally,
+            // the message will be received and the window will close immediately.
+            service.timeout = Ember.run.later(service, function() {
+              reject(new Error("remote was closed, authorization was denied, or a authentication message otherwise not received before the window closed."));
+            }, 100);
+          });
+
+          Ember.$(window).on('storage.torii', function(event){
+            var storageEvent = event.originalEvent;
+
+            var remoteIdFromEvent = PopupIdSerializer.deserialize(storageEvent.key);
+            if (remoteId === remoteIdFromEvent){
+              var data = parseMessage(storageEvent.newValue, keys);
+              localStorage.removeItem(storageEvent.key);
+              Ember.run(function() {
+                resolve(data);
+              });
+            }
+          });
+
+
+        })["finally"](function(){
+          // didClose will reject this same promise, but it has already resolved.
+          service.close();
+
+          Ember.$(window).off('storage.torii');
+        });
+      },
+
+      close: function(){
+        if (this.remote) {
+          this.closeRemote();
+          this.remote = null;
+          this.trigger('didClose');
+        }
+        this.cleanUp();
+      },
+
+      cleanUp: function(){
+        this.clearTimeout();
+      },
+
+
+      schedulePolling: function(){
+        this.polling = Ember.run.later(this, function(){
+          this.pollRemote();
+          this.schedulePolling();
+        }, 35);
+      },
+
+      // Clear the timeout, in case it hasn't fired.
+      clearTimeout: function(){
+        Ember.run.cancel(this.timeout);
+        this.timeout = null;
+      },
+
+      stopPolling: on('didClose', function(){
+        Ember.run.cancel(this.polling);
+      })
+
+
+
+    });
+
+    __exports__["default"] = ServicesMixin;
+  });
 define("torii/providers/azure-ad-oauth2", 
   ["torii/providers/oauth2-code","torii/configuration","exports"],
   function(__dependency1__, __dependency2__, __exports__) {
@@ -872,10 +1033,15 @@ define("torii/providers/azure-ad-oauth2",
     __exports__["default"] = AzureAdOauth2;
   });
 define("torii/providers/base", 
-  ["torii/lib/required-property","exports"],
-  function(__dependency1__, __exports__) {
+  ["torii/lib/required-property","torii/lib/container-utils","torii/configuration","exports"],
+  function(__dependency1__, __dependency2__, __dependency3__, __exports__) {
     "use strict";
     var requiredProperty = __dependency1__["default"];
+    var getOwner = __dependency2__.getOwner;
+    var configurable = __dependency3__.configurable;
+    var configuration = __dependency3__["default"];
+
+    var DEFAULT_REMOTE_SERVICE_NAME = 'popup';
 
     var computed = Ember.computed;
 
@@ -896,9 +1062,21 @@ define("torii/providers/base",
        * that holds config information for this provider.
        * @property {string} configNamespace
        */
-      configNamespace: computed('name', function(){
+      configNamespace: computed('name', function() {
         return 'providers.'+this.get('name');
-      })
+      }),
+
+      popup: computed('configuredRemoteServiceName', function() {
+        var owner = getOwner(this);
+        var remoteServiceName = (
+          this.get('configuredRemoteServiceName') ||
+          configuration.remoteServiceName ||
+          DEFAULT_REMOTE_SERVICE_NAME
+        );
+        return owner.lookup('torii-service:'+remoteServiceName);
+      }),
+
+      configuredRemoteServiceName: configurable('remoteServiceName', null)
 
     });
 
@@ -1235,11 +1413,11 @@ define("torii/providers/oauth1",
         return requestTokenUri;
       },
 
-      open: function(){
+      open: function(options){
         var name        = this.get('name'),
             url         = this.buildRequestTokenUrl();
 
-        return this.get('popup').open(url, ['code']).then(function(authData){
+        return this.get('popup').open(url, ['code'], options).then(function(authData){
           authData.provider = name;
           return authData;
         });
@@ -1267,13 +1445,13 @@ define("torii/providers/oauth2-bearer",
        * If there was an error or the user either canceled the authorization or
        * closed the popup window, the promise rejects.
        */
-      open: function(){
+      open: function(options){
         var name        = this.get('name'),
             url         = this.buildUrl(),
             redirectUri = this.get('redirectUri'),
             responseParams = this.get('responseParams');
 
-        return this.get('popup').open(url, responseParams).then(function(authData){
+        return this.get('popup').open(url, responseParams, options).then(function(authData){
           var missingResponseParams = [];
 
           responseParams.forEach(function(param){
@@ -1438,7 +1616,7 @@ define("torii/providers/oauth2-code",
        * If there was an error or the user either canceled the authorization or
        * closed the popup window, the promise rejects.
        */
-      open: function(){
+      open: function(options){
         var name        = this.get('name'),
             url         = this.buildUrl(),
             redirectUri = this.get('redirectUri'),
@@ -1447,7 +1625,7 @@ define("torii/providers/oauth2-code",
             state = this.get('state'),
             shouldCheckState = responseParams.indexOf('state') !== -1;
 
-        return this.get('popup').open(url, responseParams).then(function(authData){
+        return this.get('popup').open(url, responseParams, options).then(function(authData){
           var missingResponseParams = [];
 
           responseParams.forEach(function(param){
@@ -1517,8 +1695,8 @@ define("torii/providers/twitter-oauth1",
     });
   });
 define("torii/redirect-handler", 
-  ["./lib/popup-id-serializer","./services/popup","exports"],
-  function(__dependency1__, __dependency2__, __exports__) {
+  ["./lib/popup-id-serializer","./mixins/ui-service-mixin","torii/configuration","exports"],
+  function(__dependency1__, __dependency2__, __dependency3__, __exports__) {
     "use strict";
     /**
      * RedirectHandler will attempt to find
@@ -1530,6 +1708,7 @@ define("torii/redirect-handler",
 
     var PopupIdSerializer = __dependency1__["default"];
     var CURRENT_REQUEST_KEY = __dependency2__.CURRENT_REQUEST_KEY;
+    var configuration = __dependency3__["default"];
 
     var RedirectHandler = Ember.Object.extend({
 
@@ -1543,7 +1722,12 @@ define("torii/redirect-handler",
             var url = windowObject.location.toString();
             windowObject.localStorage.setItem(pendingRequestKey, url);
 
-            windowObject.close();
+            var remoteServiceName = configuration.remoteServiceName || 'popup';
+            if(remoteServiceName === 'popup'){
+              // NOTE : If a single provider has been configured to use the 'iframe'
+              // service, this next line will still be called. It will just fail silently.
+              windowObject.close();
+            }
           } else{
             reject('Not a torii popup');
           }
@@ -1653,16 +1837,44 @@ define("torii/routing/authenticated-route-mixin",
       }
     });
   });
-define("torii/services/popup", 
-  ["torii/lib/parse-query-string","torii/lib/uuid-generator","torii/lib/popup-id-serializer","exports"],
-  function(__dependency1__, __dependency2__, __dependency3__, __exports__) {
+define("torii/services/iframe", 
+  ["torii/mixins/ui-service-mixin","torii/lib/uuid-generator","exports"],
+  function(__dependency1__, __dependency2__, __exports__) {
     "use strict";
-    var ParseQueryString = __dependency1__["default"];
+    var UiServiceMixin = __dependency1__["default"];
     var UUIDGenerator = __dependency2__["default"];
-    var PopupIdSerializer = __dependency3__["default"];
 
-    var CURRENT_REQUEST_KEY = '__torii_request';
-    __exports__.CURRENT_REQUEST_KEY = CURRENT_REQUEST_KEY;
+    var on = Ember.on;
+
+    var Iframe = Ember.Object.extend(Ember.Evented, UiServiceMixin, {
+
+      openRemote: function(url, pendingRequestKey, options){
+        this.remote = Ember.$('<iframe src="'+url+'" id="torii-iframe"></iframe>');
+        var iframeParent = '.torii-iframe-placeholder';
+        Ember.$(iframeParent).append(this.remote);
+      },
+
+      closeRemote: function(){
+        this.remote.remove();
+      },
+
+      pollRemote: function(){
+        if (Ember.$('#torii-iframe').length === 0) {
+          this.trigger('didClose');
+        }
+      }
+
+    });
+
+    __exports__["default"] = Iframe;
+  });
+define("torii/services/popup", 
+  ["torii/mixins/ui-service-mixin","torii/lib/uuid-generator","exports"],
+  function(__dependency1__, __dependency2__, __exports__) {
+    "use strict";
+    var UiServiceMixin = __dependency1__["default"];
+    var UUIDGenerator = __dependency2__["default"];
+
     var on = Ember.on;
 
     function stringifyOptions(options){
@@ -1699,120 +1911,25 @@ define("torii/services/popup",
       }, options);
     }
 
-    function parseMessage(url, keys){
-      var parser = ParseQueryString.create({url: url, keys: keys}),
-          data = parser.parse();
-      return data;
-    }
+    var Popup = Ember.Object.extend(Ember.Evented, UiServiceMixin, {
 
-    var Popup = Ember.Object.extend(Ember.Evented, {
-
-      init: function() {
-        this.popupIdGenerator = this.popupIdGenerator || UUIDGenerator;
+      // Open a popup window.
+      openRemote: function(url, pendingRequestKey, options){
+        var optionsString = stringifyOptions(prepareOptions(options || {}));
+        this.remote = window.open(url, pendingRequestKey, optionsString);
       },
 
-      // Open a popup window. Returns a promise that resolves or rejects
-      // accoring to if the popup is redirected with arguments in the URL.
-      //
-      // For example, an OAuth2 request:
-      //
-      // popup.open('http://some-oauth.com', ['code']).then(function(data){
-      //   // resolves with data.code, as from http://app.com?code=13124
-      // });
-      //
-      open: function(url, keys, options){
-        var service   = this,
-            lastPopup = this.popup;
-
-
-        return new Ember.RSVP.Promise(function(resolve, reject){
-          if (lastPopup) {
-            service.close();
-          }
-
-          var popupId = service.popupIdGenerator.generate();
-
-          var optionsString = stringifyOptions(prepareOptions(options || {}));
-          var pendingRequestKey = PopupIdSerializer.serialize(popupId);
-          localStorage.setItem(CURRENT_REQUEST_KEY, pendingRequestKey);
-          service.popup = window.open(url, pendingRequestKey, optionsString);
-
-          if (service.popup && !service.popup.closed) {
-            service.popup.focus();
-          } else {
-            reject(new Error(
-              'Popup could not open or was closed'));
-            return;
-          }
-
-          service.one('didClose', function(){
-            var pendingRequestKey = localStorage.getItem(CURRENT_REQUEST_KEY);
-            if (pendingRequestKey) {
-              localStorage.removeItem(pendingRequestKey);
-              localStorage.removeItem(CURRENT_REQUEST_KEY);
-            }
-            // If we don't receive a message before the timeout, we fail. Normally,
-            // the message will be received and the window will close immediately.
-            service.timeout = Ember.run.later(service, function() {
-              reject(new Error("Popup was closed, authorization was denied, or a authentication message otherwise not received before the window closed."));
-            }, 100);
-          });
-
-          Ember.$(window).on('storage.torii', function(event){
-            var storageEvent = event.originalEvent;
-
-            var popupIdFromEvent = PopupIdSerializer.deserialize(storageEvent.key);
-            if (popupId === popupIdFromEvent){
-              var data = parseMessage(storageEvent.newValue, keys);
-              localStorage.removeItem(storageEvent.key);
-              Ember.run(function() {
-                resolve(data);
-              });
-            }
-          });
-
-          service.schedulePolling();
-
-        })["finally"](function(){
-          // didClose will reject this same promise, but it has already resolved.
-          service.close();
-          service.clearTimeout();
-          Ember.$(window).off('storage.torii');
-        });
+      closeRemote: function(){
       },
 
-      close: function(){
-        if (this.popup) {
-          this.popup = null;
-          this.trigger('didClose');
-        }
-      },
-
-      pollPopup: function(){
-        if (!this.popup) {
+      pollRemote: function(){
+        if (!this.remote) {
           return;
         }
-        if (this.popup.closed) {
+        if (this.remote.closed) {
           this.trigger('didClose');
         }
-      },
-
-      schedulePolling: function(){
-        this.polling = Ember.run.later(this, function(){
-          this.pollPopup();
-          this.schedulePolling();
-        }, 35);
-      },
-
-      // Clear the timeout, in case it hasn't fired.
-      clearTimeout: function(){
-        Ember.run.cancel(this.timeout);
-        this.timeout = null;
-      },
-
-      stopPolling: on('didClose', function(){
-        Ember.run.cancel(this.polling);
-      }),
+      }
 
     });
 
