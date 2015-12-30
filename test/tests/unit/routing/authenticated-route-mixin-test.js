@@ -129,6 +129,34 @@ test('failed authentication causes accessDenied action to be sent', function(ass
     });
 });
 
+test('failed authentication causes accessDenied action to be sent with transition', function(assert){
+  assert.expect(2);
+  var fetchCalled = false;
+  var sentTransition;
+  var transition = {
+    targetName: 'custom.route'
+  };
+
+  var route = createAuthenticatedRoute({
+    session: {
+      isAuthenticated: undefined,
+      fetch: function(){
+        fetchCalled = true;
+        return Ember.RSVP.reject();
+      }
+    },
+    
+    accessDenied: function(transition) {
+      sentTransition = transition;
+    }
+  });
+  return route.authenticate(transition)
+    .then(function(){
+      assert.ok(fetchCalled, 'fetch default provider was called');
+      assert.deepEqual(sentTransition, transition, 'transition was sent');
+    });
+});
+
 function createAuthenticatedRoute(attrs) {
   return Ember.Router.extend(AuthenticatedRouteMixin, attrs).create()
 }
