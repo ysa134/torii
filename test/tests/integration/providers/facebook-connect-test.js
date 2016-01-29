@@ -1,8 +1,9 @@
-var torii, container, registry;
+var torii, app;
 
 import buildFBMock from 'test/helpers/build-fb-mock';
-import toriiContainer from 'test/helpers/torii-container';
 import configuration from 'torii/configuration';
+import startApp from 'test/helpers/start-app';
+import lookup from 'test/helpers/lookup';
 
 var originalConfiguration = configuration.providers['facebook-connect'],
     originalGetScript = $.getScript,
@@ -10,10 +11,8 @@ var originalConfiguration = configuration.providers['facebook-connect'],
 
 module('Facebook Connect - Integration', {
   setup: function(){
-    var results = toriiContainer();
-    registry = results[0];
-    container = results[1];
-    torii = container.lookup('service:torii');
+    app = startApp({loadInitializers: true});
+    torii = lookup(app, 'service:torii');
     configuration.providers['facebook-connect'] = {appId: 'dummy'};
     window.FB = buildFBMock();
   },
@@ -21,7 +20,7 @@ module('Facebook Connect - Integration', {
     window.FB = originalFB;
     configuration.providers['facebook-connect'] = originalConfiguration;
     $.getScript = originalGetScript;
-    Ember.run(container, 'destroy');
+    Ember.run(app, 'destroy');
   }
 });
 

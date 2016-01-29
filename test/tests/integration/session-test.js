@@ -1,24 +1,23 @@
-var container, session, user, adapter, registry;
+var session, user, adapter, app;
 
-import toriiContainer from 'test/helpers/torii-container';
 import SessionService from 'torii/services/torii-session';
 import DummyAdapter from 'test/helpers/dummy-adapter';
 import DummySuccessProvider from 'test/helpers/dummy-success-provider';
 import DummyFailureProvider from 'test/helpers/dummy-failure-provider';
+import startApp from 'test/helpers/start-app';
+import lookup from 'test/helpers/lookup';
 
 module('Session (open) - Integration', {
   setup: function(){
-    var results = toriiContainer();
-    registry = results[0];
-    container = results[1];
-    registry.register('service:session', SessionService);
-    registry.register('torii-provider:dummy-success', DummySuccessProvider);
-    registry.register('torii-provider:dummy-failure', DummyFailureProvider);
-    registry.injection('service:session', 'torii', 'service:torii');
-    session = container.lookup('service:session');
+    app = startApp({loadInitializers: true});
+    app.register('service:session', SessionService);
+    app.register('torii-provider:dummy-success', DummySuccessProvider);
+    app.register('torii-provider:dummy-failure', DummyFailureProvider);
+    app.inject('service:session', 'torii', 'service:torii');
+    session = lookup(app, 'service:session');
   },
   teardown: function(){
-    Ember.run(container, 'destroy');
+    Ember.run(app, 'destroy');
   }
 });
 
@@ -28,7 +27,7 @@ test("session starts in unauthenticated unopened state", function(){
 });
 
 test("starting auth sets isOpening to true", function(){
-  var provider = container.lookup('torii-provider:dummy-success');
+  var provider = lookup(app, 'torii-provider:dummy-success');
   var oldOpen = provider.open;
 
   provider.open = function(){
@@ -38,14 +37,14 @@ test("starting auth sets isOpening to true", function(){
     return oldOpen.apply(this, arguments);
   };
 
-  registry.register("torii-adapter:dummy-success", DummyAdapter);
+  app.register("torii-adapter:dummy-success", DummyAdapter);
   Ember.run(function(){
     session.open('dummy-success');
   });
 });
 
 test("successful auth sets isAuthenticated to true", function(){
-  registry.register("torii-adapter:dummy-success", DummyAdapter);
+  app.register("torii-adapter:dummy-success", DummyAdapter);
   Ember.run(function(){
     session.open('dummy-success').then(function(){
       ok(!session.get('isOpening'), 'session is no longer opening');
@@ -70,13 +69,11 @@ test("failed auth sets isAuthenticated to false, sets error", function(){
 
 module('Session (close) - Integration', {
   setup: function(){
-    var results = toriiContainer();
-    registry = results[0];
-    container = results[1];
-    registry.register('service:session', SessionService);
-    registry.injection('service:session', 'torii', 'service:torii');
-    session = container.lookup('service:session');
-    adapter = container.lookup('torii-adapter:application');
+    app = startApp({loadInitializers: true});
+    app.register('service:session', SessionService);
+    app.inject('service:session', 'torii', 'service:torii');
+    session = lookup(app, 'service:session');
+    adapter = lookup(app, 'torii-adapter:application');
 
     // Put the session in an open state
     user = {email: 'fake@fake.com'};
@@ -84,7 +81,7 @@ module('Session (close) - Integration', {
     session.get('stateMachine').send('finishOpen', { currentUser: user});
   },
   teardown: function(){
-    Ember.run(container, 'destroy');
+    Ember.run(app, 'destroy');
   }
 });
 

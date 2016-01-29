@@ -1,6 +1,7 @@
-var torii, container, registry;
+var torii, app;
 
-import toriiContainer from 'test/helpers/torii-container';
+import startApp from 'test/helpers/start-app';
+import lookup from 'test/helpers/lookup';
 import configuration from 'torii/configuration';
 
 var originalConfiguration = configuration.providers['edmodo-connect'];
@@ -9,19 +10,17 @@ var opened, mockPopup;
 
 module('Edmodo Connect - Integration', {
   setup: function(){
-    var results = toriiContainer();
-    registry = results[0];
-    container = results[1];
+    app = startApp({loadInitializers: true});
     mockPopup = {
       open: function(){
         opened = true;
         return Ember.RSVP.resolve({ access_token: 'test' });
       }
     };
-    registry.register('torii-service:mock-popup', mockPopup, {instantiate: false});
-    registry.injection('torii-provider', 'popup', 'torii-service:mock-popup');
+    app.register('torii-service:mock-popup', mockPopup, {instantiate: false});
+    app.inject('torii-provider', 'popup', 'torii-service:mock-popup');
 
-    torii = container.lookup("service:torii");
+    torii = lookup(app, "service:torii");
     configuration.providers['edmodo-connect'] = {
       apiKey: 'dummy',
       redirectUri: 'some url'
@@ -30,7 +29,7 @@ module('Edmodo Connect - Integration', {
   teardown: function(){
     opened = false;
     configuration.providers['edmodo-connect'] = originalConfiguration;
-    Ember.run(container, 'destroy');
+    Ember.run(app, 'destroy');
   }
 });
 

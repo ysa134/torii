@@ -1,9 +1,6 @@
 import startApp from 'test/helpers/start-app';
 import configuration from 'torii/configuration';
-
-function lookup(app, key) {
-  return app.__container__.lookup(key);
-}
+import lookup from 'test/helpers/lookup';
 
 function lookupFactory(app, key) {
   return app.__container__.lookupFactory(key);
