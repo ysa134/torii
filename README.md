@@ -440,7 +440,10 @@ A minimal provider:
 ```JavaScript
 // app/torii-providers/geocities.js
 export default Ember.Object.extend({
-  // create a new authorization
+  // Create a new authorization.
+  // When your code calls `this.get('torii').open('geocities', options)`,
+  // the `options` will be passed to this provider's `open` method.
+  
   open: function(options) {
     return new Ember.RSVP.Promise(function(resolve, reject){
       // resolve with an authorization object
@@ -486,11 +489,15 @@ export default Ember.Route.extend({
     openGeocities: function(username, password){
       var route = this;
       var providerName = 'geocities';
-      // argument to open is passed into the provider
-      this.get('torii').open(providerName, {
+
+      // The options to `this.get('torii').open(providerName, options)` will
+      // be passed to the provider's `open` method.
+      var options = {
         username: username,
         password: password
-      }).then(function(authorization){
+      };
+      
+      this.get('torii').open(providerName, options).then(function(authorization){
         // authorization as returned by the provider
         route.somethingWithGeocitiesToken(authorization.sessionToken);
       });
