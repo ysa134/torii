@@ -1,6 +1,6 @@
 /**
- * Torii version: 0.7.0-beta1
- * Built: Fri Dec 18 2015 16:40:30 GMT-0500 (EST)
+ * Torii version: 0.7.0-beta.4
+ * Built: Fri Jan 29 2016 16:52:36 GMT-0500 (EST)
  */
 define("torii/adapters/application", 
   ["exports"],
@@ -131,15 +131,6 @@ define("torii/bootstrap/torii",
 
       application.register('torii-service:iframe', IframeService);
       application.register('torii-service:popup', PopupService);
-
-      if (window.DS) {
-        var storeFactoryName = 'store:main';
-        if (hasRegistration(application, 'service:store')) {
-          storeFactoryName = 'service:store';
-        }
-        application.inject('torii-provider', 'store', storeFactoryName);
-        application.inject('torii-adapter', 'store', storeFactoryName);
-      }
     }
   });
 define("torii/components/torii-iframe-placeholder", 
@@ -249,10 +240,6 @@ define("torii/initializers/initialize-torii",
         application.inject('route', 'torii', 'service:torii');
       }
     };
-
-    if (window.DS) {
-      initializer.after = 'store';
-    }
 
     __exports__["default"] = initializer;
   });
@@ -1396,21 +1383,13 @@ define("torii/providers/oauth1",
     var QueryString = __dependency3__["default"];
     var requiredProperty = __dependency4__["default"];
 
-    function currentUrl(){
-      return [window.location.protocol,
-              "//",
-              window.location.host,
-              window.location.pathname].join('');
-    }
-
     var Oauth1 = Provider.extend({
       name: 'oauth1',
 
       requestTokenUri: configurable('requestTokenUri'),
 
       buildRequestTokenUrl: function(){
-        var requestTokenUri = this.get('requestTokenUri');
-        return requestTokenUri;
+        return this.get('requestTokenUri');
       },
 
       open: function(options){
@@ -1833,7 +1812,7 @@ define("torii/routing/authenticated-route-mixin",
         }
       },
       accessDenied: function (transition) {
-        transition.send('accessDenied');
+        transition.send('accessDenied', transition);
       }
     });
   });
@@ -1936,10 +1915,11 @@ define("torii/services/popup",
     __exports__["default"] = Popup;
   });
 define("torii/services/torii-session", 
-  ["torii/session/state-machine","exports"],
-  function(__dependency1__, __exports__) {
+  ["torii/session/state-machine","torii/lib/container-utils","exports"],
+  function(__dependency1__, __dependency2__, __exports__) {
     "use strict";
     var createStateMachine = __dependency1__["default"];
+    var getOwner = __dependency2__.getOwner;
 
     var computed = Ember.computed;
     var on = Ember.on;
@@ -1972,7 +1952,7 @@ define("torii/services/torii-session",
       setUnknownProperty: Ember.K,
 
       open: function(provider, options){
-        var container = this.container,
+        var owner     = getOwner(this),
             torii     = this.get('torii'),
             sm        = this.get('stateMachine');
 
@@ -1983,7 +1963,7 @@ define("torii/services/torii-session",
           return torii.open(provider, options);
         }).then(function(authorization){
           var adapter = lookupAdapter(
-            container, provider
+            owner, provider
           );
 
           return adapter.open(authorization);
@@ -1997,7 +1977,7 @@ define("torii/services/torii-session",
       },
 
       fetch: function(provider, options){
-        var container = this.container,
+        var owner     = getOwner(this),
             sm        = this.get('stateMachine');
 
         return new Ember.RSVP.Promise(function(resolve){
@@ -2005,7 +1985,7 @@ define("torii/services/torii-session",
           resolve();
         }).then(function(){
           var adapter = lookupAdapter(
-            container, provider
+            owner, provider
           );
 
           return adapter.fetch(options);
@@ -2019,14 +1999,14 @@ define("torii/services/torii-session",
       },
 
       close: function(provider, options){
-        var container = this.container,
+        var owner     = getOwner(this),
             sm        = this.get('stateMachine');
 
         return new Ember.RSVP.Promise(function(resolve){
           sm.send('startClose');
           resolve();
         }).then(function(){
-          var adapter = lookupAdapter(container, provider);
+          var adapter = lookupAdapter(owner, provider);
           return adapter.close(options);
         }).then(function(){
           sm.send('finishClose');
@@ -2038,17 +2018,19 @@ define("torii/services/torii-session",
     });
   });
 define("torii/services/torii", 
-  ["exports"],
-  function(__exports__) {
+  ["torii/lib/container-utils","exports"],
+  function(__dependency1__, __exports__) {
     "use strict";
+    var getOwner = __dependency1__.getOwner;
+
     function lookupProvider(container, providerName){
       return container.lookup('torii-provider:'+providerName);
     }
 
     function proxyToProvider(methodName, requireMethod){
       return function(providerName, options){
-        var container = this.container;
-        var provider = lookupProvider(container, providerName);
+        var owner = getOwner(this);
+        var provider = lookupProvider(owner, providerName);
         if (!provider) {
           throw new Error("Expected a provider named '"+providerName+"' " +
                           ", did you forget to register it?");
@@ -2074,7 +2056,8 @@ define("torii/services/torii",
      * Linked In via Oauth2 and authorization codes by doing
      * the following:
      *
-     *     Torii.open('linked-in-oauth2').then(function(authData){
+     *     var options = {foo: 'bar'};
+     *     Torii.open('linked-in-oauth2', options).then(function(authData){
      *       console.log(authData.authorizationCode);
      *     });
      *
@@ -2092,7 +2075,8 @@ define("torii/services/torii",
        * namespace.
        *
        * @method open
-       * @param {String} providerName The provider to open
+       * @param {String} providerName The provider to call `open` on
+       * @param {Object} [options] options to pass to the provider's `open` method
        * @return {Ember.RSVP.Promise} Promise resolving to an authentication object
        */
       open:  proxyToProvider('open', true),
@@ -2102,7 +2086,8 @@ define("torii/services/torii",
        * already been opened.
        *
        * @method fetch
-       * @param {String} providerName The provider to open
+       * @param {String} providerName The provider to call `fetch` on
+       * @param {Object} [options] options to pass to the provider's `fetch` method
        * @return {Ember.RSVP.Promise} Promise resolving to an authentication object
        */
       fetch:  proxyToProvider('fetch'),
@@ -2113,7 +2098,8 @@ define("torii/services/torii",
        * and may be better handled by torii's session management instead.
        *
        * @method close
-       * @param {String} providerName The provider to open
+       * @param {String} providerName The provider to call `close` on
+       * @param {Object} [options] options to pass to the provider's `close` method
        * @return {Ember.RSVP.Promise} Promise resolving when the provider is closed
        */
       close:  proxyToProvider('close')
