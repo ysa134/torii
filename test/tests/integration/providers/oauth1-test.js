@@ -1,8 +1,9 @@
-import toriiContainer from 'test/helpers/torii-container';
 import OAuth1Provider from 'torii/providers/oauth1';
 import configuration from 'torii/configuration';
+import startApp from 'test/helpers/start-app';
+import lookup from 'test/helpers/lookup';
 
-var torii, container, registry;
+var torii, app;
 
 var opened, openedUrl, mockPopup = {
   open: function(url){
@@ -18,21 +19,19 @@ var originalConfiguration = configuration.providers[providerName];
 
 module('Oauth1 - Integration', {
   setup: function(){
-    var results = toriiContainer();
-    registry = results[0];
-    container = results[1];
-    registry.register('torii-service:mock-popup', mockPopup, {instantiate: false});
-    registry.injection('torii-provider', 'popup', 'torii-service:mock-popup');
+    app = startApp({loadInitializers: true});
+    app.register('torii-service:mock-popup', mockPopup, {instantiate: false});
+    app.inject('torii-provider', 'popup', 'torii-service:mock-popup');
 
-    registry.register('torii-provider:'+providerName, OAuth1Provider);
+    app.register('torii-provider:'+providerName, OAuth1Provider);
 
-    torii = container.lookup("service:torii");
+    torii = lookup(app, "service:torii");
     configuration.providers[providerName] = {requestTokenUri: requestTokenUri};
   },
   teardown: function(){
     opened = false;
     configuration.providers[providerName] = originalConfiguration;
-    Ember.run(container, 'destroy');
+    Ember.run(app, 'destroy');
   }
 });
 

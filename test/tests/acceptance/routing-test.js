@@ -1,10 +1,7 @@
 import startApp from 'test/helpers/start-app';
 import configuration from 'torii/configuration';
 import AuthenticatedRouteMixin from 'torii/routing/authenticated-route-mixin';
-
-function lookup(app, key) {
-  return app.__container__.lookup(key);
-}
+import lookup from 'test/helpers/lookup';
 
 var app, originalSessionServiceName;
 
