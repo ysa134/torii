@@ -678,7 +678,7 @@ test('shows something when signed in', function(assert) {
   * `npm install`
   * `bower install`
 
-The torii example apps (at facebook, google, linkedin, etc) are all
+The torii example apps (at Facebook, Google, LinkedIn, etc.) are all
 configured to use
 `http://torii-example.com:8000/example/basic.html` as their redirect
 uri, so you will need to make an alias in your hosts file that points
