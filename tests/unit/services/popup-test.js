@@ -156,3 +156,25 @@ test("open rejects when window closes", function(assert){
 
   mockWindow.closed = true;
 });
+
+test("localStorage state is cleaned up when parent window closes", function(assert){
+  var mockWindow = buildMockWindow();
+  window.open = function(){
+    assert.ok(true, 'calls window.open');
+    return mockWindow;
+  };
+
+  Ember.run(function(){
+    popup.open('some-url', ['code']).then(function(){
+      assert.ok(false, 'resolved the open promise');
+    }, function(){
+      assert.ok(false, 'rejected the open promise');
+    });
+  });
+
+  window.onbeforeunload();
+
+  assert.notOk(localStorage.getItem(CURRENT_REQUEST_KEY), "adds the key to the current request item");
+
+});
+
