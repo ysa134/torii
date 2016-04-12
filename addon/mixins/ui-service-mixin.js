@@ -47,6 +47,14 @@ var ServicesMixin = Ember.Mixin.create({
       service.openRemote(url, pendingRequestKey, options);
       service.schedulePolling();
 
+      var onbeforeunload = window.onbeforeunload;
+      window.onbeforeunload = function() {
+        if (typeof onbeforeunload === 'function') {
+          onbeforeunload();
+        }
+        service.close();
+      };
+
       if (service.remote && !service.remote.closed) {
         service.remote.focus();
       } else {
