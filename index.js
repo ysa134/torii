@@ -4,10 +4,20 @@
 module.exports = {
   name: 'torii',
   included: function(app) {
-    var toriiConfig = this.app.project.config(app.env)['torii'];
+    var hostApp = this._findApp(app);
+    var toriiConfig = hostApp.project.config(app.env)['torii'];
     if (!toriiConfig) {
       console.warn('Torii is installed but not configured in config/environment.js!');
     }
+
     this._super.included(app);
+  },
+
+  _findApp: function(hostApp) {
+    var app = this.app || hostApp;
+    while (app.app) {
+      app = app.app;
+    }
+    return app;
   }
 };
