@@ -368,14 +368,7 @@ module.exports = function(environment) {
 };
 ```
 
-Once your provider has been configured you need to tell torii where to
-append the iframe when you call `session.open` by using the
-`{{torii-iframe-placeholder}}` component. You need to make sure that
-this component is added to the DOM before you call `session.open` and if
-you give the user a way to back out of authentication (by closing a
-modal that contains the iframe, for instance) you need to make sure that
-the component is removed from the DOM so that torii will see that the
-auth flow has been cancelled.
+Tell torii where to append the iframe when provider has been configured. Use the {{torii-iframe-placeholder}} component to call session.open. Make sure that adding the component to the DOM before calling session.open. Remove the component from the DOM if user can back out of authentication (by closing a modal that contains the iframe). Torii should know that the auth flow has been cancelled.
 
 For instance, in `routes/application.js` you might have the following
 `signIn` action:
